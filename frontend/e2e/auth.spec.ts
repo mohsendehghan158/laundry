@@ -20,14 +20,15 @@ test("sends a signed-out visitor to login and back to the page they asked for", 
 test("the owner sees every management page in the menu", async ({ page }) => {
   await loginAndWait(page, "admin");
   await expect(page.getByRole("heading", { name: "سلام مدیر سامانه" })).toBeVisible();
-  for (const name of ["داشبورد", "شعبه‌ها", "کاربران", "نقش‌ها و مجوزها", "تنظیمات", "لاگ فعالیت"]) {
+  for (const name of ["داشبورد", "کاتالوگ و قیمت", "شعبه‌ها", "کاربران", "نقش‌ها و مجوزها", "تنظیمات", "لاگ فعالیت"]) {
     await expect(sidebar(page).getByRole("link", { name })).toBeVisible();
   }
 });
 
-test("a cashier only sees the dashboard and cannot open management pages", async ({ page }) => {
+test("a cashier sees the dashboard and catalog but cannot open management pages", async ({ page }) => {
   await loginAndWait(page, "cashier");
   await expect(sidebar(page).getByRole("link", { name: "داشبورد" })).toBeVisible();
+  await expect(sidebar(page).getByRole("link", { name: "کاتالوگ و قیمت" })).toBeVisible();
   await expect(sidebar(page).getByRole("link", { name: "کاربران" })).toHaveCount(0);
   await expect(sidebar(page).getByRole("link", { name: "شعبه‌ها" })).toHaveCount(0);
 

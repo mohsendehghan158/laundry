@@ -15,6 +15,17 @@ export type Role = Schemas["RoleResource"];
 export type Activity = Schemas["ActivityResource"];
 export type Organization = Schemas["OrganizationResource"];
 
+export type ServiceType = Schemas["ServiceTypeResource"];
+export type ItemCategory = Schemas["ItemCategoryResource"];
+export type Item = Schemas["ItemResource"];
+export type Upcharge = Schemas["UpchargeResource"];
+export type TurnaroundTier = Schemas["TurnaroundTierResource"];
+export type DefectType = Schemas["DefectTypeResource"];
+export type Color = Schemas["ColorResource"];
+export type PriceUnit = Schemas["PriceUnit"];
+export type UpchargeType = Schemas["UpchargeType"];
+export type DefectKind = Schemas["DefectKind"];
+
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
 export type UpdateBranchInput = Schemas["UpdateBranchRequest"];
@@ -30,6 +41,8 @@ type Json<O, S extends number = 200> = O extends { responses: Record<S, { conten
 
 export type Settings = Json<operations["setting.show"]>["data"];
 export type PermissionGroup = Json<operations["role.permissions"]>["data"][number];
+export type CounterCatalog = Json<operations["catalog.catalog"]>["data"];
+export type PriceCell = Json<operations["price.index"]>["data"][number];
 
 /** Laravel's paginated resource collection. */
 export type Paginated<T> = {

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
 {
     public const string PASSWORD = 'password';
 
-    public function run(SyncPermissions $syncPermissions): void
+    public function run(SyncPermissions $syncPermissions, DemoCatalogSeeder $catalog): void
     {
         $syncPermissions->handle();
 
@@ -37,6 +37,8 @@ class DatabaseSeeder extends Seeder
         $this->user($organization, 'حسین موسوی', 'operator', 'plant_operator', [$plant]);
         $this->user($organization, 'رضا نوری', 'driver', 'driver', [$central, $west]);
         $this->user($organization, 'نرگس صادقی', 'accountant', 'accountant', []);
+
+        $catalog->run($organization->id);
     }
 
     private function branch(

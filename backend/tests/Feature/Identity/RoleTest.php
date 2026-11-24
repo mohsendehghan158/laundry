@@ -53,7 +53,7 @@ it('replaces the permissions of a role and takes effect immediately', function (
     $entry = Activity::query()->where('log_name', 'role')->oldest('id')->firstOrFail();
     expect($entry->attribute_changes->all())->toBe([
         'attributes' => ['permissions' => ['branches.view', 'users.view']],
-        'old' => ['permissions' => []],
+        'old' => ['permissions' => ['catalog.view']],
     ]);
 });
 
@@ -119,4 +119,26 @@ it('syncs permissions without undoing an administrator\'s changes', function () 
     expect($role->fresh()->permissions->pluck('name')->all())->toBe(['branches.view'])
         ->and(Permission::query()->where('name', 'legacy.permission')->exists())->toBeFalse()
         ->and(Permission::query()->count())->toBe(count(PermissionRegistry::all()));
+});
+
+it('grants a newly released permission to the built-in roles that have it by default, once', function () {
+    $manager = Role::findByName('branch_manager');
+    $accountant = Role::findByName('accountant');
+    // Simulate an install made before "branches.view" existed: the
+    // permission is gone and the administrator also trimmed the accountant.
+    Permission::findByName('branches.view')->delete();
+    $accountant->syncPermissions(['settings.view']);
+
+    app(SyncPermissions::class)->handle();
+
+    expect($manager->fresh()->hasPermissionTo('branches.view'))->toBeTrue()
+        ->and($accountant->fresh()->hasPermissionTo('branches.view'))->toBeTrue()
+        ->and($accountant->fresh()->hasPermissionTo('branches.access_all'))->toBeFalse()
+        ->and(Role::findByName('cashier')->hasPermissionTo('branches.view'))->toBeFalse();
+
+    // Removing it again is respected by the next sync.
+    $manager->revokePermissionTo('branches.view');
+    app(SyncPermissions::class)->handle();
+
+    expect($manager->fresh()->hasPermissionTo('branches.view'))->toBeFalse();
 });

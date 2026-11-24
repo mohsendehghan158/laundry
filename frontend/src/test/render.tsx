@@ -16,7 +16,7 @@ export function makeUser(overrides: Partial<AuthUser> = {}): AuthUser {
     email: null,
     mobile: null,
     locale: "fa",
-    organization: { id: 1, name: "خشکشویی نمونه" },
+    organization: { id: 1, name: "خشکشویی نمونه", currency_unit: "toman" },
     roles: ["branch_manager"],
     permissions: [],
     branches: [{ id: 1, name: "شعبه مرکزی", code: "T1", type: "hybrid" }],

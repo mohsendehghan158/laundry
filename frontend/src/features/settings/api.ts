@@ -21,7 +21,11 @@ export function useUpdateSettings() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: UpdateSettingsInput) => (await api.put<Wrapped<Settings>>("/settings", input)).data,
-    onSuccess: (settings) => queryClient.setQueryData(settingsKey, settings),
+    onSuccess: (settings) => {
+      queryClient.setQueryData(settingsKey, settings);
+      // The currency unit reaches every screen through /me.
+      queryClient.invalidateQueries({ queryKey: meKey });
+    },
   });
 }
 

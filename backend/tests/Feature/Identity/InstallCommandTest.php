@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Catalog\Models\ServiceType;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\Organization;
@@ -23,7 +24,8 @@ it('sets up an organization, its first branch and an owner who can sign in', fun
         ->and(Branch::query()->sole()->code)->toBe('T1')
         ->and($owner->username)->toBe('boss')
         ->and($owner->organization_id)->toBe($organization->id)
-        ->and($owner->isOwner())->toBeTrue();
+        ->and($owner->isOwner())->toBeTrue()
+        ->and(ServiceType::query()->withoutGlobalScopes()->where('organization_id', $organization->id)->count())->toBe(4);
 
     $this->postJson('/api/v1/auth/login', ['username' => 'boss', 'password' => 'a-strong-password'])->assertOk();
 });

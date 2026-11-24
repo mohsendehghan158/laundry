@@ -34,3 +34,8 @@ body {
   unicode-bidi: plaintext;
   text-align: left;
 }
+
+/* Disabled catalog records stay listed but recede. */
+.catalog-row-inactive > td {
+  opacity: 0.55;
+}

@@ -7,7 +7,7 @@ import { applyFormErrors, errorMessage } from "@/shared/api/formErrors";
 import type { Settings } from "@/shared/api/types";
 import { usePermission } from "@/shared/hooks/usePermission";
 import { parseAmount } from "@/shared/lib/money";
-import { formatNumber } from "@/shared/lib/digits";
+import { inputNumberFormatter } from "@/shared/lib/digits";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { useOrganization, useSettings, useUpdateOrganization, useUpdateSettings } from "../api";
 
@@ -123,7 +123,7 @@ function SettingsForm({ section }: { section: "general" | "tax" | "receipt" }) {
               max={100}
               step={0.5}
               style={{ width: 160 }}
-              formatter={(value, info) => (info.userTyping ? info.input : value === undefined || value === null ? "" : formatNumber(Number(value)))}
+              formatter={inputNumberFormatter}
               parser={(text) => parseAmount(text) ?? 0}
             />
           </Form.Item>

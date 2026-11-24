@@ -11,8 +11,10 @@ use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Brings the permission and role tables in line with PermissionRegistry.
- * Safe to run on every deploy: it never touches permissions an
- * administrator has already granted to or removed from an existing role.
+ * Safe to run on every deploy: permissions that already existed are never
+ * granted or revoked again, so an administrator's changes to a role stay.
+ * A permission introduced by a new release is granted once to the
+ * built-in roles that have it by default.
  */
 final class SyncPermissions
 {
@@ -21,6 +23,8 @@ final class SyncPermissions
     public function handle(): void
     {
         $names = PermissionRegistry::all();
+        $existing = Permission::query()->pluck('name')->all();
+        $introduced = array_values(array_diff($names, $existing));
 
         foreach ($names as $name) {
             Permission::findOrCreate($name);
@@ -37,6 +41,14 @@ final class SyncPermissions
             if (! $role->exists) {
                 $role->save();
                 $role->syncPermissions($permissions);
+
+                continue;
+            }
+
+            $newDefaults = array_values(array_intersect($permissions, $introduced));
+
+            if ($newDefaults !== []) {
+                $role->givePermissionTo($newDefaults);
             }
         }
 

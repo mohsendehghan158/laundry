@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Console;
 
+use App\Modules\Catalog\Actions\CreateDefaultCatalog;
 use App\Modules\Identity\Actions\SyncPermissions;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Support\PermissionRegistry;
@@ -32,7 +33,7 @@ use function Laravel\Prompts\text;
 #[Description('Set up a fresh installation: organization, first branch and owner account')]
 class InstallCommand extends Command
 {
-    public function handle(SyncPermissions $syncPermissions): int
+    public function handle(SyncPermissions $syncPermissions, CreateDefaultCatalog $createDefaultCatalog): int
     {
         if (Organization::query()->exists()) {
             $this->components->error('An organization already exists; nothing was changed.');
@@ -66,7 +67,7 @@ class InstallCommand extends Command
             return self::FAILURE;
         }
 
-        DB::transaction(function () use ($input, $syncPermissions): void {
+        DB::transaction(function () use ($input, $syncPermissions, $createDefaultCatalog): void {
             $syncPermissions->handle();
 
             $organization = Organization::query()->create([
@@ -87,6 +88,8 @@ class InstallCommand extends Command
                 'username' => $input['username'],
                 'password' => $input['password'],
             ])->assignRole(PermissionRegistry::OWNER);
+
+            $createDefaultCatalog->handle($organization->id);
         });
 
         $this->components->info("Installed. Sign in as \"{$input['username']}\".");

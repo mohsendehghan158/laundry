@@ -56,7 +56,8 @@
     "settings": "Settings",
     "activity": "Activity log",
     "account": "My account",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "catalog": "Catalog & prices"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -145,7 +146,8 @@
       "users": "Users",
       "roles": "Roles",
       "settings": "Settings",
-      "activity": "Activity log"
+      "activity": "Activity log",
+      "catalog": "Catalog & prices"
     },
     "permissions": {
       "organization": {
@@ -174,6 +176,10 @@
       },
       "activity": {
         "view": "View the activity log"
+      },
+      "catalog": {
+        "view": "View catalog and prices",
+        "manage": "Edit catalog and prices"
       }
     }
   },
@@ -224,7 +230,8 @@
       "branch": "Branches",
       "role": "Roles",
       "settings": "Settings",
-      "organization": "Organization"
+      "organization": "Organization",
+      "catalog": "Catalog & prices"
     },
     "events": {
       "created": "Created",
@@ -232,7 +239,8 @@
       "deleted": "Deleted",
       "login": "Signed in",
       "logout": "Signed out",
-      "roles_updated": "Roles changed"
+      "roles_updated": "Roles changed",
+      "prices_updated": "Prices changed"
     }
   },
   "account": {
@@ -244,5 +252,84 @@
     "confirmPassword": "Repeat new password",
     "mismatch": "The repeated password does not match.",
     "changed": "Password changed."
+  },
+  "catalog": {
+    "title": "Catalog & prices",
+    "readOnly": "You may only view the catalog.",
+    "tabs": {
+      "prices": "Price matrix",
+      "items": "Items",
+      "categories": "Categories",
+      "services": "Services",
+      "upcharges": "Upcharges",
+      "tiers": "Turnaround",
+      "defects": "Defects & stains",
+      "colors": "Colors"
+    },
+    "add": {
+      "service-types": "New service",
+      "item-categories": "New category",
+      "items": "New item",
+      "upcharges": "New upcharge",
+      "turnaround-tiers": "New tier",
+      "defect-types": "New entry",
+      "colors": "New color"
+    },
+    "edit": "Edit",
+    "deleteConfirm": "Delete “{name}”? Existing orders are not affected.",
+    "fields": {
+      "name": "Name",
+      "code": "Code",
+      "codeHelp": "Short code printed on tags and receipts, e.g. DC.",
+      "color": "Color",
+      "icon": "Icon",
+      "iconHelp": "An emoji for the counter's touch grid.",
+      "sortOrder": "Order",
+      "isActive": "Active",
+      "category": "Category",
+      "unit": "Unit",
+      "piecesPerUnit": "Pieces per unit",
+      "piecesPerUnitHelp": "How many tags one unit gets, e.g. 2 for a suit.",
+      "type": "Type",
+      "value": "Value",
+      "percent": "Percent",
+      "amount": "Amount",
+      "durationHours": "Duration (working hours)",
+      "surchargePercent": "Price increase (percent)",
+      "isDefault": "Default",
+      "kind": "Kind",
+      "hex": "Display color"
+    },
+    "units": {
+      "piece": "Piece",
+      "kg": "Kilogram",
+      "sqm": "Square metre"
+    },
+    "perUnit": {
+      "piece": "per piece",
+      "kg": "per kg",
+      "sqm": "per m²"
+    },
+    "upchargeTypes": {
+      "fixed": "Fixed amount",
+      "percent": "Percent"
+    },
+    "defectKinds": {
+      "defect": "Defect",
+      "stain": "Stain"
+    },
+    "default": "Default",
+    "hours": "{count, number} hours",
+    "matrix": {
+      "help": "Enter each item's price for each service. An empty cell means the service is not offered for that item.",
+      "unsaved": "{count, plural, =0 {No changes} one {# unsaved change} other {# unsaved changes}}",
+      "discard": "Discard changes",
+      "item": "Item",
+      "noItems": "No items yet. Start on the “Items” tab.",
+      "noServices": "No services yet.",
+      "allCategories": "All categories"
+    },
+    "codeInvalid": "Capital letters and digits only.",
+    "needCategory": "Create a category on the “Categories” tab first."
   }
 }

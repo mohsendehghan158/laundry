@@ -15,8 +15,8 @@ export type ActivityFilters = {
   per_page?: number;
 };
 
-export const LOG_NAMES = ["auth", "user", "branch", "role", "settings", "organization"] as const;
-export const EVENTS = ["created", "updated", "deleted", "login", "logout", "roles_updated"] as const;
+export const LOG_NAMES = ["auth", "user", "branch", "role", "settings", "organization", "catalog"] as const;
+export const EVENTS = ["created", "updated", "deleted", "login", "logout", "roles_updated", "prices_updated"] as const;
 
 export function useActivityLog(filters: ActivityFilters) {
   return useQuery({

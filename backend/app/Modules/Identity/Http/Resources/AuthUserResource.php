@@ -6,6 +6,7 @@ namespace App\Modules\Identity\Http\Resources;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
+use App\Modules\Organization\Support\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,6 +37,8 @@ class AuthUserResource extends JsonResource
             'organization' => [
                 'id' => $organization->id,
                 'name' => $organization->name,
+                /** @var 'toman'|'rial' Unit amounts are shown and typed in; they are always stored in rials. */
+                'currency_unit' => app(Settings::class)->get('general.currency_unit'),
             ],
             /** @var list<string> Role names. */
             'roles' => $this->roles->pluck('name')->values()->all(),

@@ -23,5 +23,7 @@ return [
         'user_last_owner' => 'At least one active owner must remain.',
         'role_owner_immutable' => 'The permissions of the owner role cannot be changed.',
         'role_permission_beyond_own' => 'You cannot grant a permission you do not hold yourself.',
+
+        'category_has_items' => 'This category still has items; move or delete them first.',
     ],
 ];

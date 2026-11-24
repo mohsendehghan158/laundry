@@ -107,6 +107,197 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show the counter catalog
+         * @description Everything the counter needs to take an order, in one response:
+         *     active services, categories with their active items, the price
+         *     matrix, upcharges, turnaround tiers, defects and colors. Prices are
+         *     whole rials per unit, keyed by item and service.
+         */
+        get: operations["catalog.catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/colors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List colors
+         * @description All of them, inactive included, in display order.
+         */
+        get: operations["colors.index"];
+        put?: never;
+        /** Create a color */
+        post: operations["colors.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/colors/{color}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a color */
+        put: operations["colors.update"];
+        post?: never;
+        /**
+         * Delete a color
+         * @description Orders that already use it keep their copy of the name and price.
+         */
+        delete: operations["colors.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/defect-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List defect types
+         * @description All of them, inactive included, in display order.
+         */
+        get: operations["defect-types.index"];
+        put?: never;
+        /** Create a defect type */
+        post: operations["defect-types.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/defect-types/{defectType}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a defect type */
+        put: operations["defect-types.update"];
+        post?: never;
+        /**
+         * Delete a defect type
+         * @description Orders that already use it keep their copy of the name and price.
+         */
+        delete: operations["defect-types.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List items
+         * @description All of them, inactive included, grouped by category in display order.
+         */
+        get: operations["items.index"];
+        put?: never;
+        /** Create an item */
+        post: operations["items.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/items/{item}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an item */
+        put: operations["items.update"];
+        post?: never;
+        /**
+         * Delete an item
+         * @description Orders that already use it keep their copy of the name and price.
+         */
+        delete: operations["items.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List item categories
+         * @description All of them, inactive included, in display order.
+         */
+        get: operations["item-categories.index"];
+        put?: never;
+        /** Create an item category */
+        post: operations["item-categories.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item-categories/{itemCategory}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an item category */
+        put: operations["item-categories.update"];
+        post?: never;
+        /**
+         * Delete an item category
+         * @description Fails with 409 `category_has_items` while items still belong to it.
+         */
+        delete: operations["item-categories.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me": {
         parameters: {
             query?: never;
@@ -155,6 +346,33 @@ export interface paths {
         get: operations["organization.show"];
         /** Update the current organization */
         put: operations["organization.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show the price matrix
+         * @description Every priced item × service pair of the default price list, in
+         *     whole rials per unit. A missing pair means the service is not
+         *     offered for that item.
+         */
+        get: operations["price.index"];
+        /**
+         * Set prices
+         * @description Changes only the listed cells; send `price: null` to remove one.
+         *     Returns the whole matrix afterwards.
+         */
+        put: operations["price.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -219,6 +437,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/service-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List service types
+         * @description All of them, inactive included, in display order.
+         */
+        get: operations["service-types.index"];
+        put?: never;
+        /** Create a service type */
+        post: operations["service-types.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-types/{serviceType}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a service type */
+        put: operations["service-types.update"];
+        post?: never;
+        /**
+         * Delete a service type
+         * @description Orders that already use it keep their copy of the name and price.
+         */
+        delete: operations["service-types.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settings": {
         parameters: {
             query?: never;
@@ -238,6 +498,90 @@ export interface paths {
         put: operations["setting.update"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/turnaround-tiers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List turnaround tiers
+         * @description All of them, inactive included, in display order.
+         */
+        get: operations["turnaround-tiers.index"];
+        put?: never;
+        /**
+         * Create a turnaround tier
+         * @description Marking it as the default clears the flag on the other tiers.
+         */
+        post: operations["turnaround-tiers.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/turnaround-tiers/{turnaroundTier}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a turnaround tier */
+        put: operations["turnaround-tiers.update"];
+        post?: never;
+        /** Delete a turnaround tier */
+        delete: operations["turnaround-tiers.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/upcharges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List upcharges
+         * @description All of them, inactive included, in display order.
+         */
+        get: operations["upcharges.index"];
+        put?: never;
+        /** Create an upcharge */
+        post: operations["upcharges.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/upcharges/{upcharge}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an upcharge */
+        put: operations["upcharges.update"];
+        post?: never;
+        /**
+         * Delete an upcharge
+         * @description Orders that already use it keep their copy of the name and price.
+         */
+        delete: operations["upcharges.destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -298,9 +642,9 @@ export interface components {
         /** ActivityResource */
         ActivityResource: {
             id: number;
-            /** @description Area the entry belongs to: auth, user, branch, role, settings, organization. */
+            /** @description Area the entry belongs to: auth, user, branch, role, settings, organization, catalog. */
             log_name: string | null;
-            /** @description What happened: created, updated, deleted, login, logout, roles_updated. */
+            /** @description What happened: created, updated, deleted, login, logout, roles_updated, prices_updated. */
             event: string | null;
             subject_id: number | null;
             /** @description Display name of the affected record, when it still exists. */
@@ -336,6 +680,11 @@ export interface components {
             organization: {
                 id: number;
                 name: string;
+                /**
+                 * @description Unit amounts are shown and typed in; they are always stored in rials.
+                 * @enum {string}
+                 */
+                currency_unit: "toman" | "rial";
             };
             /** @description Role names. */
             roles: string[];
@@ -376,6 +725,54 @@ export interface components {
          * @enum {string}
          */
         BranchType: "store" | "plant" | "hybrid";
+        /** ColorResource */
+        ColorResource: {
+            id: number;
+            name: string;
+            hex: string | null;
+            sort_order: number;
+            is_active: boolean;
+        };
+        /**
+         * DefectKind
+         * @description | |
+         *     |---|
+         *     | `defect` <br/> Damage noted at intake: torn, missing button, faded … |
+         *     | `stain` <br/> A stain to treat: oil, ink, blood … |
+         * @enum {string}
+         */
+        DefectKind: "defect" | "stain";
+        /** DefectTypeResource */
+        DefectTypeResource: {
+            id: number;
+            name: string;
+            kind: components["schemas"]["DefectKind"];
+            sort_order: number;
+            is_active: boolean;
+        };
+        /** ItemCategoryResource */
+        ItemCategoryResource: {
+            id: number;
+            name: string;
+            icon: string | null;
+            color: string | null;
+            /** @description Present only in the counter catalog (GET /catalog). */
+            items?: components["schemas"]["ItemResource"][];
+            sort_order: number;
+            is_active: boolean;
+        };
+        /** ItemResource */
+        ItemResource: {
+            id: number;
+            item_category_id: number;
+            name: string;
+            unit: components["schemas"]["PriceUnit"];
+            /** @description Physical pieces (and tags) one unit makes. */
+            pieces_per_unit: number;
+            icon: string | null;
+            sort_order: number;
+            is_active: boolean;
+        };
         /** LoginRequest */
         LoginRequest: {
             username: string;
@@ -388,6 +785,17 @@ export interface components {
             id: number;
             name: string;
         };
+        /**
+         * PriceUnit
+         * @description How an item's quantity is counted and priced.
+         *     | |
+         *     |---|
+         *     | `piece` <br/> Counted one by one; each unit becomes tagged pieces. |
+         *     | `kg` <br/> Weighed; quantity in kilograms (washing by weight). |
+         *     | `sqm` <br/> Measured; quantity in square metres (carpets, curtains). |
+         * @enum {string}
+         */
+        PriceUnit: "piece" | "kg" | "sqm";
         /** RoleResource */
         RoleResource: {
             id: number;
@@ -397,6 +805,79 @@ export interface components {
             permissions: string[];
             /** @description Number of users holding the role. */
             users_count?: number;
+        };
+        /** SaveColorRequest */
+        SaveColorRequest: {
+            name: string;
+            hex?: string | null;
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveDefectTypeRequest */
+        SaveDefectTypeRequest: {
+            name: string;
+            kind: components["schemas"]["DefectKind"];
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveItemCategoryRequest */
+        SaveItemCategoryRequest: {
+            name: string;
+            /** @description Icon name for the counter's touch grid. */
+            icon?: string | null;
+            color?: string | null;
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveItemRequest */
+        SaveItemRequest: {
+            item_category_id?: number;
+            name?: string;
+            unit?: components["schemas"]["PriceUnit"];
+            /** @description Physical pieces (and tags) one unit makes, e.g. 2 for a suit. */
+            pieces_per_unit?: number;
+            icon?: string | null;
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveServiceTypeRequest */
+        SaveServiceTypeRequest: {
+            name?: string;
+            /** @description Short code printed on tags and receipts, e.g. "DC". */
+            code?: string;
+            color?: string | null;
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveTurnaroundTierRequest */
+        SaveTurnaroundTierRequest: {
+            name: string;
+            /** @description Working hours from intake until the order is due. */
+            duration_hours: number;
+            /** @description Added to line prices, e.g. 50 for +50%. */
+            surcharge_percent?: number;
+            /** @description Making one tier the default clears the flag on the others. */
+            is_default?: boolean;
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveUpchargeRequest */
+        SaveUpchargeRequest: {
+            name: string;
+            type: components["schemas"]["UpchargeType"];
+            /** @description Rials when fixed, whole percent (at most 1000) when percent. */
+            value: number;
+            sort_order?: number;
+            is_active?: boolean;
+        };
+        /** ServiceTypeResource */
+        ServiceTypeResource: {
+            id: number;
+            name: string;
+            code: string;
+            color: string | null;
+            sort_order: number;
+            is_active: boolean;
         };
         /** StoreBranchRequest */
         StoreBranchRequest: {
@@ -425,6 +906,36 @@ export interface components {
             /** @enum {string} */
             locale?: "fa" | "en";
         };
+        /** TurnaroundTierResource */
+        TurnaroundTierResource: {
+            id: number;
+            name: string;
+            duration_hours: number;
+            /** @description Added to line prices, e.g. 50 for +50%. */
+            surcharge_percent: number;
+            is_default: boolean;
+            sort_order: number;
+            is_active: boolean;
+        };
+        /** UpchargeResource */
+        UpchargeResource: {
+            id: number;
+            name: string;
+            type: components["schemas"]["UpchargeType"];
+            /** @description Rials when fixed, whole percent when percent. */
+            value: number;
+            sort_order: number;
+            is_active: boolean;
+        };
+        /**
+         * UpchargeType
+         * @description | |
+         *     |---|
+         *     | `fixed` <br/> A fixed amount in rials per unit. |
+         *     | `percent` <br/> A whole percent of the line's base price. |
+         * @enum {string}
+         */
+        UpchargeType: "fixed" | "percent";
         /** UpdateBranchRequest */
         UpdateBranchRequest: {
             name?: string;
@@ -444,10 +955,19 @@ export interface components {
             password: string;
             password_confirmation: string;
         };
+        /** UpdatePricesRequest */
+        UpdatePricesRequest: {
+            prices: {
+                item_id: number;
+                service_type_id: number;
+                /** @description Whole rials per unit; null removes the price (the service is not offered for the item). */
+                price: number | null;
+            }[];
+        };
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -567,7 +1087,7 @@ export interface operations {
     "activityLog.index": {
         parameters: {
             query?: {
-                /** @description One of auth, user, branch, role, settings, organization. */
+                /** @description One of auth, user, branch, role, settings, organization, catalog. */
                 "filter[log_name]"?: string;
                 /** @description e.g. created, updated, deleted, login. */
                 "filter[event]"?: string;
@@ -859,6 +1379,481 @@ export interface operations {
             404: components["responses"]["ModelNotFoundException"];
         };
     };
+    "catalog.catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            service_types: components["schemas"]["ServiceTypeResource"][];
+                            categories: components["schemas"]["ItemCategoryResource"][];
+                            prices: {
+                                item_id: number;
+                                service_type_id: number;
+                                price: number;
+                            }[];
+                            upcharges: components["schemas"]["UpchargeResource"][];
+                            turnaround_tiers: components["schemas"]["TurnaroundTierResource"][];
+                            defect_types: components["schemas"]["DefectTypeResource"][];
+                            colors: components["schemas"]["ColorResource"][];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "colors.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ColorResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ColorResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "colors.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveColorRequest"];
+            };
+        };
+        responses: {
+            /** @description `ColorResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ColorResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "colors.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The color ID */
+                color: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveColorRequest"];
+            };
+        };
+        responses: {
+            /** @description `ColorResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ColorResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "colors.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The color ID */
+                color: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "defect-types.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `DefectTypeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DefectTypeResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "defect-types.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveDefectTypeRequest"];
+            };
+        };
+        responses: {
+            /** @description `DefectTypeResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DefectTypeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "defect-types.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The defect type ID */
+                defectType: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveDefectTypeRequest"];
+            };
+        };
+        responses: {
+            /** @description `DefectTypeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DefectTypeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "defect-types.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The defect type ID */
+                defectType: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "items.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ItemResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "items.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveItemRequest"];
+            };
+        };
+        responses: {
+            /** @description `ItemResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "items.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The item ID */
+                item: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveItemRequest"];
+            };
+        };
+        responses: {
+            /** @description `ItemResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "items.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The item ID */
+                item: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "item-categories.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ItemCategoryResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemCategoryResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "item-categories.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveItemCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description `ItemCategoryResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemCategoryResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "item-categories.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The item category ID */
+                itemCategory: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveItemCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description `ItemCategoryResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemCategoryResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "item-categories.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The item category ID */
+                itemCategory: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "me.show": {
         parameters: {
             query?: never;
@@ -958,6 +1953,65 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "price.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            item_id: number;
+                            service_type_id: number;
+                            price: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "price.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePricesRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            item_id: number;
+                            service_type_id: number;
+                            price: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "role.permissions": {
         parameters: {
             query?: never;
@@ -1041,6 +2095,116 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "service-types.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ServiceTypeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceTypeResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "service-types.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveServiceTypeRequest"];
+            };
+        };
+        responses: {
+            /** @description `ServiceTypeResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceTypeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "service-types.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The service type ID */
+                serviceType: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveServiceTypeRequest"];
+            };
+        };
+        responses: {
+            /** @description `ServiceTypeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceTypeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "service-types.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The service type ID */
+                serviceType: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "setting.show": {
         parameters: {
             query?: never;
@@ -1118,6 +2282,226 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "turnaround-tiers.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `TurnaroundTierResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TurnaroundTierResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "turnaround-tiers.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveTurnaroundTierRequest"];
+            };
+        };
+        responses: {
+            /** @description `TurnaroundTierResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TurnaroundTierResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "turnaround-tiers.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The turnaround tier ID */
+                turnaroundTier: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveTurnaroundTierRequest"];
+            };
+        };
+        responses: {
+            /** @description `TurnaroundTierResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TurnaroundTierResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "turnaround-tiers.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The turnaround tier ID */
+                turnaroundTier: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "upcharges.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `UpchargeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UpchargeResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "upcharges.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveUpchargeRequest"];
+            };
+        };
+        responses: {
+            /** @description `UpchargeResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UpchargeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "upcharges.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The upcharge ID */
+                upcharge: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveUpchargeRequest"];
+            };
+        };
+        responses: {
+            /** @description `UpchargeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UpchargeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "upcharges.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The upcharge ID */
+                upcharge: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
         };
     };
     "users.index": {

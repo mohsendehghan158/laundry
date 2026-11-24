@@ -26,6 +26,7 @@ it('signs a user in and returns their profile, permissions and branches', functi
         ->assertOk()
         ->assertJsonPath('data.username', $user->username)
         ->assertJsonPath('data.organization.id', $user->organization_id)
+        ->assertJsonPath('data.organization.currency_unit', 'toman')
         ->assertJsonPath('data.roles', ['branch_manager'])
         ->assertJsonPath('data.branches.*.name', ['شعبه یک'])
         ->assertJsonMissingPath('data.password');

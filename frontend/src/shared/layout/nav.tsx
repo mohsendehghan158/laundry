@@ -4,6 +4,7 @@ import {
   HistoryOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
+  TagsOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import type { ReactNode } from "react";
@@ -12,7 +13,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission. */
   permission?: Permission;
@@ -25,6 +26,7 @@ export const NAV: NavGroup[] = [
   {
     label: "management",
     items: [
+      { href: "/catalog", label: "catalog", icon: <TagsOutlined />, permission: "catalog.view" },
       { href: "/branches", label: "branches", icon: <ApartmentOutlined />, permission: "branches.view" },
       { href: "/users", label: "users", icon: <TeamOutlined />, permission: "users.view" },
       { href: "/roles", label: "roles", icon: <SafetyCertificateOutlined />, permission: "roles.view" },

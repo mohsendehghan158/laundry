@@ -21,3 +21,18 @@ export function formatNumber(value: number | null | undefined, locale = "fa"): s
   }
   return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US").format(value);
 }
+
+/**
+ * Formatter for antd InputNumber: shows what is being typed as is, and
+ * otherwise the value with Persian digits and separators. An empty field
+ * stays empty (antd passes "" for it, which must not become 0).
+ */
+export function inputNumberFormatter(value: number | string | undefined | null, info: { userTyping: boolean; input: string }): string {
+  if (info.userTyping) {
+    return info.input;
+  }
+  if (value === undefined || value === null || value === "") {
+    return "";
+  }
+  return formatNumber(Number(value));
+}

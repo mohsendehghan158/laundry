@@ -23,7 +23,7 @@ class ActivityLogController
      *
      * Newest first.
      */
-    #[QueryParameter('filter[log_name]', 'One of auth, user, branch, role, settings, organization.', type: 'string')]
+    #[QueryParameter('filter[log_name]', 'One of auth, user, branch, role, settings, organization, catalog.', type: 'string')]
     #[QueryParameter('filter[event]', 'e.g. created, updated, deleted, login.', type: 'string')]
     #[QueryParameter('filter[causer_id]', 'User who performed the action.', type: 'integer')]
     #[QueryParameter('filter[from]', 'Entries at or after this moment.', type: 'string', format: 'date-time')]

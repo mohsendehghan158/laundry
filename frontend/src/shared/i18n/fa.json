@@ -56,7 +56,8 @@
     "settings": "تنظیمات",
     "activity": "لاگ فعالیت",
     "account": "حساب من",
-    "openMenu": "باز کردن منو"
+    "openMenu": "باز کردن منو",
+    "catalog": "کاتالوگ و قیمت"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -145,7 +146,8 @@
       "users": "کاربران",
       "roles": "نقش‌ها",
       "settings": "تنظیمات",
-      "activity": "لاگ فعالیت"
+      "activity": "لاگ فعالیت",
+      "catalog": "کاتالوگ و قیمت"
     },
     "permissions": {
       "organization": {
@@ -174,6 +176,10 @@
       },
       "activity": {
         "view": "مشاهده لاگ فعالیت"
+      },
+      "catalog": {
+        "view": "مشاهده کاتالوگ و قیمت‌ها",
+        "manage": "ویرایش کاتالوگ و قیمت‌ها"
       }
     }
   },
@@ -224,7 +230,8 @@
       "branch": "شعبه‌ها",
       "role": "نقش‌ها",
       "settings": "تنظیمات",
-      "organization": "سازمان"
+      "organization": "سازمان",
+      "catalog": "کاتالوگ و قیمت"
     },
     "events": {
       "created": "ایجاد",
@@ -232,7 +239,8 @@
       "deleted": "حذف",
       "login": "ورود",
       "logout": "خروج",
-      "roles_updated": "تغییر نقش"
+      "roles_updated": "تغییر نقش",
+      "prices_updated": "تغییر قیمت"
     }
   },
   "account": {
@@ -244,5 +252,84 @@
     "confirmPassword": "تکرار رمز عبور جدید",
     "mismatch": "تکرار رمز با رمز جدید یکسان نیست.",
     "changed": "رمز عبور تغییر کرد."
+  },
+  "catalog": {
+    "title": "کاتالوگ و قیمت",
+    "readOnly": "شما فقط اجازه مشاهده کاتالوگ را دارید.",
+    "tabs": {
+      "prices": "ماتریس قیمت",
+      "items": "اقلام",
+      "categories": "دسته‌ها",
+      "services": "خدمات",
+      "upcharges": "اضافه‌بها",
+      "tiers": "سطوح تحویل",
+      "defects": "عیب و لکه",
+      "colors": "رنگ‌ها"
+    },
+    "add": {
+      "service-types": "خدمت جدید",
+      "item-categories": "دسته جدید",
+      "items": "قلم جدید",
+      "upcharges": "اضافه‌بهای جدید",
+      "turnaround-tiers": "سطح تحویل جدید",
+      "defect-types": "مورد جدید",
+      "colors": "رنگ جدید"
+    },
+    "edit": "ویرایش",
+    "deleteConfirm": "«{name}» حذف شود؟ سفارش‌های ثبت‌شده تغییری نمی‌کنند.",
+    "fields": {
+      "name": "نام",
+      "code": "کد",
+      "codeHelp": "کد کوتاه انگلیسی که روی تگ و رسید چاپ می‌شود، مثل DC.",
+      "color": "رنگ",
+      "icon": "آیکون",
+      "iconHelp": "یک ایموجی برای صفحه لمسی صندوق.",
+      "sortOrder": "ترتیب",
+      "isActive": "فعال",
+      "category": "دسته",
+      "unit": "واحد",
+      "piecesPerUnit": "قطعه در هر واحد",
+      "piecesPerUnitHelp": "هر واحد چند تگ می‌گیرد؛ مثلاً کت‌وشلوار ۲.",
+      "type": "نوع",
+      "value": "مقدار",
+      "percent": "درصد",
+      "amount": "مبلغ",
+      "durationHours": "مدت انجام (ساعت کاری)",
+      "surchargePercent": "افزایش قیمت (درصد)",
+      "isDefault": "پیش‌فرض",
+      "kind": "نوع",
+      "hex": "رنگ نمایش"
+    },
+    "units": {
+      "piece": "عدد",
+      "kg": "کیلو",
+      "sqm": "متر مربع"
+    },
+    "perUnit": {
+      "piece": "هر عدد",
+      "kg": "هر کیلو",
+      "sqm": "هر متر مربع"
+    },
+    "upchargeTypes": {
+      "fixed": "مبلغ ثابت",
+      "percent": "درصدی"
+    },
+    "defectKinds": {
+      "defect": "عیب",
+      "stain": "لکه"
+    },
+    "default": "پیش‌فرض",
+    "hours": "{count, number} ساعت",
+    "matrix": {
+      "help": "قیمت هر قلم را برای هر خدمت وارد کنید. خانه خالی یعنی آن خدمت برای آن قلم ارائه نمی‌شود.",
+      "unsaved": "{count, plural, =0 {بدون تغییر} other {# تغییر ذخیره‌نشده}}",
+      "discard": "لغو تغییرات",
+      "item": "قلم",
+      "noItems": "هنوز قلمی تعریف نشده است. از برگه «اقلام» شروع کنید.",
+      "noServices": "هنوز خدمتی تعریف نشده است.",
+      "allCategories": "همه دسته‌ها"
+    },
+    "codeInvalid": "فقط حروف بزرگ انگلیسی و عدد.",
+    "needCategory": "اول یک دسته در برگه «دسته‌ها» بسازید."
   }
 }

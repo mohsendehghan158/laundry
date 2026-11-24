@@ -22,9 +22,9 @@ class ActivityResource extends JsonResource
 
         return [
             'id' => $this->id,
-            /** Area the entry belongs to: auth, user, branch, role, settings, organization. */
+            /** Area the entry belongs to: auth, user, branch, role, settings, organization, catalog. */
             'log_name' => $this->log_name,
-            /** What happened: created, updated, deleted, login, logout, roles_updated. */
+            /** What happened: created, updated, deleted, login, logout, roles_updated, prices_updated. */
             'event' => $this->event,
             'subject_id' => $this->subject_id,
             /** @var string|null Display name of the affected record, when it still exists. */

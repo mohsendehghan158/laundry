@@ -28,7 +28,7 @@
                     {
                         "name": "filter[log_name]",
                         "in": "query",
-                        "description": "One of auth, user, branch, role, settings, organization.",
+                        "description": "One of auth, user, branch, role, settings, organization, catalog.",
                         "schema": {
                             "type": "string"
                         }
@@ -709,6 +709,829 @@
                 }
             }
         },
+        "/catalog": {
+            "get": {
+                "operationId": "catalog.catalog",
+                "description": "Everything the counter needs to take an order, in one response:\nactive services, categories with their active items, the price\nmatrix, upcharges, turnaround tiers, defects and colors. Prices are\nwhole rials per unit, keyed by item and service.",
+                "summary": "Show the counter catalog",
+                "tags": [
+                    "Catalog"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "service_types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ServiceTypeResource"
+                                                    }
+                                                },
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ItemCategoryResource"
+                                                    }
+                                                },
+                                                "prices": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "item_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "service_type_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "price": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "item_id",
+                                                            "service_type_id",
+                                                            "price"
+                                                        ]
+                                                    }
+                                                },
+                                                "upcharges": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UpchargeResource"
+                                                    }
+                                                },
+                                                "turnaround_tiers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/TurnaroundTierResource"
+                                                    }
+                                                },
+                                                "defect_types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/DefectTypeResource"
+                                                    }
+                                                },
+                                                "colors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ColorResource"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "service_types",
+                                                "categories",
+                                                "prices",
+                                                "upcharges",
+                                                "turnaround_tiers",
+                                                "defect_types",
+                                                "colors"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/colors": {
+            "get": {
+                "operationId": "colors.index",
+                "description": "All of them, inactive included, in display order.",
+                "summary": "List colors",
+                "tags": [
+                    "Color"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ColorResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ColorResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "colors.store",
+                "summary": "Create a color",
+                "tags": [
+                    "Color"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveColorRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ColorResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ColorResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/colors/{color}": {
+            "put": {
+                "operationId": "colors.update",
+                "summary": "Update a color",
+                "tags": [
+                    "Color"
+                ],
+                "parameters": [
+                    {
+                        "name": "color",
+                        "in": "path",
+                        "required": true,
+                        "description": "The color ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveColorRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ColorResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ColorResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "colors.destroy",
+                "description": "Orders that already use it keep their copy of the name and price.",
+                "summary": "Delete a color",
+                "tags": [
+                    "Color"
+                ],
+                "parameters": [
+                    {
+                        "name": "color",
+                        "in": "path",
+                        "required": true,
+                        "description": "The color ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/defect-types": {
+            "get": {
+                "operationId": "defect-types.index",
+                "description": "All of them, inactive included, in display order.",
+                "summary": "List defect types",
+                "tags": [
+                    "DefectType"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `DefectTypeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/DefectTypeResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "defect-types.store",
+                "summary": "Create a defect type",
+                "tags": [
+                    "DefectType"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveDefectTypeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`DefectTypeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/DefectTypeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/defect-types/{defectType}": {
+            "put": {
+                "operationId": "defect-types.update",
+                "summary": "Update a defect type",
+                "tags": [
+                    "DefectType"
+                ],
+                "parameters": [
+                    {
+                        "name": "defectType",
+                        "in": "path",
+                        "required": true,
+                        "description": "The defect type ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveDefectTypeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`DefectTypeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/DefectTypeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "defect-types.destroy",
+                "description": "Orders that already use it keep their copy of the name and price.",
+                "summary": "Delete a defect type",
+                "tags": [
+                    "DefectType"
+                ],
+                "parameters": [
+                    {
+                        "name": "defectType",
+                        "in": "path",
+                        "required": true,
+                        "description": "The defect type ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/items": {
+            "get": {
+                "operationId": "items.index",
+                "description": "All of them, inactive included, grouped by category in display order.",
+                "summary": "List items",
+                "tags": [
+                    "Item"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ItemResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ItemResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "items.store",
+                "summary": "Create an item",
+                "tags": [
+                    "Item"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ItemResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ItemResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/items/{item}": {
+            "put": {
+                "operationId": "items.update",
+                "summary": "Update an item",
+                "tags": [
+                    "Item"
+                ],
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "required": true,
+                        "description": "The item ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ItemResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ItemResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "items.destroy",
+                "description": "Orders that already use it keep their copy of the name and price.",
+                "summary": "Delete an item",
+                "tags": [
+                    "Item"
+                ],
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "required": true,
+                        "description": "The item ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/item-categories": {
+            "get": {
+                "operationId": "item-categories.index",
+                "description": "All of them, inactive included, in display order.",
+                "summary": "List item categories",
+                "tags": [
+                    "ItemCategory"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ItemCategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ItemCategoryResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "item-categories.store",
+                "summary": "Create an item category",
+                "tags": [
+                    "ItemCategory"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveItemCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ItemCategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ItemCategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/item-categories/{itemCategory}": {
+            "put": {
+                "operationId": "item-categories.update",
+                "summary": "Update an item category",
+                "tags": [
+                    "ItemCategory"
+                ],
+                "parameters": [
+                    {
+                        "name": "itemCategory",
+                        "in": "path",
+                        "required": true,
+                        "description": "The item category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveItemCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ItemCategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ItemCategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "item-categories.destroy",
+                "description": "Fails with 409 `category_has_items` while items still belong to it.",
+                "summary": "Delete an item category",
+                "tags": [
+                    "ItemCategory"
+                ],
+                "parameters": [
+                    {
+                        "name": "itemCategory",
+                        "in": "path",
+                        "required": true,
+                        "description": "The item category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/me": {
             "get": {
                 "operationId": "me.show",
@@ -829,6 +1652,127 @@
                                     "properties": {
                                         "data": {
                                             "$ref": "#/components/schemas/OrganizationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/prices": {
+            "get": {
+                "operationId": "price.index",
+                "description": "Every priced item \u00d7 service pair of the default price list, in\nwhole rials per unit. A missing pair means the service is not\noffered for that item.",
+                "summary": "Show the price matrix",
+                "tags": [
+                    "Price"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "item_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "service_type_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "price": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "item_id",
+                                                    "service_type_id",
+                                                    "price"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "price.update",
+                "description": "Changes only the listed cells; send `price: null` to remove one.\nReturns the whole matrix afterwards.",
+                "summary": "Set prices",
+                "tags": [
+                    "Price"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePricesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "item_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "service_type_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "price": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "item_id",
+                                                    "service_type_id",
+                                                    "price"
+                                                ]
+                                            }
                                         }
                                     },
                                     "required": [
@@ -1001,6 +1945,184 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/service-types": {
+            "get": {
+                "operationId": "service-types.index",
+                "description": "All of them, inactive included, in display order.",
+                "summary": "List service types",
+                "tags": [
+                    "ServiceType"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ServiceTypeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ServiceTypeResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "service-types.store",
+                "summary": "Create a service type",
+                "tags": [
+                    "ServiceType"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveServiceTypeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ServiceTypeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ServiceTypeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/service-types/{serviceType}": {
+            "put": {
+                "operationId": "service-types.update",
+                "summary": "Update a service type",
+                "tags": [
+                    "ServiceType"
+                ],
+                "parameters": [
+                    {
+                        "name": "serviceType",
+                        "in": "path",
+                        "required": true,
+                        "description": "The service type ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveServiceTypeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ServiceTypeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ServiceTypeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "service-types.destroy",
+                "description": "Orders that already use it keep their copy of the name and price.",
+                "summary": "Delete a service type",
+                "tags": [
+                    "ServiceType"
+                ],
+                "parameters": [
+                    {
+                        "name": "serviceType",
+                        "in": "path",
+                        "required": true,
+                        "description": "The service type ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -1207,6 +2329,366 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/turnaround-tiers": {
+            "get": {
+                "operationId": "turnaround-tiers.index",
+                "description": "All of them, inactive included, in display order.",
+                "summary": "List turnaround tiers",
+                "tags": [
+                    "TurnaroundTier"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `TurnaroundTierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/TurnaroundTierResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "turnaround-tiers.store",
+                "description": "Marking it as the default clears the flag on the other tiers.",
+                "summary": "Create a turnaround tier",
+                "tags": [
+                    "TurnaroundTier"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveTurnaroundTierRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`TurnaroundTierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TurnaroundTierResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/turnaround-tiers/{turnaroundTier}": {
+            "put": {
+                "operationId": "turnaround-tiers.update",
+                "summary": "Update a turnaround tier",
+                "tags": [
+                    "TurnaroundTier"
+                ],
+                "parameters": [
+                    {
+                        "name": "turnaroundTier",
+                        "in": "path",
+                        "required": true,
+                        "description": "The turnaround tier ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveTurnaroundTierRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`TurnaroundTierResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TurnaroundTierResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "turnaround-tiers.destroy",
+                "summary": "Delete a turnaround tier",
+                "tags": [
+                    "TurnaroundTier"
+                ],
+                "parameters": [
+                    {
+                        "name": "turnaroundTier",
+                        "in": "path",
+                        "required": true,
+                        "description": "The turnaround tier ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/upcharges": {
+            "get": {
+                "operationId": "upcharges.index",
+                "description": "All of them, inactive included, in display order.",
+                "summary": "List upcharges",
+                "tags": [
+                    "Upcharge"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `UpchargeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UpchargeResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "upcharges.store",
+                "summary": "Create an upcharge",
+                "tags": [
+                    "Upcharge"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveUpchargeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`UpchargeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UpchargeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/upcharges/{upcharge}": {
+            "put": {
+                "operationId": "upcharges.update",
+                "summary": "Update an upcharge",
+                "tags": [
+                    "Upcharge"
+                ],
+                "parameters": [
+                    {
+                        "name": "upcharge",
+                        "in": "path",
+                        "required": true,
+                        "description": "The upcharge ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveUpchargeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`UpchargeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UpchargeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "upcharges.destroy",
+                "description": "Orders that already use it keep their copy of the name and price.",
+                "summary": "Delete an upcharge",
+                "tags": [
+                    "Upcharge"
+                ],
+                "parameters": [
+                    {
+                        "name": "upcharge",
+                        "in": "path",
+                        "required": true,
+                        "description": "The upcharge ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -1635,14 +3117,14 @@
                             "string",
                             "null"
                         ],
-                        "description": "Area the entry belongs to: auth, user, branch, role, settings, organization."
+                        "description": "Area the entry belongs to: auth, user, branch, role, settings, organization, catalog."
                     },
                     "event": {
                         "type": [
                             "string",
                             "null"
                         ],
-                        "description": "What happened: created, updated, deleted, login, logout, roles_updated."
+                        "description": "What happened: created, updated, deleted, login, logout, roles_updated, prices_updated."
                     },
                     "subject_id": {
                         "type": [
@@ -1756,11 +3238,20 @@
                             },
                             "name": {
                                 "type": "string"
+                            },
+                            "currency_unit": {
+                                "type": "string",
+                                "description": "Unit amounts are shown and typed in; they are always stored in rials.",
+                                "enum": [
+                                    "toman",
+                                    "rial"
+                                ]
                             }
                         },
                         "required": [
                             "id",
-                            "name"
+                            "name",
+                            "currency_unit"
                         ]
                     },
                     "roles": {
@@ -1896,6 +3387,163 @@
                 ],
                 "title": "BranchType"
             },
+            "ColorResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "hex": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "hex",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "ColorResource"
+            },
+            "DefectKind": {
+                "type": "string",
+                "description": "| |\n|---|\n| `defect` <br/> Damage noted at intake: torn, missing button, faded \u2026 |\n| `stain` <br/> A stain to treat: oil, ink, blood \u2026 |",
+                "enum": [
+                    "defect",
+                    "stain"
+                ],
+                "title": "DefectKind"
+            },
+            "DefectTypeResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/DefectKind"
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "kind",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "DefectTypeResource"
+            },
+            "ItemCategoryResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "color": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "items": {
+                        "type": "array",
+                        "description": "Present only in the counter catalog (GET /catalog).",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResource"
+                        }
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "icon",
+                    "color",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "ItemCategoryResource"
+            },
+            "ItemResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "item_category_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "$ref": "#/components/schemas/PriceUnit"
+                    },
+                    "pieces_per_unit": {
+                        "type": "integer",
+                        "description": "Physical pieces (and tags) one unit makes."
+                    },
+                    "icon": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "item_category_id",
+                    "name",
+                    "unit",
+                    "pieces_per_unit",
+                    "icon",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "ItemResource"
+            },
             "LoginRequest": {
                 "type": "object",
                 "properties": {
@@ -1932,6 +3580,16 @@
                 ],
                 "title": "OrganizationResource"
             },
+            "PriceUnit": {
+                "type": "string",
+                "description": "How an item's quantity is counted and priced.\n| |\n|---|\n| `piece` <br/> Counted one by one; each unit becomes tagged pieces. |\n| `kg` <br/> Weighed; quantity in kilograms (washing by weight). |\n| `sqm` <br/> Measured; quantity in square metres (carpets, curtains). |",
+                "enum": [
+                    "piece",
+                    "kg",
+                    "sqm"
+                ],
+                "title": "PriceUnit"
+            },
             "RoleResource": {
                 "type": "object",
                 "properties": {
@@ -1963,6 +3621,268 @@
                     "permissions"
                 ],
                 "title": "RoleResource"
+            },
+            "SaveColorRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "hex": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "SaveColorRequest"
+            },
+            "SaveDefectTypeRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/DefectKind"
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name",
+                    "kind"
+                ],
+                "title": "SaveDefectTypeRequest"
+            },
+            "SaveItemCategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "icon": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Icon name for the counter's touch grid.",
+                        "maxLength": 50
+                    },
+                    "color": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "SaveItemCategoryRequest"
+            },
+            "SaveItemRequest": {
+                "type": "object",
+                "properties": {
+                    "item_category_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "unit": {
+                        "$ref": "#/components/schemas/PriceUnit"
+                    },
+                    "pieces_per_unit": {
+                        "type": "integer",
+                        "description": "Physical pieces (and tags) one unit makes, e.g. 2 for a suit.",
+                        "minimum": 1,
+                        "maximum": 50
+                    },
+                    "icon": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 50
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveItemRequest"
+            },
+            "SaveServiceTypeRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Short code printed on tags and receipts, e.g. \"DC\".",
+                        "pattern": "^[A-Z0-9]+$",
+                        "maxLength": 10
+                    },
+                    "color": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveServiceTypeRequest"
+            },
+            "SaveTurnaroundTierRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "duration_hours": {
+                        "type": "integer",
+                        "description": "Working hours from intake until the order is due.",
+                        "minimum": 1,
+                        "maximum": 720
+                    },
+                    "surcharge_percent": {
+                        "type": "integer",
+                        "description": "Added to line prices, e.g. 50 for +50%.",
+                        "minimum": 0,
+                        "maximum": 500
+                    },
+                    "is_default": {
+                        "type": "boolean",
+                        "description": "Making one tier the default clears the flag on the others."
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name",
+                    "duration_hours"
+                ],
+                "title": "SaveTurnaroundTierRequest"
+            },
+            "SaveUpchargeRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/UpchargeType"
+                    },
+                    "value": {
+                        "type": "integer",
+                        "description": "Rials when fixed, whole percent (at most 1000) when percent.",
+                        "minimum": 0,
+                        "maximum": 1000000000000
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name",
+                    "type",
+                    "value"
+                ],
+                "title": "SaveUpchargeRequest"
+            },
+            "ServiceTypeResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "code",
+                    "color",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "ServiceTypeResource"
             },
             "StoreBranchRequest": {
                 "type": "object",
@@ -2071,6 +3991,85 @@
                 ],
                 "title": "StoreUserRequest"
             },
+            "TurnaroundTierResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "duration_hours": {
+                        "type": "integer"
+                    },
+                    "surcharge_percent": {
+                        "type": "integer",
+                        "description": "Added to line prices, e.g. 50 for +50%."
+                    },
+                    "is_default": {
+                        "type": "boolean"
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "duration_hours",
+                    "surcharge_percent",
+                    "is_default",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "TurnaroundTierResource"
+            },
+            "UpchargeResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/UpchargeType"
+                    },
+                    "value": {
+                        "type": "integer",
+                        "description": "Rials when fixed, whole percent when percent."
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "value",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "UpchargeResource"
+            },
+            "UpchargeType": {
+                "type": "string",
+                "description": "| |\n|---|\n| `fixed` <br/> A fixed amount in rials per unit. |\n| `percent` <br/> A whole percent of the line's base price. |",
+                "enum": [
+                    "fixed",
+                    "percent"
+                ],
+                "title": "UpchargeType"
+            },
             "UpdateBranchRequest": {
                 "type": "object",
                 "properties": {
@@ -2139,6 +4138,45 @@
                 ],
                 "title": "UpdatePasswordRequest"
             },
+            "UpdatePricesRequest": {
+                "type": "object",
+                "properties": {
+                    "prices": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "item_id": {
+                                    "type": "integer"
+                                },
+                                "service_type_id": {
+                                    "type": "integer"
+                                },
+                                "price": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ],
+                                    "description": "Whole rials per unit; null removes the price (the service is not offered for the item).",
+                                    "minimum": 0,
+                                    "maximum": 1000000000000
+                                }
+                            },
+                            "required": [
+                                "item_id",
+                                "service_type_id",
+                                "price"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 2000
+                    }
+                },
+                "required": [
+                    "prices"
+                ],
+                "title": "UpdatePricesRequest"
+            },
             "UpdateRoleRequest": {
                 "type": "object",
                 "properties": {
@@ -2162,7 +4200,9 @@
                                 "roles.update",
                                 "settings.view",
                                 "settings.update",
-                                "activity.view"
+                                "activity.view",
+                                "catalog.view",
+                                "catalog.manage"
                             ]
                         },
                         "uniqueItems": true

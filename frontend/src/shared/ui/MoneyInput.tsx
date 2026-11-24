@@ -2,7 +2,7 @@
 
 import { InputNumber, type InputNumberProps } from "antd";
 import { useTranslations } from "next-intl";
-import { formatNumber } from "@/shared/lib/digits";
+import { inputNumberFormatter } from "@/shared/lib/digits";
 import { fromRial, parseAmount, toRial, type CurrencyUnit } from "@/shared/lib/money";
 
 export type MoneyInputProps = Omit<InputNumberProps<number>, "value" | "onChange" | "formatter" | "parser"> & {
@@ -27,7 +27,7 @@ export function MoneyInput({ value, onChange, unit = "toman", ...rest }: MoneyIn
       suffix={t(unit)}
       {...rest}
       value={value === null || value === undefined ? null : fromRial(value, unit)}
-      formatter={(v, info) => (info.userTyping ? info.input : v === undefined || v === null ? "" : formatNumber(Number(v)))}
+      formatter={inputNumberFormatter}
       parser={(text) => parseAmount(text) ?? (null as unknown as number)}
       onChange={(amount) => onChange?.(amount === null ? null : toRial(amount, unit))}
     />

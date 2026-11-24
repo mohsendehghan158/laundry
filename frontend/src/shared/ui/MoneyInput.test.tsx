@@ -25,3 +25,10 @@ describe("MoneyInput", () => {
     expect(screen.getByText("ریال")).toBeInTheDocument();
   });
 });
+
+describe("MoneyInput when empty", () => {
+  it("stays empty instead of showing zero", () => {
+    renderWithProviders(<MoneyInput value={null} />);
+    expect(screen.getByRole("spinbutton")).toHaveValue("");
+  });
+});
