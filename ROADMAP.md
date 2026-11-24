@@ -552,7 +552,7 @@ flowchart TB
 | جست‌وجو | `laravel/scout` + Meilisearch | 11.x | جست‌وجوی آنی مشتری و سفارش |
 | پرچم قابلیت | `laravel/pennant` | 1.x | انتشار تدریجی |
 | پایش | `laravel/pulse`، `laravel/telescope` | 1.x، 5.x | تولید / توسعه |
-| تست | `pestphp/pest` | 5.x | واحد، قابلیت، معماری |
+| تست | `pestphp/pest` | 4.x | واحد، قابلیت، معماری |
 | تحلیل ایستا | `larastan/larastan`، Pint | 3.x | کیفیت کد |
 
 ### ۷ـ۲. فرانت‌اند
@@ -562,7 +562,7 @@ flowchart TB
 | محیط اجرا | Node.js | 22 LTS به بالا | — |
 | چارچوب | `next` | 16.x | App Router، Turbopack |
 | کتابخانه UI | `react`، `react-dom` | 19.x | — |
-| زبان | `typescript` | 7.x | حالت strict |
+| زبان | `typescript` | 5.x | حالت strict |
 | سیستم طراحی | `antd` | 6.x | همه اجزای رابط |
 | اتصال antd به Next | `@ant-design/nextjs-registry` | 1.x | استایل در رندر سرور |
 | نمودار | `@ant-design/charts` | 2.x | داشبورد و گزارش |
