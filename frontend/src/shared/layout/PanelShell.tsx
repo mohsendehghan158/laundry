@@ -2,7 +2,7 @@
 
 import { LogoutOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { App, Avatar, Button, Dropdown, Grid, Layout, Menu, Result, Space, Spin, Typography, theme } from "antd";
+import { App, Avatar, Button, Dropdown, Grid, Layout, Menu, Result, Space, Spin, Typography, theme, type MenuProps } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -13,6 +13,8 @@ import { usePermission } from "@/shared/hooks/usePermission";
 import { activeNavItem, visibleNav } from "./nav";
 
 const { Header, Sider, Content } = Layout;
+
+type MenuItem = NonNullable<MenuProps["items"]>[number];
 
 function FullPage({ children }: { children: ReactNode }) {
   return <div style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>{children}</div>;
@@ -49,15 +51,13 @@ export function PanelShell({ children }: { children: ReactNode }) {
 
   const menuItems = useMemo(
     () =>
-      visibleNav(can).map((group, index) => {
+      visibleNav(can).flatMap((group, index): MenuItem[] => {
         const items = group.items.map((item) => ({
           key: item.href,
           icon: item.icon,
           label: <Link href={item.href}>{t(`nav.${item.label}`)}</Link>,
         }));
-        return group.label
-          ? { type: "group" as const, key: `group-${index}`, label: t(`nav.${group.label}`), children: items }
-          : items[0];
+        return group.label ? [{ type: "group" as const, key: `group-${index}`, label: t(`nav.${group.label}`), children: items }] : items;
       }),
     [can, t],
   );

@@ -994,6 +994,417 @@
                 }
             }
         },
+        "/customers": {
+            "get": {
+                "operationId": "customers.index",
+                "description": "Search matches part of the name, mobile or phone, typed with Persian\nor Latin digits (\"\u06f0\u06f9\u06f1\u06f2\" finds 0912\u2026).",
+                "summary": "List customers",
+                "tags": [
+                    "Customer"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[q]",
+                        "in": "query",
+                        "description": "Part of a name, mobile or phone number.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "One of name, created_at; prefix with \"-\" for descending.",
+                        "schema": {
+                            "type": "string",
+                            "default": "-created_at"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `CustomerResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "customers.store",
+                "description": "A mobile number already used by another customer fails with 422.",
+                "summary": "Create a customer",
+                "tags": [
+                    "Customer"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveCustomerRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`CustomerResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CustomerResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "addresses"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/customers/{customer}": {
+            "get": {
+                "operationId": "customers.show",
+                "summary": "Show a customer",
+                "tags": [
+                    "Customer"
+                ],
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CustomerResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CustomerResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "addresses"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "customers.update",
+                "description": "Sending `addresses` replaces the whole list (keep an entry by sending its id).",
+                "summary": "Update a customer",
+                "tags": [
+                    "Customer"
+                ],
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveCustomerRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CustomerResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CustomerResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "addresses"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "customers.destroy",
+                "description": "Their orders are kept.",
+                "summary": "Delete a customer",
+                "tags": [
+                    "Customer"
+                ],
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/defect-types": {
             "get": {
                 "operationId": "defect-types.index",
@@ -3418,6 +3829,104 @@
                 ],
                 "title": "ColorResource"
             },
+            "CustomerAddressResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "longitude": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "is_default": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "title",
+                    "address",
+                    "latitude",
+                    "longitude",
+                    "is_default"
+                ],
+                "title": "CustomerAddressResource"
+            },
+            "CustomerResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "mobile": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "alert": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Shown as a warning whenever the customer is picked at the counter."
+                    },
+                    "addresses": {
+                        "type": "array",
+                        "description": "Present on a single customer and after saving.",
+                        "items": {
+                            "$ref": "#/components/schemas/CustomerAddressResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "mobile",
+                    "phone",
+                    "notes",
+                    "alert",
+                    "created_at"
+                ],
+                "title": "CustomerResource"
+            },
             "DefectKind": {
                 "type": "string",
                 "description": "| |\n|---|\n| `defect` <br/> Damage noted at intake: torn, missing button, faded \u2026 |\n| `stain` <br/> A stain to treat: oil, ink, blood \u2026 |",
@@ -3649,6 +4158,92 @@
                     "name"
                 ],
                 "title": "SaveColorRequest"
+            },
+            "SaveCustomerRequest": {
+                "type": "object",
+                "description": "Creates (POST) or updates (PUT) a customer together with their\naddresses. On update, the addresses sent replace the stored ones:\nentries with an id are kept and changed, the rest are added, and\naddresses left out are removed.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "mobile": {
+                        "type": "string",
+                        "description": "Iranian mobile number; \"+98\u2026\", \"98\u2026\", spaces and Persian digits are accepted.",
+                        "pattern": "^09\\d{9}$"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^[0-9+\\-\\s]{5,20}$"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    },
+                    "alert": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Shown as a warning whenever the customer is picked at the counter.",
+                        "maxLength": 500
+                    },
+                    "addresses": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "title": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 50
+                                },
+                                "address": {
+                                    "type": "string",
+                                    "maxLength": 500
+                                },
+                                "latitude": {
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ],
+                                    "minimum": -90,
+                                    "maximum": 90
+                                },
+                                "longitude": {
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ],
+                                    "minimum": -180,
+                                    "maximum": 180
+                                },
+                                "is_default": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "address"
+                            ]
+                        },
+                        "maxItems": 10
+                    }
+                },
+                "title": "SaveCustomerRequest"
             },
             "SaveDefectTypeRequest": {
                 "type": "object",
@@ -4202,7 +4797,10 @@
                                 "settings.update",
                                 "activity.view",
                                 "catalog.view",
-                                "catalog.manage"
+                                "catalog.manage",
+                                "customers.view",
+                                "customers.manage",
+                                "customers.delete"
                             ]
                         },
                         "uniqueItems": true

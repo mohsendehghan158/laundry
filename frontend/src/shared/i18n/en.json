@@ -57,7 +57,8 @@
     "activity": "Activity log",
     "account": "My account",
     "openMenu": "Open menu",
-    "catalog": "Catalog & prices"
+    "catalog": "Catalog & prices",
+    "customers": "Customers"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -147,7 +148,8 @@
       "roles": "Roles",
       "settings": "Settings",
       "activity": "Activity log",
-      "catalog": "Catalog & prices"
+      "catalog": "Catalog & prices",
+      "customers": "Customers"
     },
     "permissions": {
       "organization": {
@@ -180,6 +182,11 @@
       "catalog": {
         "view": "View catalog and prices",
         "manage": "Edit catalog and prices"
+      },
+      "customers": {
+        "view": "View customers",
+        "manage": "Add and edit customers",
+        "delete": "Delete customers"
       }
     }
   },
@@ -231,7 +238,8 @@
       "role": "Roles",
       "settings": "Settings",
       "organization": "Organization",
-      "catalog": "Catalog & prices"
+      "catalog": "Catalog & prices",
+      "customer": "Customers"
     },
     "events": {
       "created": "Created",
@@ -331,5 +339,31 @@
     },
     "codeInvalid": "Capital letters and digits only.",
     "needCategory": "Create a category on the “Categories” tab first."
+  },
+  "customers": {
+    "title": "Customers",
+    "new": "New customer",
+    "edit": "Edit customer",
+    "searchPlaceholder": "Name or mobile number",
+    "noMatch": "No customer matches.",
+    "deleteConfirm": "Delete customer “{name}”? Their orders are kept.",
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "noAddresses": "No addresses.",
+    "addAddress": "Add address",
+    "backToList": "Back to customers",
+    "fields": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "phone": "Landline",
+      "notes": "Notes",
+      "alert": "Alert",
+      "alertHelp": "Shown prominently whenever this customer is picked at the counter.",
+      "createdAt": "Added",
+      "address": "Address",
+      "addressTitle": "Label",
+      "addressTitlePlaceholder": "Home, work …",
+      "default": "Default"
+    }
   }
 }

@@ -53,7 +53,7 @@ it('replaces the permissions of a role and takes effect immediately', function (
     $entry = Activity::query()->where('log_name', 'role')->oldest('id')->firstOrFail();
     expect($entry->attribute_changes->all())->toBe([
         'attributes' => ['permissions' => ['branches.view', 'users.view']],
-        'old' => ['permissions' => ['catalog.view']],
+        'old' => ['permissions' => collect(PermissionRegistry::defaultRoles()['cashier'])->sort()->values()->all()],
     ]);
 });
 

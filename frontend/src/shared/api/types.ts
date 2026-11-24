@@ -26,6 +26,10 @@ export type PriceUnit = Schemas["PriceUnit"];
 export type UpchargeType = Schemas["UpchargeType"];
 export type DefectKind = Schemas["DefectKind"];
 
+export type Customer = Schemas["CustomerResource"];
+export type CustomerAddress = Schemas["CustomerAddressResource"];
+export type SaveCustomerInput = Schemas["SaveCustomerRequest"];
+
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
 export type UpdateBranchInput = Schemas["UpdateBranchRequest"];

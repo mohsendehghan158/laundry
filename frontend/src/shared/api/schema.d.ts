@@ -172,6 +172,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List customers
+         * @description Search matches part of the name, mobile or phone, typed with Persian
+         *     or Latin digits ("۰۹۱۲" finds 0912…).
+         */
+        get: operations["customers.index"];
+        put?: never;
+        /**
+         * Create a customer
+         * @description A mobile number already used by another customer fails with 422.
+         */
+        post: operations["customers.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers/{customer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Show a customer */
+        get: operations["customers.show"];
+        /**
+         * Update a customer
+         * @description Sending `addresses` replaces the whole list (keep an entry by sending its id).
+         */
+        put: operations["customers.update"];
+        post?: never;
+        /**
+         * Delete a customer
+         * @description Their orders are kept.
+         */
+        delete: operations["customers.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/defect-types": {
         parameters: {
             query?: never;
@@ -733,6 +783,29 @@ export interface components {
             sort_order: number;
             is_active: boolean;
         };
+        /** CustomerAddressResource */
+        CustomerAddressResource: {
+            id: number;
+            title: string | null;
+            address: string;
+            latitude: number | null;
+            longitude: number | null;
+            is_default: boolean;
+        };
+        /** CustomerResource */
+        CustomerResource: {
+            id: number;
+            name: string;
+            mobile: string;
+            phone: string | null;
+            notes: string | null;
+            /** @description Shown as a warning whenever the customer is picked at the counter. */
+            alert: string | null;
+            /** @description Present on a single customer and after saving. */
+            addresses?: components["schemas"]["CustomerAddressResource"][];
+            /** Format: date-time */
+            created_at: string | null;
+        };
         /**
          * DefectKind
          * @description | |
@@ -812,6 +885,30 @@ export interface components {
             hex?: string | null;
             sort_order?: number;
             is_active?: boolean;
+        };
+        /**
+         * SaveCustomerRequest
+         * @description Creates (POST) or updates (PUT) a customer together with their
+         *     addresses. On update, the addresses sent replace the stored ones:
+         *     entries with an id are kept and changed, the rest are added, and
+         *     addresses left out are removed.
+         */
+        SaveCustomerRequest: {
+            name?: string;
+            /** @description Iranian mobile number; "+98…", "98…", spaces and Persian digits are accepted. */
+            mobile?: string;
+            phone?: string | null;
+            notes?: string | null;
+            /** @description Shown as a warning whenever the customer is picked at the counter. */
+            alert?: string | null;
+            addresses?: {
+                id?: number | null;
+                title?: string | null;
+                address: string;
+                latitude?: number | null;
+                longitude?: number | null;
+                is_default?: boolean;
+            }[];
         };
         /** SaveDefectTypeRequest */
         SaveDefectTypeRequest: {
@@ -967,7 +1064,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -1507,6 +1604,177 @@ export interface operations {
             path: {
                 /** @description The color ID */
                 color: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "customers.index": {
+        parameters: {
+            query?: {
+                /** @description Part of a name, mobile or phone number. */
+                "filter[q]"?: string;
+                /** @description One of name, created_at; prefix with "-" for descending. */
+                sort?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `CustomerResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomerResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "customers.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveCustomerRequest"];
+            };
+        };
+        responses: {
+            /** @description `CustomerResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomerResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "customers.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The customer ID */
+                customer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `CustomerResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomerResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "customers.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The customer ID */
+                customer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveCustomerRequest"];
+            };
+        };
+        responses: {
+            /** @description `CustomerResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomerResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "customers.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The customer ID */
+                customer: number;
             };
             cookie?: never;
         };

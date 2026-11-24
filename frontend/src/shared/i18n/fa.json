@@ -57,7 +57,8 @@
     "activity": "لاگ فعالیت",
     "account": "حساب من",
     "openMenu": "باز کردن منو",
-    "catalog": "کاتالوگ و قیمت"
+    "catalog": "کاتالوگ و قیمت",
+    "customers": "مشتریان"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -147,7 +148,8 @@
       "roles": "نقش‌ها",
       "settings": "تنظیمات",
       "activity": "لاگ فعالیت",
-      "catalog": "کاتالوگ و قیمت"
+      "catalog": "کاتالوگ و قیمت",
+      "customers": "مشتریان"
     },
     "permissions": {
       "organization": {
@@ -180,6 +182,11 @@
       "catalog": {
         "view": "مشاهده کاتالوگ و قیمت‌ها",
         "manage": "ویرایش کاتالوگ و قیمت‌ها"
+      },
+      "customers": {
+        "view": "مشاهده مشتریان",
+        "manage": "ثبت و ویرایش مشتری",
+        "delete": "حذف مشتری"
       }
     }
   },
@@ -231,7 +238,8 @@
       "role": "نقش‌ها",
       "settings": "تنظیمات",
       "organization": "سازمان",
-      "catalog": "کاتالوگ و قیمت"
+      "catalog": "کاتالوگ و قیمت",
+      "customer": "مشتریان"
     },
     "events": {
       "created": "ایجاد",
@@ -331,5 +339,31 @@
     },
     "codeInvalid": "فقط حروف بزرگ انگلیسی و عدد.",
     "needCategory": "اول یک دسته در برگه «دسته‌ها» بسازید."
+  },
+  "customers": {
+    "title": "مشتریان",
+    "new": "مشتری جدید",
+    "edit": "ویرایش مشتری",
+    "searchPlaceholder": "نام یا شماره موبایل",
+    "noMatch": "مشتری‌ای با این مشخصات پیدا نشد.",
+    "deleteConfirm": "مشتری «{name}» حذف شود؟ سفارش‌هایش باقی می‌مانند.",
+    "profile": "مشخصات",
+    "addresses": "نشانی‌ها",
+    "noAddresses": "نشانی‌ای ثبت نشده است.",
+    "addAddress": "افزودن نشانی",
+    "backToList": "بازگشت به فهرست مشتریان",
+    "fields": {
+      "name": "نام",
+      "mobile": "موبایل",
+      "phone": "تلفن ثابت",
+      "notes": "یادداشت",
+      "alert": "هشدار",
+      "alertHelp": "هر بار که این مشتری در صندوق انتخاب شود، به‌صورت برجسته نمایش داده می‌شود.",
+      "createdAt": "تاریخ ثبت",
+      "address": "نشانی",
+      "addressTitle": "عنوان",
+      "addressTitlePlaceholder": "خانه، محل کار …",
+      "default": "پیش‌فرض"
+    }
   }
 }

@@ -34,6 +34,8 @@ final class PermissionRegistry
             'activity' => ['activity.view'],
             // Services, items, prices, upcharges, turnaround tiers, defects, colors.
             'catalog' => ['catalog.view', 'catalog.manage'],
+            // manage = create and edit.
+            'customers' => ['customers.view', 'customers.manage', 'customers.delete'],
         ];
     }
 
@@ -62,12 +64,13 @@ final class PermissionRegistry
                 'settings.view',
                 'activity.view',
                 'catalog.view',
+                'customers.view', 'customers.manage', 'customers.delete',
             ],
-            'cashier' => ['catalog.view'],
+            'cashier' => ['catalog.view', 'customers.view', 'customers.manage'],
             'plant_operator' => [],
-            'driver' => [],
-            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view'],
-            'support' => ['branches.view', 'branches.access_all', 'catalog.view'],
+            'driver' => ['customers.view'],
+            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view'],
+            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete'],
         ];
     }
 }

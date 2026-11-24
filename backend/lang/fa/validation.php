@@ -165,5 +165,12 @@ return [
         'prices.*.item_id' => 'قلم',
         'prices.*.service_type_id' => 'خدمت',
         'prices.*.price' => 'قیمت',
+        'notes' => 'یادداشت',
+        'alert' => 'هشدار',
+        'addresses' => 'نشانی‌ها',
+        'addresses.*.title' => 'عنوان نشانی',
+        'addresses.*.address' => 'نشانی',
+        'addresses.*.latitude' => 'عرض جغرافیایی',
+        'addresses.*.longitude' => 'طول جغرافیایی',
     ],
 ];
