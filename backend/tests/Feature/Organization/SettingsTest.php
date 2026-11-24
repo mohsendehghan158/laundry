@@ -15,6 +15,8 @@ it('returns defaults until a setting is changed', function () {
             'general' => ['currency_unit' => 'toman', 'timezone' => 'Asia/Tehran'],
             'tax' => ['vat_percent' => 10, 'prices_include_vat' => false],
             'receipt' => ['header_text' => null, 'footer_text' => null],
+            'hours' => ['opening' => '09:00', 'closing' => '21:00', 'closed_days' => '5'],
+            'orders' => ['max_discount_percent' => 10],
         ]]);
 });
 
@@ -108,4 +110,17 @@ it('shows the organization to every member but lets only permitted users rename 
         ->assertJsonPath('data.name', 'خشکشویی پاکان');
 
     expect(Activity::query()->where('log_name', 'organization')->where('event', 'updated')->count())->toBe(1);
+});
+
+it('validates working hours and closed days', function () {
+    $this->actingAsOwner();
+
+    $this->putJson('/api/v1/settings', ['hours' => ['opening' => '8:00', 'closed_days' => '5,7']])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['hours.opening', 'hours.closed_days']);
+
+    $this->putJson('/api/v1/settings', ['hours' => ['opening' => '08:30', 'closed_days' => '4,5']])
+        ->assertOk()
+        ->assertJsonPath('data.hours.opening', '08:30')
+        ->assertJsonPath('data.hours.closed_days', '4,5');
 });

@@ -50,7 +50,11 @@ export function CustomerFormModal({ open, customer, initial, onClose, onSaved }:
           }
         : { name: initial?.name ?? "", mobile: initial?.mobile ?? "", addresses: [] },
     );
-  }, [open, customer, initial, form]);
+    // Fill the form when it opens or switches to another customer only;
+    // re-running on every new `initial`/`customer` object would wipe what
+    // the user is typing whenever the parent re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, customer?.id, form]);
 
   const onFinish = (values: Values) => {
     const input: Partial<SaveCustomerInput> = {

@@ -13,3 +13,9 @@ it('converts Persian and Arabic digits to Latin', function (string $input, strin
     'already latin' => ['T1-04217', 'T1-04217'],
     'empty' => ['', ''],
 ]);
+
+it('reads numbers typed with Persian separators', function () {
+    expect(Digits::toLatinNumber('۲٫۵'))->toBe('2.5')
+        ->and(Digits::toLatinNumber('۱٬۲۵۰٬۰۰۰'))->toBe('1250000')
+        ->and(Digits::toLatinNumber(' 1,250 '))->toBe('1250');
+});

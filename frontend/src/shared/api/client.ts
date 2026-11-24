@@ -41,6 +41,7 @@ export type RequestOptions = {
   query?: Query;
   body?: unknown;
   signal?: AbortSignal;
+  headers?: Record<string, string>;
 };
 
 let unauthenticatedHandler: (() => void) | null = null;
@@ -90,6 +91,7 @@ export function buildQuery(query: Query | undefined): string {
 async function send(path: string, options: RequestOptions, csrfRetry: boolean): Promise<Response> {
   const method = options.method ?? "GET";
   const headers: Record<string, string> = {
+    ...options.headers,
     Accept: "application/json",
     "Accept-Language": (typeof document !== "undefined" && document.documentElement.lang) || "fa",
   };

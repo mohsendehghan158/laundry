@@ -103,10 +103,10 @@ it('does not let someone grant a permission they do not hold', function () {
 
 it('gives owners permissions that are added later, without a role edit', function () {
     $owner = $this->owner();
-    Permission::findOrCreate('orders.create');
+    Permission::findOrCreate('future.feature');
 
-    expect($owner->can('orders.create'))->toBeTrue()
-        ->and($this->userWithRole('cashier')->can('orders.create'))->toBeFalse();
+    expect($owner->can('future.feature'))->toBeTrue()
+        ->and($this->userWithRole('cashier')->can('future.feature'))->toBeFalse();
 });
 
 it('syncs permissions without undoing an administrator\'s changes', function () {

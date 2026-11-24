@@ -385,6 +385,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List orders
+         * @description Orders of the branches the user can work in, newest first.
+         */
+        get: operations["orders.index"];
+        put?: never;
+        /**
+         * Take in an order
+         * @description Prices the lines against the catalog, gives the order the branch's
+         *     next ticket number, computes the due time from the turnaround tier
+         *     and working hours, and tags every piece. Send an `Idempotency-Key`
+         *     header so that a retried request returns the same order (200)
+         *     instead of creating a second one (201).
+         */
+        post: operations["orders.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{order}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Show an order */
+        get: operations["orders.show"];
+        /**
+         * Change an order's lines
+         * @description Only before any work has started (status `received`). Fails with 409
+         *     `order_version_conflict` when the order changed since `version`, and
+         *     `order_not_editable` once it is in process. Pieces are tagged again.
+         */
+        put: operations["orders.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/price-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview an order's price
+         * @description Runs the same pricing as taking the order in, without saving
+         *     anything, so the counter can show the total and due time while the
+         *     order is being put together. Amounts are whole rials.
+         */
+        post: operations["orders.orderPreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{order}/transitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change an order's status
+         * @description Allowed moves are listed in the order's `available_transitions`.
+         *     Marking it `ready` marks its pieces ready and can record where it is
+         *     kept (`rack_location`); cancelling needs `orders.cancel` and a reason,
+         *     and fails with 409 `order_has_payments` while payments are recorded.
+         */
+        post: operations["orders.orderTransition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/organization": {
         parameters: {
             query?: never;
@@ -823,6 +919,15 @@ export interface components {
             sort_order: number;
             is_active: boolean;
         };
+        /**
+         * DiscountType
+         * @description | |
+         *     |---|
+         *     | `amount` <br/> A fixed number of rials off the order. |
+         *     | `percent` <br/> A percentage of the order's subtotal. |
+         * @enum {string}
+         */
+        DiscountType: "amount" | "percent";
         /** ItemCategoryResource */
         ItemCategoryResource: {
             id: number;
@@ -853,10 +958,177 @@ export interface components {
             /** @description Keep the session alive after the browser closes. */
             remember?: boolean;
         };
+        /** OrderLineResource */
+        OrderLineResource: {
+            id: number;
+            item_id: number | null;
+            service_type_id: number | null;
+            item_name: string;
+            service_name: string;
+            service_code: string;
+            unit: components["schemas"]["PriceUnit"];
+            /** @description Pieces, kilograms or square metres. */
+            quantity: number;
+            unit_price: number;
+            base_amount: number;
+            upcharge_amount: number;
+            /** @description Turnaround surcharge of this line. */
+            surcharge_amount: number;
+            line_total: number;
+            notes: string | null;
+            upcharges: {
+                upcharge_id: number | null;
+                name: string;
+                /** @enum {string} */
+                type: "fixed" | "percent";
+                value: number;
+                amount: number;
+            }[];
+            pieces?: components["schemas"]["PieceResource"][];
+        };
+        /** OrderResource */
+        OrderResource: {
+            id: number;
+            /** @description Opaque id for the public tracking link. */
+            public_id: string;
+            ticket_number: string;
+            status: components["schemas"]["OrderStatus"];
+            payment_status: components["schemas"]["PaymentStatus"];
+            branch: {
+                id: number;
+                name: string;
+                code: string;
+            };
+            customer: {
+                id: number;
+                name: string;
+                mobile: string;
+                alert: string | null;
+            };
+            turnaround: {
+                id: number | null;
+                name: string | null;
+                surcharge_percent: number;
+            };
+            /** Format: date-time */
+            received_at: string;
+            /** Format: date-time */
+            due_at: string;
+            /** Format: date-time */
+            ready_at: string | null;
+            /** Format: date-time */
+            completed_at: string | null;
+            /** Format: date-time */
+            cancelled_at: string | null;
+            cancel_reason: string | null;
+            rack_location: string | null;
+            notes: string | null;
+            subtotal: number;
+            discount: {
+                /** @enum {string} */
+                type: "amount" | "percent";
+                value: number;
+                amount: number;
+                reason: string | null;
+            } | null;
+            tax_amount: number;
+            total: number;
+            paid_amount: number;
+            /** @description Still to be paid. */
+            balance: number;
+            piece_count?: number;
+            /** @description Send back with an edit; a newer version on the server means someone else changed the order. */
+            version: number;
+            /** @description Statuses this order can be moved to with POST /orders/{id}/transitions. */
+            available_transitions: components["schemas"]["OrderStatus"][];
+            /** Format: date-time */
+            created_at: string | null;
+            created_by?: {
+                id: number;
+                name: string;
+            } | null;
+            lines?: components["schemas"]["OrderLineResource"][];
+            history?: {
+                from_status: components["schemas"]["OrderStatus"] | null;
+                to_status: components["schemas"]["OrderStatus"];
+                user: {
+                    id: number;
+                    name: string;
+                } | null;
+                reason: string | null;
+                created_at: string;
+            }[];
+        };
+        /**
+         * OrderStatus
+         * @description The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at "received".
+         * @enum {string}
+         */
+        OrderStatus: "draft" | "pending_pickup" | "picked_up" | "received" | "in_process" | "partially_ready" | "ready" | "out_for_delivery" | "completed" | "cancelled";
         /** OrganizationResource */
         OrganizationResource: {
             id: number;
             name: string;
+        };
+        /**
+         * PaymentStatus
+         * @enum {string}
+         */
+        PaymentStatus: "unpaid" | "partially_paid" | "paid" | "refunded";
+        /** PieceResource */
+        PieceResource: {
+            id: number;
+            /** @description Printed as a barcode on the piece's tag. */
+            tag_code: string;
+            /** @description Position of the piece within the order, from 1. */
+            number: number;
+            status: components["schemas"]["PieceStatus"];
+            color_id: number | null;
+            color_name: string | null;
+            brand: string | null;
+            notes: string | null;
+            defects: {
+                defect_type_id: number | null;
+                name: string;
+                /** @enum {string} */
+                kind: "defect" | "stain";
+            }[];
+            /** Format: date-time */
+            ready_at: string | null;
+            /** Format: date-time */
+            handed_over_at: string | null;
+        };
+        /**
+         * PieceStatus
+         * @description Where a piece is in the simple counter flow. Workshop stations (phase 3) add their own scan history on top of this.
+         * @enum {string}
+         */
+        PieceStatus: "received" | "ready" | "handed_over";
+        /** PreviewOrderRequest */
+        PreviewOrderRequest: {
+            lines: {
+                item_id: number;
+                service_type_id: number;
+                /** @description Pieces for items counted one by one; kilograms or square metres otherwise. */
+                quantity: number;
+                upcharge_ids?: number[];
+                notes?: string | null;
+                /** @description Description of each physical piece, in tag order; may cover only some. */
+                pieces?: {
+                    color_id?: number | null;
+                    brand?: string | null;
+                    notes?: string | null;
+                    defect_type_ids?: number[];
+                }[];
+            }[];
+            /** @description The default tier is used when left out. */
+            turnaround_tier_id?: number | null;
+            discount?: {
+                type?: components["schemas"]["DiscountType"];
+                /** @description Rials for "amount", percent (up to two decimals) for "percent". */
+                value?: number;
+                reason?: string | null;
+            } | null;
         };
         /**
          * PriceUnit
@@ -986,6 +1258,35 @@ export interface components {
             address?: string | null;
             is_active?: boolean;
         };
+        /** StoreOrderRequest */
+        StoreOrderRequest: {
+            branch_id: number;
+            customer_id: number;
+            notes?: string | null;
+            lines: {
+                item_id: number;
+                service_type_id: number;
+                /** @description Pieces for items counted one by one; kilograms or square metres otherwise. */
+                quantity: number;
+                upcharge_ids?: number[];
+                notes?: string | null;
+                /** @description Description of each physical piece, in tag order; may cover only some. */
+                pieces?: {
+                    color_id?: number | null;
+                    brand?: string | null;
+                    notes?: string | null;
+                    defect_type_ids?: number[];
+                }[];
+            }[];
+            /** @description The default tier is used when left out. */
+            turnaround_tier_id?: number | null;
+            discount?: {
+                type?: components["schemas"]["DiscountType"];
+                /** @description Rials for "amount", percent (up to two decimals) for "percent". */
+                value?: number;
+                reason?: string | null;
+            } | null;
+        };
         /** StoreUserRequest */
         StoreUserRequest: {
             name: string;
@@ -1002,6 +1303,18 @@ export interface components {
             is_active?: boolean;
             /** @enum {string} */
             locale?: "fa" | "en";
+        };
+        /** TransitionOrderRequest */
+        TransitionOrderRequest: {
+            /**
+             * @description The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at "received".
+             * @enum {string}
+             */
+            to: "in_process" | "ready" | "cancelled";
+            /** @description Required when cancelling. */
+            reason?: string | null;
+            /** @description Where the finished order is kept, e.g. "A-12"; used when marking it ready. */
+            rack_location?: string | null;
         };
         /** TurnaroundTierResource */
         TurnaroundTierResource: {
@@ -1042,6 +1355,37 @@ export interface components {
             address?: string | null;
             is_active?: boolean;
         };
+        /** UpdateOrderRequest */
+        UpdateOrderRequest: {
+            /** @description The version the change was made on; a newer one on the server means someone else edited it. */
+            version: number;
+            /** @description Why the order is being changed after intake; kept in the audit log. */
+            reason: string;
+            notes?: string | null;
+            lines: {
+                item_id: number;
+                service_type_id: number;
+                /** @description Pieces for items counted one by one; kilograms or square metres otherwise. */
+                quantity: number;
+                upcharge_ids?: number[];
+                notes?: string | null;
+                /** @description Description of each physical piece, in tag order; may cover only some. */
+                pieces?: {
+                    color_id?: number | null;
+                    brand?: string | null;
+                    notes?: string | null;
+                    defect_type_ids?: number[];
+                }[];
+            }[];
+            /** @description The default tier is used when left out. */
+            turnaround_tier_id?: number | null;
+            discount?: {
+                type?: components["schemas"]["DiscountType"];
+                /** @description Rials for "amount", percent (up to two decimals) for "percent". */
+                value?: number;
+                reason?: string | null;
+            } | null;
+        };
         /** UpdateOrganizationRequest */
         UpdateOrganizationRequest: {
             name: string;
@@ -1064,7 +1408,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -1080,6 +1424,14 @@ export interface components {
             receipt?: {
                 header_text?: string | null;
                 footer_text?: string | null;
+            };
+            hours?: {
+                opening?: string;
+                closing?: string;
+                closed_days?: string | null;
+            };
+            orders?: {
+                max_discount_percent?: number;
             };
         };
         /** UpdateUserRequest */
@@ -2169,6 +2521,240 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "orders.index": {
+        parameters: {
+            query?: {
+                /** @description Ticket number, or part of the customer's name or mobile. */
+                "filter[q]"?: string;
+                /** @description One or more statuses, comma separated. */
+                "filter[status]"?: string;
+                "filter[branch_id]"?: number;
+                "filter[customer_id]"?: number;
+                /** @description "today": open orders due today; "overdue": open orders past their due time. */
+                "filter[due]"?: string;
+                /** @description One of created_at, due_at, ticket_number; prefix with "-" for descending. */
+                sort?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `OrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "orders.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreOrderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "orders.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `OrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "orders.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description `OrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "orders.orderPreview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewOrderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            lines: {
+                                item_name: string;
+                                service_name: string;
+                                quantity: number;
+                                unit_price: number;
+                                base_amount: number;
+                                upcharge_amount: number;
+                                surcharge_amount: number;
+                                line_total: number;
+                                piece_count: number;
+                            }[];
+                            turnaround: {
+                                id: number | null;
+                                name: string | null;
+                                surcharge_percent: number;
+                            };
+                            subtotal: number;
+                            discount_amount: number;
+                            tax_amount: number;
+                            total: number;
+                            piece_count: number;
+                            due_at: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "orders.orderTransition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description `OrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "organization.show": {
         parameters: {
             query?: never;
@@ -2502,6 +3088,14 @@ export interface operations {
                                 header_text: string | null;
                                 footer_text: string | null;
                             };
+                            hours: {
+                                opening: string;
+                                closing: string;
+                                closed_days: string | null;
+                            };
+                            orders: {
+                                max_discount_percent: number;
+                            };
                         };
                     };
                 };
@@ -2542,6 +3136,14 @@ export interface operations {
                             receipt: {
                                 header_text: string | null;
                                 footer_text: string | null;
+                            };
+                            hours: {
+                                opening: string;
+                                closing: string;
+                                closed_days: string | null;
+                            };
+                            orders: {
+                                max_discount_percent: number;
                             };
                         };
                     };

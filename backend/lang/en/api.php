@@ -25,5 +25,13 @@ return [
         'role_permission_beyond_own' => 'You cannot grant a permission you do not hold yourself.',
 
         'category_has_items' => 'This category still has items; move or delete them first.',
+
+        'order_branch_unavailable' => 'You cannot work in this branch, or it is inactive.',
+        'order_branch_not_counter' => 'A plant does not take orders directly; choose a counter branch.',
+        'order_not_editable' => 'Order lines can only change before work starts.',
+        'order_version_conflict' => 'Someone else changed this order in the meantime. Reload and try again.',
+        'order_total_below_paid' => 'The new total is below what has been paid; refund first.',
+        'order_transition_not_allowed' => 'The order cannot go from “:from” to “:to”.',
+        'order_has_payments' => 'This order has payments; refund them first.',
     ],
 ];

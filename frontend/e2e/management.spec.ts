@@ -90,6 +90,11 @@ test("settings can be changed and are kept", async ({ page }) => {
   await page.reload();
   await page.getByRole("tab", { name: "مالیات" }).click();
   await expect(page.getByLabel("نرخ مالیات بر ارزش افزوده (درصد)")).toHaveValue("۹");
+
+  // Put the default back; later tests price orders with 10% VAT.
+  await page.getByLabel("نرخ مالیات بر ارزش افزوده (درصد)").fill("10");
+  await page.getByRole("tabpanel", { name: "مالیات" }).getByRole("button", { name: "ذخیره" }).click();
+  await expect(page.getByText("تغییرات ذخیره شد.")).toBeVisible();
 });
 
 test("the panel works on a phone @mobile", async ({ page }) => {

@@ -30,6 +30,14 @@ export type Customer = Schemas["CustomerResource"];
 export type CustomerAddress = Schemas["CustomerAddressResource"];
 export type SaveCustomerInput = Schemas["SaveCustomerRequest"];
 
+export type Order = Schemas["OrderResource"];
+export type OrderLine = Schemas["OrderLineResource"];
+export type Piece = Schemas["PieceResource"];
+export type OrderStatus = Schemas["OrderStatus"];
+export type PaymentStatus = Schemas["PaymentStatus"];
+export type StoreOrderInput = Schemas["StoreOrderRequest"];
+export type OrderPayload = Schemas["PreviewOrderRequest"];
+
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
 export type UpdateBranchInput = Schemas["UpdateBranchRequest"];
@@ -47,6 +55,7 @@ export type Settings = Json<operations["setting.show"]>["data"];
 export type PermissionGroup = Json<operations["role.permissions"]>["data"][number];
 export type CounterCatalog = Json<operations["catalog.catalog"]>["data"];
 export type PriceCell = Json<operations["price.index"]>["data"][number];
+export type PricePreview = Json<operations["orders.orderPreview"]>["data"];
 
 /** Laravel's paginated resource collection. */
 export type Paginated<T> = {

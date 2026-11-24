@@ -49,6 +49,29 @@ final class SettingsRegistry
                 'type' => 'string',
                 'rules' => ['nullable', 'string', 'max:500'],
             ],
+            // Working hours: due dates count only time inside them.
+            'hours.opening' => [
+                'default' => '09:00',
+                'type' => 'string',
+                'rules' => ['string', 'date_format:H:i'],
+            ],
+            'hours.closing' => [
+                'default' => '21:00',
+                'type' => 'string',
+                'rules' => ['string', 'date_format:H:i'],
+            ],
+            // Weekdays the business is closed, comma separated: 0 = Sunday … 6 = Saturday (5 = Friday).
+            'hours.closed_days' => [
+                'default' => '5',
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'regex:/^([0-6](,[0-6]){0,6})?$/'],
+            ],
+            // Largest manual discount, in percent of the order, for staff without unlimited discount rights.
+            'orders.max_discount_percent' => [
+                'default' => 10,
+                'type' => 'number',
+                'rules' => ['numeric', 'min:0', 'max:100'],
+            ],
         ];
     }
 

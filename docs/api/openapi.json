@@ -2006,6 +2006,627 @@
                 }
             }
         },
+        "/orders": {
+            "get": {
+                "operationId": "orders.index",
+                "description": "Orders of the branches the user can work in, newest first.",
+                "summary": "List orders",
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[q]",
+                        "in": "query",
+                        "description": "Ticket number, or part of the customer's name or mobile.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "description": "One or more statuses, comma separated.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[branch_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[customer_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[due]",
+                        "in": "query",
+                        "description": "\"today\": open orders due today; \"overdue\": open orders past their due time.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "One of created_at, due_at, ticket_number; prefix with \"-\" for descending.",
+                        "schema": {
+                            "type": "string",
+                            "default": "-created_at"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OrderResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "orders.store",
+                "description": "Prices the lines against the catalog, gives the order the branch's\nnext ticket number, computes the due time from the turnaround tier\nand working hours, and tags every piece. Send an `Idempotency-Key`\nheader so that a retried request returns the same order (200)\ninstead of creating a second one (201).",
+                "summary": "Take in an order",
+                "tags": [
+                    "Order"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}": {
+            "get": {
+                "operationId": "orders.show",
+                "summary": "Show an order",
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by",
+                                                        "lines",
+                                                        "history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "orders.update",
+                "description": "Only before any work has started (status `received`). Fails with 409\n`order_version_conflict` when the order changed since `version`, and\n`order_not_editable` once it is in process. Pieces are tagged again.",
+                "summary": "Change an order's lines",
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by",
+                                                        "lines",
+                                                        "history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/orders/price-preview": {
+            "post": {
+                "operationId": "orders.orderPreview",
+                "description": "Runs the same pricing as taking the order in, without saving\nanything, so the counter can show the total and due time while the\norder is being put together. Amounts are whole rials.",
+                "summary": "Preview an order's price",
+                "tags": [
+                    "OrderPreview"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PreviewOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "lines": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "service_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "quantity": {
+                                                                "type": "number"
+                                                            },
+                                                            "unit_price": {
+                                                                "type": "integer"
+                                                            },
+                                                            "base_amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "upcharge_amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "surcharge_amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "line_total": {
+                                                                "type": "integer"
+                                                            },
+                                                            "piece_count": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "item_name",
+                                                            "service_name",
+                                                            "quantity",
+                                                            "unit_price",
+                                                            "base_amount",
+                                                            "upcharge_amount",
+                                                            "surcharge_amount",
+                                                            "line_total",
+                                                            "piece_count"
+                                                        ]
+                                                    }
+                                                },
+                                                "turnaround": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "surcharge_percent": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "surcharge_percent"
+                                                    ]
+                                                },
+                                                "subtotal": {
+                                                    "type": "integer"
+                                                },
+                                                "discount_amount": {
+                                                    "type": "integer"
+                                                },
+                                                "tax_amount": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "piece_count": {
+                                                    "type": "integer"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "lines",
+                                                "turnaround",
+                                                "subtotal",
+                                                "discount_amount",
+                                                "tax_amount",
+                                                "total",
+                                                "piece_count",
+                                                "due_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/transitions": {
+            "post": {
+                "operationId": "orders.orderTransition",
+                "description": "Allowed moves are listed in the order's `available_transitions`.\nMarking it `ready` marks its pieces ready and can record where it is\nkept (`rack_location`); cancelling needs `orders.cancel` and a reason,\nand fails with 409 `order_has_payments` while payments are recorded.",
+                "summary": "Change an order's status",
+                "tags": [
+                    "OrderTransition"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransitionOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by",
+                                                        "lines",
+                                                        "history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/organization": {
             "get": {
                 "operationId": "organization.show",
@@ -2611,12 +3232,47 @@
                                                         "header_text",
                                                         "footer_text"
                                                     ]
+                                                },
+                                                "hours": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "opening": {
+                                                            "type": "string"
+                                                        },
+                                                        "closing": {
+                                                            "type": "string"
+                                                        },
+                                                        "closed_days": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "opening",
+                                                        "closing",
+                                                        "closed_days"
+                                                    ]
+                                                },
+                                                "orders": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "max_discount_percent": {
+                                                            "type": "number"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "max_discount_percent"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "general",
                                                 "tax",
-                                                "receipt"
+                                                "receipt",
+                                                "hours",
+                                                "orders"
                                             ]
                                         }
                                     },
@@ -2716,12 +3372,47 @@
                                                         "header_text",
                                                         "footer_text"
                                                     ]
+                                                },
+                                                "hours": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "opening": {
+                                                            "type": "string"
+                                                        },
+                                                        "closing": {
+                                                            "type": "string"
+                                                        },
+                                                        "closed_days": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "opening",
+                                                        "closing",
+                                                        "closed_days"
+                                                    ]
+                                                },
+                                                "orders": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "max_discount_percent": {
+                                                            "type": "number"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "max_discount_percent"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "general",
                                                 "tax",
-                                                "receipt"
+                                                "receipt",
+                                                "hours",
+                                                "orders"
                                             ]
                                         }
                                     },
@@ -3964,6 +4655,15 @@
                 ],
                 "title": "DefectTypeResource"
             },
+            "DiscountType": {
+                "type": "string",
+                "description": "| |\n|---|\n| `amount` <br/> A fixed number of rials off the order. |\n| `percent` <br/> A percentage of the order's subtotal. |",
+                "enum": [
+                    "amount",
+                    "percent"
+                ],
+                "title": "DiscountType"
+            },
             "ItemCategoryResource": {
                 "type": "object",
                 "properties": {
@@ -4073,6 +4773,457 @@
                 ],
                 "title": "LoginRequest"
             },
+            "OrderLineResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "item_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "service_type_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "item_name": {
+                        "type": "string"
+                    },
+                    "service_name": {
+                        "type": "string"
+                    },
+                    "service_code": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "$ref": "#/components/schemas/PriceUnit"
+                    },
+                    "quantity": {
+                        "type": "number",
+                        "description": "Pieces, kilograms or square metres."
+                    },
+                    "unit_price": {
+                        "type": "integer"
+                    },
+                    "base_amount": {
+                        "type": "integer"
+                    },
+                    "upcharge_amount": {
+                        "type": "integer"
+                    },
+                    "surcharge_amount": {
+                        "type": "integer",
+                        "description": "Turnaround surcharge of this line."
+                    },
+                    "line_total": {
+                        "type": "integer"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "upcharges": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "upcharge_id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "fixed",
+                                        "percent"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "amount": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "upcharge_id",
+                                "name",
+                                "type",
+                                "value",
+                                "amount"
+                            ]
+                        }
+                    },
+                    "pieces": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PieceResource"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "item_id",
+                    "service_type_id",
+                    "item_name",
+                    "service_name",
+                    "service_code",
+                    "unit",
+                    "quantity",
+                    "unit_price",
+                    "base_amount",
+                    "upcharge_amount",
+                    "surcharge_amount",
+                    "line_total",
+                    "notes",
+                    "upcharges"
+                ],
+                "title": "OrderLineResource"
+            },
+            "OrderResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "public_id": {
+                        "type": "string",
+                        "description": "Opaque id for the public tracking link."
+                    },
+                    "ticket_number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    },
+                    "payment_status": {
+                        "$ref": "#/components/schemas/PaymentStatus"
+                    },
+                    "branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "code": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "code"
+                        ]
+                    },
+                    "customer": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "mobile": {
+                                "type": "string"
+                            },
+                            "alert": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "mobile",
+                            "alert"
+                        ]
+                    },
+                    "turnaround": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "name": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "surcharge_percent": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "surcharge_percent"
+                        ]
+                    },
+                    "received_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "due_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ready_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "completed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "cancelled_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "cancel_reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "rack_location": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "subtotal": {
+                        "type": "integer"
+                    },
+                    "discount": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "amount",
+                                    "percent"
+                                ]
+                            },
+                            "value": {
+                                "type": "number"
+                            },
+                            "amount": {
+                                "type": "integer"
+                            },
+                            "reason": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "value",
+                            "amount",
+                            "reason"
+                        ]
+                    },
+                    "tax_amount": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "paid_amount": {
+                        "type": "integer"
+                    },
+                    "balance": {
+                        "type": "integer",
+                        "description": "Still to be paid."
+                    },
+                    "piece_count": {
+                        "type": "integer"
+                    },
+                    "version": {
+                        "type": "integer",
+                        "description": "Send back with an edit; a newer version on the server means someone else changed the order."
+                    },
+                    "available_transitions": {
+                        "type": "array",
+                        "description": "Statuses this order can be moved to with POST /orders/{id}/transitions.",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderStatus"
+                        }
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_by": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderLineResource"
+                        }
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "from_status": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/OrderStatus"
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ]
+                                },
+                                "to_status": {
+                                    "$ref": "#/components/schemas/OrderStatus"
+                                },
+                                "user": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name"
+                                    ]
+                                },
+                                "reason": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "created_at": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "from_status",
+                                "to_status",
+                                "user",
+                                "reason",
+                                "created_at"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "public_id",
+                    "ticket_number",
+                    "status",
+                    "payment_status",
+                    "branch",
+                    "customer",
+                    "turnaround",
+                    "received_at",
+                    "due_at",
+                    "ready_at",
+                    "completed_at",
+                    "cancelled_at",
+                    "cancel_reason",
+                    "rack_location",
+                    "notes",
+                    "subtotal",
+                    "discount",
+                    "tax_amount",
+                    "total",
+                    "paid_amount",
+                    "balance",
+                    "version",
+                    "available_transitions",
+                    "created_at"
+                ],
+                "title": "OrderResource"
+            },
+            "OrderStatus": {
+                "type": "string",
+                "description": "The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at \"received\".\n",
+                "enum": [
+                    "draft",
+                    "pending_pickup",
+                    "picked_up",
+                    "received",
+                    "in_process",
+                    "partially_ready",
+                    "ready",
+                    "out_for_delivery",
+                    "completed",
+                    "cancelled"
+                ],
+                "title": "OrderStatus"
+            },
             "OrganizationResource": {
                 "type": "object",
                 "properties": {
@@ -4088,6 +5239,245 @@
                     "name"
                 ],
                 "title": "OrganizationResource"
+            },
+            "PaymentStatus": {
+                "type": "string",
+                "enum": [
+                    "unpaid",
+                    "partially_paid",
+                    "paid",
+                    "refunded"
+                ],
+                "title": "PaymentStatus"
+            },
+            "PieceResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "tag_code": {
+                        "type": "string",
+                        "description": "Printed as a barcode on the piece's tag."
+                    },
+                    "number": {
+                        "type": "integer",
+                        "description": "Position of the piece within the order, from 1."
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/PieceStatus"
+                    },
+                    "color_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "color_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "brand": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "defects": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "defect_type_id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "defect",
+                                        "stain"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "defect_type_id",
+                                "name",
+                                "kind"
+                            ]
+                        }
+                    },
+                    "ready_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "handed_over_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "tag_code",
+                    "number",
+                    "status",
+                    "color_id",
+                    "color_name",
+                    "brand",
+                    "notes",
+                    "defects",
+                    "ready_at",
+                    "handed_over_at"
+                ],
+                "title": "PieceResource"
+            },
+            "PieceStatus": {
+                "type": "string",
+                "description": "Where a piece is in the simple counter flow. Workshop stations (phase 3) add their own scan history on top of this.\n",
+                "enum": [
+                    "received",
+                    "ready",
+                    "handed_over"
+                ],
+                "title": "PieceStatus"
+            },
+            "PreviewOrderRequest": {
+                "type": "object",
+                "properties": {
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "item_id": {
+                                    "type": "integer"
+                                },
+                                "service_type_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "number",
+                                    "description": "Pieces for items counted one by one; kilograms or square metres otherwise.",
+                                    "maximum": 10000
+                                },
+                                "upcharge_ids": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    },
+                                    "maxItems": 10,
+                                    "uniqueItems": true
+                                },
+                                "notes": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 500
+                                },
+                                "pieces": {
+                                    "type": "array",
+                                    "description": "Description of each physical piece, in tag order; may cover only some.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "color_id": {
+                                                "type": [
+                                                    "integer",
+                                                    "null"
+                                                ]
+                                            },
+                                            "brand": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 50
+                                            },
+                                            "notes": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 500
+                                            },
+                                            "defect_type_ids": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                },
+                                                "maxItems": 20,
+                                                "uniqueItems": true
+                                            }
+                                        }
+                                    },
+                                    "maxItems": 500
+                                }
+                            },
+                            "required": [
+                                "item_id",
+                                "service_type_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 200
+                    },
+                    "turnaround_tier_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The default tier is used when left out."
+                    },
+                    "discount": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "type": {
+                                "$ref": "#/components/schemas/DiscountType"
+                            },
+                            "value": {
+                                "type": "number",
+                                "description": "Rials for \"amount\", percent (up to two decimals) for \"percent\".",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                            },
+                            "reason": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 255
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "lines"
+                ],
+                "title": "PreviewOrderRequest"
             },
             "PriceUnit": {
                 "type": "string",
@@ -4520,6 +5910,140 @@
                 ],
                 "title": "StoreBranchRequest"
             },
+            "StoreOrderRequest": {
+                "type": "object",
+                "properties": {
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "customer_id": {
+                        "type": "integer"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "item_id": {
+                                    "type": "integer"
+                                },
+                                "service_type_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "number",
+                                    "description": "Pieces for items counted one by one; kilograms or square metres otherwise.",
+                                    "maximum": 10000
+                                },
+                                "upcharge_ids": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    },
+                                    "maxItems": 10,
+                                    "uniqueItems": true
+                                },
+                                "notes": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 500
+                                },
+                                "pieces": {
+                                    "type": "array",
+                                    "description": "Description of each physical piece, in tag order; may cover only some.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "color_id": {
+                                                "type": [
+                                                    "integer",
+                                                    "null"
+                                                ]
+                                            },
+                                            "brand": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 50
+                                            },
+                                            "notes": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 500
+                                            },
+                                            "defect_type_ids": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                },
+                                                "maxItems": 20,
+                                                "uniqueItems": true
+                                            }
+                                        }
+                                    },
+                                    "maxItems": 500
+                                }
+                            },
+                            "required": [
+                                "item_id",
+                                "service_type_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 200
+                    },
+                    "turnaround_tier_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The default tier is used when left out."
+                    },
+                    "discount": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "type": {
+                                "$ref": "#/components/schemas/DiscountType"
+                            },
+                            "value": {
+                                "type": "number",
+                                "description": "Rials for \"amount\", percent (up to two decimals) for \"percent\".",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                            },
+                            "reason": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 255
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "branch_id",
+                    "customer_id",
+                    "lines"
+                ],
+                "title": "StoreOrderRequest"
+            },
             "StoreUserRequest": {
                 "type": "object",
                 "properties": {
@@ -4585,6 +6109,40 @@
                     "roles"
                 ],
                 "title": "StoreUserRequest"
+            },
+            "TransitionOrderRequest": {
+                "type": "object",
+                "properties": {
+                    "to": {
+                        "type": "string",
+                        "description": "The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at \"received\".\n",
+                        "enum": [
+                            "in_process",
+                            "ready",
+                            "cancelled"
+                        ]
+                    },
+                    "reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Required when cancelling.",
+                        "maxLength": 500
+                    },
+                    "rack_location": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Where the finished order is kept, e.g. \"A-12\"; used when marking it ready.",
+                        "maxLength": 50
+                    }
+                },
+                "required": [
+                    "to"
+                ],
+                "title": "TransitionOrderRequest"
             },
             "TurnaroundTierResource": {
                 "type": "object",
@@ -4700,6 +6258,143 @@
                 },
                 "title": "UpdateBranchRequest"
             },
+            "UpdateOrderRequest": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer",
+                        "description": "The version the change was made on; a newer one on the server means someone else edited it."
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Why the order is being changed after intake; kept in the audit log.",
+                        "maxLength": 500
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "item_id": {
+                                    "type": "integer"
+                                },
+                                "service_type_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "number",
+                                    "description": "Pieces for items counted one by one; kilograms or square metres otherwise.",
+                                    "maximum": 10000
+                                },
+                                "upcharge_ids": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    },
+                                    "maxItems": 10,
+                                    "uniqueItems": true
+                                },
+                                "notes": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 500
+                                },
+                                "pieces": {
+                                    "type": "array",
+                                    "description": "Description of each physical piece, in tag order; may cover only some.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "color_id": {
+                                                "type": [
+                                                    "integer",
+                                                    "null"
+                                                ]
+                                            },
+                                            "brand": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 50
+                                            },
+                                            "notes": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 500
+                                            },
+                                            "defect_type_ids": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                },
+                                                "maxItems": 20,
+                                                "uniqueItems": true
+                                            }
+                                        }
+                                    },
+                                    "maxItems": 500
+                                }
+                            },
+                            "required": [
+                                "item_id",
+                                "service_type_id",
+                                "quantity"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 200
+                    },
+                    "turnaround_tier_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The default tier is used when left out."
+                    },
+                    "discount": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "type": {
+                                "$ref": "#/components/schemas/DiscountType"
+                            },
+                            "value": {
+                                "type": "number",
+                                "description": "Rials for \"amount\", percent (up to two decimals) for \"percent\".",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                            },
+                            "reason": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 255
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "version",
+                    "reason",
+                    "lines"
+                ],
+                "title": "UpdateOrderRequest"
+            },
             "UpdateOrganizationRequest": {
                 "type": "object",
                 "properties": {
@@ -4800,7 +6495,13 @@
                                 "catalog.manage",
                                 "customers.view",
                                 "customers.manage",
-                                "customers.delete"
+                                "customers.delete",
+                                "orders.view",
+                                "orders.create",
+                                "orders.update",
+                                "orders.cancel",
+                                "orders.discount",
+                                "orders.discount_unlimited"
                             ]
                         },
                         "uniqueItems": true
@@ -4858,6 +6559,34 @@
                                     "null"
                                 ],
                                 "maxLength": 500
+                            }
+                        }
+                    },
+                    "hours": {
+                        "type": "object",
+                        "properties": {
+                            "opening": {
+                                "type": "string"
+                            },
+                            "closing": {
+                                "type": "string"
+                            },
+                            "closed_days": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "pattern": "^([0-6](,[0-6]){0,6})?$"
+                            }
+                        }
+                    },
+                    "orders": {
+                        "type": "object",
+                        "properties": {
+                            "max_discount_percent": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100
                             }
                         }
                     }

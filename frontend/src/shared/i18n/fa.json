@@ -58,7 +58,9 @@
     "account": "حساب من",
     "openMenu": "باز کردن منو",
     "catalog": "کاتالوگ و قیمت",
-    "customers": "مشتریان"
+    "customers": "مشتریان",
+    "pos": "صندوق",
+    "orders": "سفارش‌ها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -149,7 +151,8 @@
       "settings": "تنظیمات",
       "activity": "لاگ فعالیت",
       "catalog": "کاتالوگ و قیمت",
-      "customers": "مشتریان"
+      "customers": "مشتریان",
+      "orders": "سفارش‌ها"
     },
     "permissions": {
       "organization": {
@@ -187,6 +190,14 @@
         "view": "مشاهده مشتریان",
         "manage": "ثبت و ویرایش مشتری",
         "delete": "حذف مشتری"
+      },
+      "orders": {
+        "view": "مشاهده سفارش‌ها",
+        "create": "ثبت سفارش",
+        "update": "تغییر وضعیت و اقلام سفارش",
+        "cancel": "لغو سفارش",
+        "discount": "تخفیف دستی تا سقف",
+        "discount_unlimited": "تخفیف دستی بدون سقف"
       }
     }
   },
@@ -239,7 +250,8 @@
       "settings": "تنظیمات",
       "organization": "سازمان",
       "catalog": "کاتالوگ و قیمت",
-      "customer": "مشتریان"
+      "customer": "مشتریان",
+      "order": "سفارش‌ها"
     },
     "events": {
       "created": "ایجاد",
@@ -248,7 +260,10 @@
       "login": "ورود",
       "logout": "خروج",
       "roles_updated": "تغییر نقش",
-      "prices_updated": "تغییر قیمت"
+      "prices_updated": "تغییر قیمت",
+      "discounted": "تخفیف",
+      "edited": "ویرایش سفارش",
+      "cancelled": "لغو"
     }
   },
   "account": {
@@ -364,6 +379,139 @@
       "addressTitle": "عنوان",
       "addressTitlePlaceholder": "خانه، محل کار …",
       "default": "پیش‌فرض"
+    }
+  },
+  "pos": {
+    "title": "صندوق",
+    "branch": "شعبه",
+    "noBranch": "به هیچ شعبه پذیرشی دسترسی ندارید.",
+    "customerSearch": "جست‌وجوی مشتری با نام یا موبایل",
+    "customerSearchHint": "دست‌کم دو حرف یا رقم بنویسید.",
+    "customerNotFound": "مشتری‌ای پیدا نشد.",
+    "registerWith": "ثبت مشتری جدید با «{text}»",
+    "registerNew": "ثبت مشتری جدید",
+    "changeCustomer": "تغییر",
+    "cart": "سبد سفارش",
+    "cartEmpty": "از فهرست اقلام انتخاب کنید.",
+    "quantity": "تعداد",
+    "pieces": "{count, plural, =0 {بدون قطعه} other {# قطعه}}",
+    "lineNotes": "یادداشت این ردیف …",
+    "piecesHelp": "مشخصات هر قطعه را برای تگ و پیگیری ثبت کنید؛ وارد کردن آن اختیاری است.",
+    "pieceNumber": "قطعه {number, number}",
+    "color": "رنگ",
+    "brand": "برند",
+    "pieceNotes": "توضیح قطعه",
+    "orderNotes": "یادداشت سفارش",
+    "subtotal": "جمع اقلام",
+    "discount": "تخفیف",
+    "tax": "مالیات بر ارزش افزوده",
+    "due": "موعد تحویل",
+    "pieceTotal": "تعداد قطعه",
+    "total": "مبلغ قابل پرداخت",
+    "submit": "ثبت سفارش",
+    "discountPercent": "درصدی",
+    "discountAmount": "مبلغی",
+    "discountReason": "دلیل تخفیف",
+    "discountRemove": "حذف تخفیف",
+    "discountApply": "اعمال",
+    "created": "سفارش ثبت شد",
+    "viewOrder": "مشاهده سفارش",
+    "newOrder": "سفارش جدید",
+    "emptyCatalog": "کاتالوگ خالی است. از «کاتالوگ و قیمت» اقلام و قیمت‌ها را تعریف کنید.",
+    "noPrice": "بدون قیمت",
+    "serviceCount": "{count, number} خدمت"
+  },
+  "orders": {
+    "title": "سفارش‌ها",
+    "searchPlaceholder": "شماره قبض، نام یا موبایل مشتری",
+    "notFound": "سفارش پیدا نشد.",
+    "backToList": "بازگشت به سفارش‌ها",
+    "statuses": {
+      "draft": "پیش‌نویس",
+      "pending_pickup": "منتظر جمع‌آوری",
+      "picked_up": "جمع‌آوری‌شده",
+      "received": "پذیرش‌شده",
+      "in_process": "در حال انجام",
+      "partially_ready": "بخشی آماده",
+      "ready": "آماده تحویل",
+      "out_for_delivery": "در مسیر تحویل",
+      "completed": "تحویل‌شده",
+      "cancelled": "لغوشده"
+    },
+    "paymentStatuses": {
+      "unpaid": "پرداخت‌نشده",
+      "partially_paid": "بخشی پرداخت‌شده",
+      "paid": "پرداخت‌شده",
+      "refunded": "بازپرداخت‌شده"
+    },
+    "filters": {
+      "status": "وضعیت",
+      "due": "موعد",
+      "today": "موعد امروز",
+      "overdue": "عقب‌افتاده",
+      "open": "باز"
+    },
+    "columns": {
+      "ticket": "شماره قبض",
+      "customer": "مشتری",
+      "status": "وضعیت",
+      "payment": "پرداخت",
+      "pieces": "قطعه",
+      "total": "مبلغ",
+      "due": "موعد",
+      "created": "پذیرش",
+      "branch": "شعبه"
+    },
+    "detail": {
+      "summary": "خلاصه",
+      "lines": "اقلام",
+      "pieces": "قطعه‌ها",
+      "history": "تاریخچه",
+      "item": "قلم",
+      "service": "خدمت",
+      "quantity": "مقدار",
+      "unitPrice": "فی",
+      "upcharges": "اضافه‌بها",
+      "surcharge": "افزایش فوری",
+      "lineTotal": "جمع",
+      "tag": "تگ",
+      "color": "رنگ",
+      "brand": "برند",
+      "defects": "عیب و لکه",
+      "notes": "یادداشت",
+      "subtotal": "جمع اقلام",
+      "discount": "تخفیف",
+      "tax": "مالیات",
+      "total": "جمع کل",
+      "paid": "پرداخت‌شده",
+      "balance": "مانده",
+      "received": "زمان پذیرش",
+      "due": "موعد تحویل",
+      "readyAt": "آماده‌شده در",
+      "turnaround": "سطح تحویل",
+      "rack": "محل قفسه",
+      "createdBy": "ثبت‌کننده",
+      "cancelReason": "دلیل لغو",
+      "system": "سامانه",
+      "overdue": "عقب‌افتاده"
+    },
+    "actions": {
+      "in_process": "شروع کار",
+      "ready": "آماده شد",
+      "cancelled": "لغو سفارش",
+      "backToProcess": "برگشت به کارگاه",
+      "rackPrompt": "محل نگهداری سفارش (اختیاری)",
+      "rackPlaceholder": "مثلاً A-12",
+      "cancelPrompt": "دلیل لغو را بنویسید.",
+      "cancelReason": "دلیل لغو",
+      "confirm": "تأیید"
+    }
+  },
+  "pieces": {
+    "statuses": {
+      "received": "دریافت‌شده",
+      "ready": "آماده",
+      "handed_over": "تحویل‌شده"
     }
   }
 }

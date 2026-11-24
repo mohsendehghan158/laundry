@@ -20,4 +20,13 @@ final class Digits
     {
         return str_replace(self::ARABIC, self::LATIN, str_replace(self::PERSIAN, self::LATIN, $value));
     }
+
+    /**
+     * Like toLatin(), for a number: also turns the Persian decimal
+     * separator (٫) into a dot and drops thousands separators (٬ and ,).
+     */
+    public static function toLatinNumber(string $value): string
+    {
+        return str_replace(['٫', '٬', ','], ['.', '', ''], self::toLatin(trim($value)));
+    }
 }

@@ -1,6 +1,8 @@
 import {
   ApartmentOutlined,
   ContactsOutlined,
+  FileTextOutlined,
+  ShopOutlined,
   DashboardOutlined,
   HistoryOutlined,
   SafetyCertificateOutlined,
@@ -14,7 +16,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "pos" | "orders" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission. */
   permission?: Permission;
@@ -26,6 +28,8 @@ export const NAV: NavGroup[] = [
   {
     items: [
       { href: "/dashboard", label: "dashboard", icon: <DashboardOutlined /> },
+      { href: "/pos", label: "pos", icon: <ShopOutlined />, permission: "orders.create" },
+      { href: "/orders", label: "orders", icon: <FileTextOutlined />, permission: "orders.view" },
       { href: "/customers", label: "customers", icon: <ContactsOutlined />, permission: "customers.view" },
     ],
   },
