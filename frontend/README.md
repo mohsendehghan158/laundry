@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# پنل خشکشویی (Next.js)
 
-## Getting Started
+راه‌اندازی و دستورها در [README اصلی](../README.md) آمده است. این‌جا فقط ساختار کد:
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```text
+src/
+├── app/                 # مسیرها: (auth)/login و (panel)/… — صفحه‌ها فقط کامپوننت ویژگی را رندر می‌کنند
+├── features/<دامنه>/    # api.ts (هوک‌های TanStack Query) و components/
+├── shared/
+│   ├── api/             # کلاینت fetch با CSRF، نوع‌های تولیدشده از OpenAPI، نگاشت خطای فرم
+│   ├── ui/              # DataTable، PageHeader، JalaliDatePicker، MoneyInput، Can، RequirePermission
+│   ├── hooks/           # usePermission، useListParams (فیلتر و صفحه در نشانی)، useColorScheme
+│   ├── lib/             # ارقام، پول (ریال ↔ تومان)، تاریخ جلالی
+│   ├── layout/          # پوسته پنل و منوی وابسته به مجوز
+│   └── i18n/            # fa.json و en.json
+├── theme/               # توکن‌های Ant Design: روشن، تیره، لمسی
+└── proxy.ts             # بدون کوکی نشست ← صفحه ورود
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+قواعد:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- داده سرور فقط با TanStack Query؛ مجوزها از `/me` می‌آیند و منو و دکمه‌ها با `usePermission` پنهان می‌شوند (سرور مرجع نهایی است).
+- همه متن‌ها در `src/shared/i18n/*.json`؛ تست، یکسان‌بودن کلیدهای فارسی و انگلیسی و برچسب‌داشتن همه مجوزهای بک‌اند را بررسی می‌کند.
+- `src/shared/api/schema.d.ts` را دستی ویرایش نکنید؛ با `npm run api:types` از `docs/api/openapi.json` ساخته می‌شود.
+- مبالغ همیشه ریال‌اند؛ `MoneyInput` و `formatMoney` واحد نمایش (تومان یا ریال) را می‌گیرند.

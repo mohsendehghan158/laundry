@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "api:types": "openapi-typescript ../docs/api/openapi.json -o src/shared/api/schema.d.ts"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",

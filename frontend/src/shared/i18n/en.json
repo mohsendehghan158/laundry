@@ -1,0 +1,248 @@
+{
+  "app": {
+    "name": "Laundry Management System",
+    "shortName": "Laundry"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": "Actions",
+    "search": "Search",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "active": "Active",
+    "inactive": "Inactive",
+    "status": "Status",
+    "saved": "Changes saved.",
+    "created": "Added successfully.",
+    "deleted": "Deleted.",
+    "error": "Something went wrong. Please try again.",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "total": "{count, number} items",
+    "required": "This field is required.",
+    "backHome": "Back to dashboard",
+    "notFoundTitle": "Page not found",
+    "notFoundText": "That address does not exist in the system.",
+    "forbiddenTitle": "No access",
+    "forbiddenText": "You do not have permission to view this page. If you think you should, contact your administrator.",
+    "never": "Never"
+  },
+  "money": {
+    "toman": "Toman",
+    "rial": "Rial"
+  },
+  "auth": {
+    "title": "Sign in",
+    "subtitle": "Sign in with your username and password.",
+    "username": "Username",
+    "password": "Password",
+    "remember": "Remember me",
+    "submit": "Sign in",
+    "logout": "Sign out",
+    "usernameRequired": "Enter your username.",
+    "passwordRequired": "Enter your password."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "management": "Management",
+    "branches": "Branches",
+    "users": "Users",
+    "roles": "Roles & permissions",
+    "settings": "Settings",
+    "activity": "Activity log",
+    "account": "My account",
+    "openMenu": "Open menu"
+  },
+  "dashboard": {
+    "welcome": "Hello {name}",
+    "subtitle": "{organization}",
+    "roles": "Your roles",
+    "branches": "Branches you can access",
+    "noBranches": "You do not have access to any branch yet.",
+    "branchCount": "Active branches",
+    "userCount": "Users",
+    "quickLinks": "Quick links",
+    "upcoming": "Sales, workshop status and alerts appear on this page once the counter and orders arrive (phase 2)."
+  },
+  "branches": {
+    "title": "Branches",
+    "new": "New branch",
+    "edit": "Edit branch",
+    "searchPlaceholder": "Branch name or code",
+    "deleteConfirm": "Delete branch “{name}”?",
+    "fields": {
+      "name": "Name",
+      "code": "Code",
+      "codeHelp": "Capital letters and digits; prefixes this branch's ticket numbers, e.g. T1.",
+      "type": "Type",
+      "phone": "Phone",
+      "address": "Address",
+      "isActive": "Active",
+      "usersCount": "Staff"
+    },
+    "types": {
+      "store": "Store",
+      "plant": "Plant",
+      "hybrid": "Store and plant"
+    },
+    "codeInvalid": "Capital letters and digits only, at most 10 characters.",
+    "phoneInvalid": "Not a valid phone number."
+  },
+  "users": {
+    "title": "Users",
+    "new": "New user",
+    "edit": "Edit user",
+    "searchPlaceholder": "Name, username or mobile",
+    "deleteConfirm": "Delete user “{name}”?",
+    "fields": {
+      "name": "Full name",
+      "username": "Username",
+      "usernameHelp": "Lower-case letters, digits, dot, underscore and hyphen; 3 to 30 characters.",
+      "email": "Email",
+      "mobile": "Mobile",
+      "password": "Password",
+      "passwordEditHelp": "Leave empty to keep the current password.",
+      "roles": "Roles",
+      "branches": "Branches",
+      "branchesHelp": "The user only sees data of the selected branches, unless a role grants access to all branches.",
+      "isActive": "Active",
+      "locale": "Language",
+      "lastLogin": "Last sign-in",
+      "createdAt": "Created"
+    },
+    "locales": {
+      "fa": "فارسی",
+      "en": "English"
+    },
+    "usernameInvalid": "Not a valid username.",
+    "mobileInvalid": "Mobile numbers look like 09121234567.",
+    "emailInvalid": "Not a valid email address.",
+    "allBranches": "All branches"
+  },
+  "roles": {
+    "title": "Roles & permissions",
+    "description": "Choose the permissions of each role. Users holding the role get the same access straight away.",
+    "usersCount": "{count, plural, =0 {No users} one {# user} other {# users}}",
+    "ownerNote": "The owner role always holds every permission and cannot be edited.",
+    "readOnly": "You may only view roles.",
+    "names": {
+      "owner": "Owner",
+      "branch_manager": "Branch manager",
+      "cashier": "Counter & cashier",
+      "plant_operator": "Plant operator",
+      "driver": "Driver",
+      "accountant": "Accountant",
+      "support": "Support"
+    },
+    "groups": {
+      "organization": "Organization",
+      "branches": "Branches",
+      "users": "Users",
+      "roles": "Roles",
+      "settings": "Settings",
+      "activity": "Activity log"
+    },
+    "permissions": {
+      "organization": {
+        "update": "Edit organization details"
+      },
+      "branches": {
+        "view": "View branches",
+        "create": "Add branches",
+        "update": "Edit branches",
+        "delete": "Delete branches",
+        "access_all": "Access every branch"
+      },
+      "users": {
+        "view": "View users",
+        "create": "Add users",
+        "update": "Edit users",
+        "delete": "Delete users"
+      },
+      "roles": {
+        "view": "View roles",
+        "update": "Change role permissions"
+      },
+      "settings": {
+        "view": "View settings",
+        "update": "Change settings"
+      },
+      "activity": {
+        "view": "View the activity log"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "readOnly": "You may only view settings.",
+    "tabs": {
+      "organization": "Organization",
+      "general": "General",
+      "tax": "Tax",
+      "receipt": "Receipt"
+    },
+    "fields": {
+      "organizationName": "Business name",
+      "currencyUnit": "Display unit for amounts",
+      "currencyUnitHelp": "Amounts are always stored in rial; this only sets how they are shown and typed.",
+      "timezone": "Time zone",
+      "vatPercent": "VAT rate (percent)",
+      "pricesIncludeVat": "Catalogue prices include VAT",
+      "headerText": "Receipt header",
+      "footerText": "Receipt footer"
+    }
+  },
+  "activity": {
+    "title": "Activity log",
+    "columns": {
+      "time": "Time",
+      "causer": "User",
+      "area": "Area",
+      "event": "Event",
+      "subject": "Record"
+    },
+    "filters": {
+      "area": "Area",
+      "event": "Event",
+      "from": "From",
+      "to": "To"
+    },
+    "system": "System",
+    "details": "Change details",
+    "field": "Field",
+    "before": "Before",
+    "after": "After",
+    "noChanges": "No details were recorded.",
+    "logNames": {
+      "auth": "Sign-in",
+      "user": "Users",
+      "branch": "Branches",
+      "role": "Roles",
+      "settings": "Settings",
+      "organization": "Organization"
+    },
+    "events": {
+      "created": "Created",
+      "updated": "Updated",
+      "deleted": "Deleted",
+      "login": "Signed in",
+      "logout": "Signed out",
+      "roles_updated": "Roles changed"
+    }
+  },
+  "account": {
+    "title": "My account",
+    "profile": "Profile",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Repeat new password",
+    "mismatch": "The repeated password does not match.",
+    "changed": "Password changed."
+  }
+}
