@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAndWait } from "./helpers";
+import { loginAndWait, markReady } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -18,8 +18,7 @@ test("the customer is texted with a tracking link that opens without signing in"
   // Sanctum treats requests with the site as referer as the signed-in browser.
   const order = await (await page.request.get(`/api/v1/orders/${orderId}`, { headers: { Accept: "application/json", Referer: "http://localhost:3000/" } })).json();
 
-  await page.getByRole("button", { name: "آماده شد" }).click();
-  await page.getByRole("button", { name: "تأیید" }).click();
+  await markReady(page);
   await expect(page.getByRole("heading", { level: 3 }).getByText("آماده تحویل")).toBeVisible();
 
   // The branch manager sees both messages in the log.

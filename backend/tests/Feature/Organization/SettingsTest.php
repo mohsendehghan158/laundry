@@ -16,6 +16,7 @@ it('returns defaults until a setting is changed', function () {
             'tax' => ['vat_percent' => 10, 'prices_include_vat' => false],
             'receipt' => ['header_text' => null, 'footer_text' => null],
             'hours' => ['opening' => '09:00', 'closing' => '21:00', 'closed_days' => '5'],
+            'production' => ['assembly_scan_required' => false],
             'orders' => ['max_discount_percent' => 10],
         ]]);
 });

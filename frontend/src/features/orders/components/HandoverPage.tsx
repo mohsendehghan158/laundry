@@ -106,6 +106,7 @@ export function HandoverPage() {
     { key: "tag", dataIndex: "tag_code", title: t("orders.detail.tag"), render: (v: string) => <Typography.Text code className="ltr">{v}</Typography.Text> },
     { key: "item", title: t("orders.detail.item"), render: (_v, p) => `${p.item_name} · ${p.service_name}` },
     { key: "color", dataIndex: "color_name", title: t("orders.detail.color"), render: (v: string | null) => v ?? "—" },
+    { key: "rack", dataIndex: "rack_slot", title: t("orders.detail.rack"), render: (v: string | null) => (v ? <Tag className="ltr">{v}</Tag> : "—") },
     {
       key: "status",
       dataIndex: "status",

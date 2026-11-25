@@ -184,20 +184,22 @@ it('moves an order through its statuses and keeps pieces in step', function () {
     $shop = shop();
     $cashier = staff($shop);
     $this->actingAs($cashier);
-    $id = $this->postJson('/api/v1/orders', orderPayload($shop))->json('data.id');
+    $order = $this->postJson('/api/v1/orders', orderPayload($shop))->json('data');
+    $id = $order['id'];
 
-    $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'ready', 'rack_location' => 'A-12'])
-        ->assertOk()
-        ->assertJsonPath('data.status', 'ready')
-        ->assertJsonPath('data.rack_location', 'A-12')
-        ->assertJsonPath('data.available_transitions', ['in_process'])
-        ->assertJsonPath('data.lines.0.pieces.0.status', 'ready');
+    // Ready only through assembly.
+    $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'ready'])->assertJsonValidationErrors('to');
+    expect(assembleAll($order, ['rack_location' => 'A-12']))
+        ->toMatchArray(['status' => 'ready', 'rack_location' => 'A-12', 'available_transitions' => ['in_process']])
+        ->and($order = $this->getJson("/api/v1/orders/{$id}")->json('data.lines.0.pieces.0.status'))->toBe('ready');
 
     $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'cancelled', 'reason' => 'x'])->assertForbidden();
 
-    $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'in_process'])
+    // Sent back to the workshop: off the rack.
+    $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'in_process', 'reason' => 'لکه مانده'])
         ->assertOk()
-        ->assertJsonPath('data.lines.0.pieces.0.status', 'received')
+        ->assertJsonPath('data.rack_location', null)
+        ->assertJsonPath('data.lines.0.pieces.0.status', 'in_process')
         ->assertJsonPath('data.history.*.to_status', ['received', 'ready', 'in_process']);
 
     $this->actingAs(staff($shop, 'branch_manager'));
@@ -208,10 +210,9 @@ it('moves an order through its statuses and keeps pieces in step', function () {
         ->assertJsonPath('data.cancel_reason', 'مشتری منصرف شد')
         ->assertJsonPath('data.available_transitions', []);
 
-    $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'ready'])
+    $this->postJson("/api/v1/orders/{$id}/transitions", ['to' => 'in_process'])
         ->assertConflict()
-        ->assertJsonPath('code', 'order_transition_not_allowed')
-        ->assertJsonPath('message', 'سفارش از وضعیت «لغوشده» به «آماده تحویل» نمی‌رود.');
+        ->assertJsonPath('code', 'order_transition_not_allowed');
 });
 
 it('edits the lines of an order before work starts, guarding against stale edits', function () {
@@ -264,7 +265,7 @@ it('keeps orders of other organizations out of reach', function () {
     $foreign = Order::factory()->create();
 
     $this->getJson("/api/v1/orders/{$foreign->id}")->assertNotFound();
-    $this->postJson("/api/v1/orders/{$foreign->id}/transitions", ['to' => 'ready'])->assertNotFound();
+    $this->postJson("/api/v1/orders/{$foreign->id}/transitions", ['to' => 'in_process'])->assertNotFound();
     $this->postJson('/api/v1/orders', orderPayload($shop, ['customer_id' => Customer::factory()->create()->id]))
         ->assertUnprocessable()
         ->assertJsonValidationErrors('customer_id');

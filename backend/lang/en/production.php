@@ -21,6 +21,15 @@ return [
         'damaged' => 'This piece is recorded as damaged.',
         'overdue' => 'This order is past its due time.',
     ],
+    'blockers' => [
+        'on_hold' => 'on hold: :note',
+        'outsourced' => 'at an outside vendor.',
+        'in_transit' => 'on a transfer.',
+        'lost' => 'reported lost.',
+        'rework' => 'needs rework: :note',
+        'elsewhere' => 'at ":branch"; send it to this branch first.',
+    ],
+    'rack_slot_other_branch' => 'This rack slot is not at the order\'s pickup branch.',
     'events' => [
         'scanned' => 'Scanned at station',
         'qc_passed' => 'Passed quality control',

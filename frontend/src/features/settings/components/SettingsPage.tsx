@@ -63,7 +63,7 @@ function OrganizationForm() {
   );
 }
 
-function SettingsForm({ section }: { section: "general" | "tax" | "receipt" }) {
+function SettingsForm({ section }: { section: "general" | "tax" | "receipt" | "production" }) {
   const t = useTranslations();
   const { message } = App.useApp();
   const { can } = usePermission();
@@ -142,6 +142,16 @@ function SettingsForm({ section }: { section: "general" | "tax" | "receipt" }) {
           </Form.Item>
         </>
       )}
+      {section === "production" && (
+        <Form.Item
+          name={["production", "assembly_scan_required"]}
+          label={t("settings.fields.assemblyScanRequired")}
+          extra={t("settings.fields.assemblyScanRequiredHelp")}
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+      )}
       {editable && (
         <Flex>
           <Button type="primary" htmlType="submit" loading={update.isPending}>
@@ -168,6 +178,7 @@ export function SettingsPage() {
             { key: "general", label: t("settings.tabs.general"), children: <SettingsForm section="general" /> },
             { key: "tax", label: t("settings.tabs.tax"), children: <SettingsForm section="tax" /> },
             { key: "receipt", label: t("settings.tabs.receipt"), children: <SettingsForm section="receipt" /> },
+            { key: "production", label: t("settings.tabs.production"), children: <SettingsForm section="production" /> },
           ]}
         />
       </Card>

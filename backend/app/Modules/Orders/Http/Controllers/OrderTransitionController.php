@@ -16,10 +16,11 @@ class OrderTransitionController
     /**
      * Change an order's status
      *
-     * Allowed moves are listed in the order's `available_transitions`.
-     * Marking it `ready` marks its pieces ready and can record where it is
-     * kept (`rack_location`); cancelling needs `orders.cancel` and a reason,
-     * and fails with 409 `order_has_payments` while payments are recorded.
+     * Allowed moves are listed in the order's `available_transitions`:
+     * starting work, cancelling (needs `orders.cancel` and a reason; fails
+     * with 409 `order_has_payments` while payments are recorded) and
+     * sending a ready order back to the workshop. An order becomes ready
+     * through assembly (POST /assembly/{order}/complete).
      */
     public function __invoke(TransitionOrderRequest $request, Order $order, TransitionOrder $transition): OrderResource
     {
@@ -27,8 +28,8 @@ class OrderTransitionController
 
         Gate::authorize($to === OrderStatus::Cancelled ? 'cancel' : 'update', $order);
 
-        $order = $transition->handle($request->actor(), $order, $to, $request->validated('reason'), $request->validated('rack_location'));
+        $order = $transition->handle($request->actor(), $order, $to, $request->validated('reason'));
 
-        return new OrderResource($order->load(['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'history.user', 'payments.user'])->loadCount('pieces'));
+        return new OrderResource($order->load(['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'lines.pieces.rackSlot', 'history.user', 'payments.user'])->loadCount('pieces'));
     }
 }

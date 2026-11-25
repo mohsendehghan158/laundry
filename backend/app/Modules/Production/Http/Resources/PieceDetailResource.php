@@ -43,7 +43,7 @@ class PieceDetailResource extends JsonResource
             /** @var array{id: int, name: string}|null */
             'station' => $this->station === null ? null : ['id' => $this->station->id, 'name' => $this->station->name],
             /** Where it waits on the rack, once ready. */
-            'rack_location' => in_array($this->status->value, ['ready'], true) ? $order->rack_location : null,
+            'rack_location' => $this->status->value === 'ready' ? ($this->rackSlot->code ?? $order->rack_location) : null,
             'last_scanned_at' => $this->last_scanned_at,
             'assembled_at' => $this->assembled_at,
             'ready_at' => $this->ready_at,

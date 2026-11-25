@@ -10,10 +10,6 @@ use Illuminate\Validation\Rule;
 
 class TransitionOrderRequest extends ApiFormRequest
 {
-    protected array $latinDigits = ['rack_location'];
-
-    protected array $uppercase = ['rack_location'];
-
     public function authorize(): bool
     {
         return $this->input('to') === OrderStatus::Cancelled->value
@@ -27,11 +23,9 @@ class TransitionOrderRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'to' => ['required', Rule::enum(OrderStatus::class)->only([OrderStatus::InProcess, OrderStatus::Ready, OrderStatus::Cancelled])],
-            // Required when cancelling.
+            'to' => ['required', Rule::enum(OrderStatus::class)->only([OrderStatus::InProcess, OrderStatus::Cancelled])],
+            // Required when cancelling; recorded when sending an order back to the workshop.
             'reason' => [Rule::requiredIf($this->input('to') === OrderStatus::Cancelled->value), 'nullable', 'string', 'max:500'],
-            // Where the finished order is kept, e.g. "A-12"; used when marking it ready.
-            'rack_location' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

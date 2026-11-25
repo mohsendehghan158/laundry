@@ -10,6 +10,7 @@ use App\Modules\Organization\Models\Branch;
 use App\Modules\Production\Enums\PieceFlag;
 use App\Modules\Production\Models\PieceScan;
 use App\Modules\Production\Models\QcInspection;
+use App\Modules\Production\Models\RackSlot;
 use App\Modules\Production\Models\Station;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property int $order_line_id
  * @property int|null $branch_id where the piece physically is
  * @property int|null $station_id the station that last scanned it
+ * @property int|null $rack_slot_id where it waits once ready
  * @property string $tag_code
  * @property int $number
  * @property PieceStatus $status
@@ -96,6 +98,14 @@ class Piece extends Model
     public function station(): BelongsTo
     {
         return $this->belongsTo(Station::class)->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo<RackSlot, $this>
+     */
+    public function rackSlot(): BelongsTo
+    {
+        return $this->belongsTo(RackSlot::class);
     }
 
     /**

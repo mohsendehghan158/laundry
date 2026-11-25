@@ -18,3 +18,20 @@ export async function loginAndWait(page: Page, username: string) {
 export function sidebar(page: Page) {
   return page.locator(".ant-layout-sider");
 }
+
+/**
+ * On an order's page: "ready" ticks off every piece and racks the order,
+ * in the given slot (typed into the slot picker) or the suggested one.
+ */
+export async function markReady(page: Page, slot?: string) {
+  await page.getByRole("button", { name: "آماده شد" }).click();
+  const dialog = page.getByRole("dialog", { name: "مونتاژ و آماده‌سازی سفارش" });
+  await dialog.getByRole("button", { name: "همه حاضرند" }).click();
+  if (slot) {
+    await dialog.getByLabel("خانه قفسه").click();
+    await dialog.getByLabel("خانه قفسه").fill(slot);
+    await page.locator(".ant-select-dropdown:visible").getByText(slot, { exact: false }).first().click();
+  }
+  await dialog.getByRole("button", { name: "تکمیل مونتاژ و آماده" }).click();
+  await expect(dialog).toBeHidden();
+}

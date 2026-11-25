@@ -69,7 +69,9 @@
     "workshop": "Workshop",
     "station": "Scan station",
     "pieces": "Find a piece",
-    "stations": "Workshop stations"
+    "stations": "Workshop stations",
+    "assembly": "Assembly",
+    "racks": "Racks"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -275,7 +277,8 @@
       "organization": "Organization",
       "general": "General",
       "tax": "Tax",
-      "receipt": "Receipt"
+      "receipt": "Receipt",
+      "production": "Workshop"
     },
     "fields": {
       "organizationName": "Business name",
@@ -285,7 +288,9 @@
       "vatPercent": "VAT rate (percent)",
       "pricesIncludeVat": "Catalogue prices include VAT",
       "headerText": "Receipt header",
-      "footerText": "Receipt footer"
+      "footerText": "Receipt footer",
+      "assemblyScanRequired": "Require scanning at assembly",
+      "assemblyScanRequiredHelp": "When on, an order becomes ready only once every piece has been scanned at the assembly screen; pieces cannot be ticked off by hand."
     }
   },
   "activity": {
@@ -594,8 +599,6 @@
       "ready": "Mark ready",
       "cancelled": "Cancel order",
       "backToProcess": "Back to the workshop",
-      "rackPrompt": "Where is it kept? (optional)",
-      "rackPlaceholder": "e.g. A-12",
       "cancelPrompt": "Why is the order cancelled?",
       "cancelReason": "Reason",
       "confirm": "Confirm"
@@ -966,5 +969,48 @@
     "pieces": "Pieces in the order",
     "history": "History",
     "noHistory": "Nothing recorded yet."
+  },
+  "assembly": {
+    "title": "Assembly",
+    "subtitle": "Scan finished pieces to gather them with the rest of their order",
+    "hint": "Scan the tag of a finished piece.",
+    "dialogTitle": "Assemble and mark ready",
+    "progress": "{gathered, number} of {total, number} pieces",
+    "gathered": "Gathered",
+    "waiting": "Waiting",
+    "inSlot": "On rack {slot}",
+    "allHere": "Every piece is here; put the order on the rack.",
+    "missing": "{count, number} pieces have not arrived",
+    "rackTitle": "Rack",
+    "rackSlot": "Rack slot",
+    "rackLocation": "Rack location",
+    "rackPlaceholder": "e.g. B-7 (optional)",
+    "suggested": "suggested",
+    "occupied": "{count} orders",
+    "complete": "Complete and mark ready",
+    "partial": "Rack what is here (rest later)",
+    "readyDone": "Order {ticket} is ready on rack {rack}.",
+    "partialDone": "Part of order {ticket} is on rack {rack}.",
+    "scanRequired": "Here every piece must be scanned at the Assembly screen.",
+    "tickByScan": "Scan a tag to tick it",
+    "tickAll": "All here",
+    "notInOrder": "This tag is not a piece of this order that can be gathered."
+  },
+  "racks": {
+    "title": "Racks",
+    "subtitle": "Racks of finished orders in each branch and how full each slot is",
+    "new": "New rack",
+    "edit": "Edit rack",
+    "none": "No racks yet; without them, an order's place can be typed in.",
+    "empty": "Empty",
+    "usage": "{used, number} of {total, number} slots used",
+    "deleteConfirm": "Delete the rack \"{name}\"?",
+    "codeHelp": "Slots are numbered from this code: A-01, A-02…",
+    "codeInvalid": "Latin letters and digits only, up to 5.",
+    "fields": {
+      "name": "Name",
+      "code": "Code",
+      "slots": "Slots"
+    }
   }
 }

@@ -48,6 +48,13 @@ return [
         'piece_cannot_hold' => 'This piece cannot be put on hold (it is ready, handed over or in another state).',
         'piece_not_held' => 'This piece is not on hold.',
 
+        'assembly_order_not_open' => 'This order cannot be assembled in its current state.',
+        'assembly_piece_done' => 'Piece :tag is already ready or handed over.',
+        'assembly_scan_required' => 'Every piece must be scanned at the assembly screen here.',
+        'assembly_nothing_gathered' => 'No piece of this order has been gathered yet.',
+        'assembly_incomplete' => 'Not every piece has been gathered. Missing: :tags',
+        'rack_slots_in_use' => 'Orders still wait in these rack slots.',
+
         'notification_not_failed' => 'Only failed messages can be sent again.',
     ],
 ];

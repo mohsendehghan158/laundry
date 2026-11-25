@@ -18,7 +18,7 @@ function readyOrder(object $shop): array
         ['item_id' => $shop->shirt->id, 'service_type_id' => $shop->dc->id, 'quantity' => 2],
     ]]))->assertCreated()->json('data');
 
-    return test()->postJson("/api/v1/orders/{$order['id']}/transitions", ['to' => 'ready', 'rack_location' => 'a-۱۲'])->assertOk()->json('data');
+    return assembleAll($order, ['rack_location' => 'a-۱۲']);
 }
 
 function pieceIds(array $order): array

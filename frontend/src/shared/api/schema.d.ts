@@ -24,6 +24,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/assembly/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Gather a piece
+         * @description Scanned at the assembly table: the piece joins its order's pile and
+         *     the order is returned as at GET /assembly/{order}, with the id of
+         *     the scanned piece. Fails with 409 `assembly_piece_blocked` (held,
+         *     away, in rework or at another branch) or `assembly_piece_done`.
+         */
+        post: operations["assembly.scan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assembly/{order}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show an order at the assembly table
+         * @description Its pieces (gathered, waiting and why), counts, whether it can be
+         *     completed and the suggested rack slot.
+         */
+        get: operations["assembly.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assembly/{order}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete assembly and rack the order
+         * @description Racks the gathered pieces in a slot of the order's branch (or a
+         *     free-text place). The order becomes ready when no piece is left in
+         *     work; otherwise this fails with 409 `assembly_incomplete`, unless
+         *     `partial` is set, which makes the order partially ready. Pieces can
+         *     be ticked off here (`piece_ids`) unless the organization requires
+         *     scanning them.
+         */
+        post: operations["assembly.complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -776,10 +845,11 @@ export interface paths {
         put?: never;
         /**
          * Change an order's status
-         * @description Allowed moves are listed in the order's `available_transitions`.
-         *     Marking it `ready` marks its pieces ready and can record where it is
-         *     kept (`rack_location`); cancelling needs `orders.cancel` and a reason,
-         *     and fails with 409 `order_has_payments` while payments are recorded.
+         * @description Allowed moves are listed in the order's `available_transitions`:
+         *     starting work, cancelling (needs `orders.cancel` and a reason; fails
+         *     with 409 `order_has_payments` while payments are recorded) and
+         *     sending a ready order back to the workshop. An order becomes ready
+         *     through assembly (POST /assembly/{order}/complete).
          */
         post: operations["orders.orderTransition"];
         delete?: never;
@@ -1000,6 +1070,57 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/racks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List racks
+         * @description Racks of the user's branches with their slots and the orders waiting
+         *     in each.
+         */
+        get: operations["racks.index"];
+        put?: never;
+        /**
+         * Create a rack
+         * @description Its slots are numbered from 1: code "A" with 3 slots gives A-01,
+         *     A-02 and A-03.
+         */
+        post: operations["racks.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/racks/{rack}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update a rack
+         * @description Slots can be added; removing slots fails with 409 `rack_slots_in_use`
+         *     while orders wait in them.
+         */
+        put: operations["racks.update"];
+        post?: never;
+        /**
+         * Delete a rack
+         * @description Fails with 409 `rack_slots_in_use` while orders wait in it.
+         */
+        delete: operations["racks.destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1449,6 +1570,10 @@ export interface components {
             /** Format: date-time */
             created_at: string | null;
         };
+        /** AssemblyScanRequest */
+        AssemblyScanRequest: {
+            tag: string;
+        };
         /** AuthUserResource */
         AuthUserResource: {
             id: number;
@@ -1588,6 +1713,16 @@ export interface components {
             hex: string | null;
             sort_order: number;
             is_active: boolean;
+        };
+        /** CompleteAssemblyRequest */
+        CompleteAssemblyRequest: {
+            /** @description Pieces ticked off by hand at the counter (not allowed when scanning is required). */
+            piece_ids?: number[] | null;
+            /** @description A slot of the order's branch's racks, or a free-text place when the branch has none. */
+            rack_slot_id?: number | null;
+            rack_location?: string | null;
+            /** @description Rack what has been gathered while other pieces are still in work. */
+            partial?: boolean;
         };
         /** CustomerAddressResource */
         CustomerAddressResource: {
@@ -1999,6 +2134,10 @@ export interface components {
             /** @description Position of the piece within the order, from 1. */
             number: number;
             status: components["schemas"]["PieceStatus"];
+            flag: components["schemas"]["PieceFlag"] | null;
+            flag_note: string | null;
+            /** @description The rack slot it waits in, once ready. */
+            rack_slot: string | null;
             color_id: number | null;
             color_name: string | null;
             brand: string | null;
@@ -2081,6 +2220,21 @@ export interface components {
             is_active: boolean;
             /** @description Orders (not cancelled) that used the code. */
             used_count?: number;
+        };
+        /** RackResource */
+        RackResource: {
+            id: number;
+            branch_id: number;
+            name: string;
+            code: string;
+            sort_order: number;
+            is_active: boolean;
+            /** @description Ticket numbers of the orders waiting in each slot. */
+            slots: {
+                id: number;
+                code: string;
+                orders: string[];
+            }[];
         };
         /** RefundRequest */
         RefundRequest: {
@@ -2178,6 +2332,16 @@ export interface components {
             usage_limit?: number | null;
             per_customer_limit?: number | null;
             first_order_only?: boolean;
+            is_active?: boolean;
+        };
+        /** SaveRackRequest */
+        SaveRackRequest: {
+            branch_id?: string;
+            name?: string;
+            /** @description Slot codes are built from it: code "A" gives A-01, A-02… */
+            code?: string;
+            slot_count?: number;
+            sort_order?: number;
             is_active?: boolean;
         };
         /** SaveServiceTypeRequest */
@@ -2327,11 +2491,9 @@ export interface components {
              * @description The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at "received".
              * @enum {string}
              */
-            to: "in_process" | "ready" | "cancelled";
-            /** @description Required when cancelling. */
+            to: "in_process" | "cancelled";
+            /** @description Required when cancelling; recorded when sending an order back to the workshop. */
             reason?: string | null;
-            /** @description Where the finished order is kept, e.g. "A-12"; used when marking it ready. */
-            rack_location?: string | null;
         };
         /** TurnaroundTierResource */
         TurnaroundTierResource: {
@@ -2453,6 +2615,9 @@ export interface components {
                 opening?: string;
                 closing?: string;
                 closed_days?: string | null;
+            };
+            production?: {
+                assembly_scan_required?: boolean;
             };
             orders?: {
                 max_discount_percent?: number;
@@ -2624,6 +2789,226 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "assembly.scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssemblyScanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            order: {
+                                id: number;
+                                ticket_number: string;
+                                status: string;
+                                due_at: string;
+                                is_express: boolean;
+                                is_overdue: boolean;
+                                customer_name: string;
+                                branch: {
+                                    id: number;
+                                    name: string;
+                                };
+                                notes: string | null;
+                                rack_location: string | null;
+                            };
+                            pieces: {
+                                id: number;
+                                tag_code: string;
+                                item_name: string;
+                                color_name: string | null;
+                                status: string;
+                                flag: string | null;
+                                flag_note: string | null;
+                                branch: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                                slot: string | null;
+                                blocker: string | null;
+                            }[];
+                            counts: {
+                                total: number;
+                                assembled: number;
+                                ready: number;
+                                waiting: number;
+                                lost: number;
+                            };
+                            complete: boolean;
+                            suggestion: {
+                                id: number;
+                                code: string;
+                            } | null;
+                            scan_required: boolean;
+                        };
+                        scanned_piece_id: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "assembly.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            order: {
+                                id: number;
+                                ticket_number: string;
+                                status: string;
+                                due_at: string;
+                                is_express: boolean;
+                                is_overdue: boolean;
+                                customer_name: string;
+                                branch: {
+                                    id: number;
+                                    name: string;
+                                };
+                                notes: string | null;
+                                rack_location: string | null;
+                            };
+                            pieces: {
+                                id: number;
+                                tag_code: string;
+                                item_name: string;
+                                color_name: string | null;
+                                status: string;
+                                flag: string | null;
+                                flag_note: string | null;
+                                branch: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                                slot: string | null;
+                                blocker: string | null;
+                            }[];
+                            counts: {
+                                total: number;
+                                assembled: number;
+                                ready: number;
+                                waiting: number;
+                                lost: number;
+                            };
+                            complete: boolean;
+                            suggestion: {
+                                id: number;
+                                code: string;
+                            } | null;
+                            scan_required: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "assembly.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CompleteAssemblyRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            order: {
+                                id: number;
+                                ticket_number: string;
+                                status: string;
+                                due_at: string;
+                                is_express: boolean;
+                                is_overdue: boolean;
+                                customer_name: string;
+                                branch: {
+                                    id: number;
+                                    name: string;
+                                };
+                                notes: string | null;
+                                rack_location: string | null;
+                            };
+                            pieces: {
+                                id: number;
+                                tag_code: string;
+                                item_name: string;
+                                color_name: string | null;
+                                status: string;
+                                flag: string | null;
+                                flag_note: string | null;
+                                branch: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                                slot: string | null;
+                                blocker: string | null;
+                            }[];
+                            counts: {
+                                total: number;
+                                assembled: number;
+                                ready: number;
+                                waiting: number;
+                                lost: number;
+                            };
+                            complete: boolean;
+                            suggestion: {
+                                id: number;
+                                code: string;
+                            } | null;
+                            scan_required: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "auth.login": {
@@ -4783,6 +5168,131 @@ export interface operations {
             };
         };
     };
+    "racks.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `RackResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RackResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "racks.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveRackRequest"];
+            };
+        };
+        responses: {
+            /** @description `RackResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RackResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "racks.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The rack ID */
+                rack: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveRackRequest"];
+            };
+        };
+        responses: {
+            /** @description `RackResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RackResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "racks.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The rack ID */
+                rack: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "report.dashboard": {
         parameters: {
             query?: {
@@ -5190,6 +5700,9 @@ export interface operations {
                                 closing: string;
                                 closed_days: string | null;
                             };
+                            production: {
+                                assembly_scan_required: boolean;
+                            };
                             orders: {
                                 max_discount_percent: number;
                             };
@@ -5238,6 +5751,9 @@ export interface operations {
                                 opening: string;
                                 closing: string;
                                 closed_days: string | null;
+                            };
+                            production: {
+                                assembly_scan_required: boolean;
                             };
                             orders: {
                                 max_discount_percent: number;

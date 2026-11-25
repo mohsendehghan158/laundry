@@ -26,6 +26,11 @@ class PieceResource extends JsonResource
             /** Position of the piece within the order, from 1. */
             'number' => $this->number,
             'status' => $this->status,
+            /** Side state: rework, on_hold, outsourced, in_transit, damaged or lost. */
+            'flag' => $this->flag,
+            'flag_note' => $this->flag_note,
+            /** The rack slot it waits in, once ready. */
+            'rack_slot' => $this->rack_slot_id === null ? null : $this->rackSlot?->code,
             'color_id' => $this->color_id,
             'color_name' => $this->color_name,
             'brand' => $this->brand,

@@ -43,3 +43,18 @@ function shirtOrder(object $shop, int $quantity = 1): array
         ->assertCreated()
         ->json('data');
 }
+
+/**
+ * Gathers every piece of an order by hand and racks it; returns the order.
+ *
+ * @param  array<string, mixed>  $order
+ * @param  array<string, mixed>  $extra
+ * @return array<string, mixed>
+ */
+function assembleAll(array $order, array $extra = []): array
+{
+    $ids = array_merge(...array_map(fn (array $line): array => array_column($line['pieces'], 'id'), $order['lines']));
+    test()->postJson("/api/v1/assembly/{$order['id']}/complete", ['piece_ids' => $ids, ...$extra])->assertOk();
+
+    return test()->getJson("/api/v1/orders/{$order['id']}")->assertOk()->json('data');
+}

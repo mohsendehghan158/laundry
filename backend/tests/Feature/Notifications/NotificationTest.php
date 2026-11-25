@@ -40,7 +40,7 @@ it('texts on ready and cancel, but not on completion unless switched on', functi
     $shop = shop();
     $this->actingAs(staff($shop, 'branch_manager'));
     $first = $this->postJson('/api/v1/orders', orderPayload($shop, shirtLines($shop)))->json('data');
-    $this->postJson("/api/v1/orders/{$first['id']}/transitions", ['to' => 'ready'])->assertOk();
+    assembleAll($first);
     $this->postJson("/api/v1/orders/{$first['id']}/handover", ['piece_ids' => [$first['lines'][0]['pieces'][0]['id']]])->assertOk();
 
     $second = $this->postJson('/api/v1/orders', orderPayload($shop, shirtLines($shop)))->json('data');
@@ -69,7 +69,7 @@ it('uses the organization\'s own wording and respects switched-off messages', fu
 
     $this->actingAs(staff($shop));
     $order = $this->postJson('/api/v1/orders', orderPayload($shop, shirtLines($shop)))->json('data');
-    $this->postJson("/api/v1/orders/{$order['id']}/transitions", ['to' => 'ready'])->assertOk();
+    assembleAll($order);
 
     expect(NotificationLog::query()->sole()->body)->toBe("قبض T1-00001 — {$shop->branch->name}");
 });
@@ -124,7 +124,7 @@ it('shows a public tracking page without personal details', function () {
     $shop = shop();
     $this->actingAs(staff($shop));
     $order = $this->postJson('/api/v1/orders', orderPayload($shop, shirtLines($shop)))->json('data');
-    $this->postJson("/api/v1/orders/{$order['id']}/transitions", ['to' => 'ready'])->assertOk();
+    assembleAll($order);
 
     $this->app['auth']->forgetGuards();
 

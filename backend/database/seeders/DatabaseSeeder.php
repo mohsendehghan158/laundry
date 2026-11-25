@@ -10,6 +10,8 @@ use App\Modules\Identity\Support\PermissionRegistry;
 use App\Modules\Organization\Enums\BranchType;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\Organization;
+use App\Modules\Production\Models\Rack;
+use App\Modules\Production\Models\RackSlot;
 use App\Modules\Production\Models\Station;
 use Illuminate\Database\Seeder;
 
@@ -42,6 +44,10 @@ class DatabaseSeeder extends Seeder
         $this->stations($organization, $plant, [['SORT', 'تفکیک'], ['SPOT', 'لکه‌گیری'], ['WASH', 'شست‌وشو و خشکشویی'], ['PRESS', 'اتو و پرس'], ['QC', 'کنترل کیفیت', 'qc'], ['PACK', 'بسته‌بندی']]);
         $this->stations($organization, $central, [['PRESS', 'اتو'], ['QC', 'کنترل کیفیت', 'qc']]);
 
+        $this->rack($organization, $central, 'قفسه A', 'A', 20, 0);
+        $this->rack($organization, $central, 'قفسه B', 'B', 20, 1);
+        $this->rack($organization, $west, 'قفسه A', 'A', 12, 0);
+
         $catalog->run($organization->id);
         $customers->run($organization->id);
     }
@@ -62,6 +68,15 @@ class DatabaseSeeder extends Seeder
             'phone' => $phone,
             'address' => $address,
         ]);
+    }
+
+    private function rack(Organization $organization, Branch $branch, string $name, string $code, int $slots, int $order): void
+    {
+        $rack = Rack::query()->forceCreate(['organization_id' => $organization->id, 'branch_id' => $branch->id, 'name' => $name, 'code' => $code, 'sort_order' => $order]);
+
+        for ($position = 1; $position <= $slots; $position++) {
+            RackSlot::query()->forceCreate(['organization_id' => $organization->id, 'rack_id' => $rack->id, 'position' => $position, 'code' => $rack->slotCode($position)]);
+        }
     }
 
     /**

@@ -9,6 +9,8 @@ use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PieceStatus;
 use App\Modules\Orders\Events\OrderStatusChanged;
 use App\Modules\Orders\Models\Order;
+use App\Modules\Production\Enums\PieceEvent;
+use App\Modules\Production\Support\PieceHistory;
 use App\Support\Exceptions\ApiException;
 use Illuminate\Support\Facades\DB;
 
@@ -42,7 +44,11 @@ final class HandOverOrder
             }
 
             $now = now();
-            $order->pieces()->whereIn('id', $pieceIds)->update(['status' => PieceStatus::HandedOver, 'handed_over_at' => $now]);
+            foreach ($pieces as $piece) {
+                // Off the rack: the slot is free for the next order.
+                $piece->update(['status' => PieceStatus::HandedOver, 'handed_over_at' => $now, 'rack_slot_id' => null]);
+                PieceHistory::record($piece, PieceEvent::HandedOver, $actor);
+            }
 
             $remaining = $order->pieces()->where('status', '!=', PieceStatus::HandedOver)->count();
             $changes = ['version' => $order->version + 1];

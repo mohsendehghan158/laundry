@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class OrderCounterController
 {
-    private const array DETAIL = ['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'history.user', 'payments.user'];
+    private const array DETAIL = ['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'lines.pieces.rackSlot', 'history.user', 'payments.user'];
 
     /**
      * Find an order by scanning

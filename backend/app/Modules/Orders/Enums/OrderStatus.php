@@ -29,18 +29,19 @@ enum OrderStatus: string
 
     /**
      * States an order may move to from this one by an explicit transition.
-     * Handing an order back (completed) has its own endpoint because it
-     * involves pieces and payment.
+     * An order becomes ready only through assembly (every piece gathered
+     * and racked), and completed through handover; both have their own
+     * endpoints. Moving a ready order back to "in process" sends it back
+     * to the workshop.
      *
      * @return list<self>
      */
     public function transitions(): array
     {
         return match ($this) {
-            self::Received => [self::InProcess, self::Ready, self::Cancelled],
-            self::InProcess => [self::Ready, self::Cancelled],
-            self::PartiallyReady => [self::Ready, self::InProcess],
-            self::Ready => [self::InProcess],
+            self::Received => [self::InProcess, self::Cancelled],
+            self::InProcess => [self::Cancelled],
+            self::PartiallyReady, self::Ready => [self::InProcess],
             default => [],
         };
     }

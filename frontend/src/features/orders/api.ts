@@ -71,8 +71,7 @@ export function useCreateOrder() {
 export function useTransitionOrder() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, to, reason, rack_location }: { id: number; to: OrderStatus; reason?: string; rack_location?: string | null }) =>
-      (await api.post<Wrapped<Order>>(`/orders/${id}/transitions`, { to, reason, rack_location })).data,
+    mutationFn: async ({ id, to, reason }: { id: number; to: OrderStatus; reason?: string }) => (await api.post<Wrapped<Order>>(`/orders/${id}/transitions`, { to, reason })).data,
     onSuccess: (order) => {
       queryClient.setQueryData(orderKeys.detail(order.id), order);
       queryClient.invalidateQueries({ queryKey: ["orders", "list"] });

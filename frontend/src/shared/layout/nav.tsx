@@ -1,6 +1,8 @@
 import {
   ApartmentOutlined,
   ClusterOutlined,
+  InboxOutlined,
+  AppstoreOutlined,
   ScanOutlined,
   SearchOutlined,
   ContactsOutlined,
@@ -24,7 +26,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "reports" | "station" | "pieces" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "reports" | "station" | "assembly" | "racks" | "pieces" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
@@ -47,6 +49,8 @@ export const NAV: NavGroup[] = [
     label: "workshop",
     items: [
       { href: "/station", label: "station", icon: <ScanOutlined />, permission: "production.scan" },
+      { href: "/assembly", label: "assembly", icon: <InboxOutlined />, permission: ["production.scan", "orders.update"] },
+      { href: "/racks", label: "racks", icon: <AppstoreOutlined />, permission: ["production.view", "orders.view"] },
       { href: "/pieces", label: "pieces", icon: <SearchOutlined />, permission: ["production.view", "orders.view"] },
     ],
   },

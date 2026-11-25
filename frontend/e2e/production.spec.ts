@@ -5,19 +5,25 @@ test.describe.configure({ mode: "serial" });
 
 const API = { Accept: "application/json", Referer: "http://localhost:3000/" };
 
-/** The counter takes a one-shirt order; returns the shirt's tag code. */
-async function shirtAtCounter(page: Page): Promise<string> {
+/** The counter takes an order of shirts; returns the shirts' tag codes. */
+async function shirtsAtCounter(page: Page, count: number): Promise<string[]> {
   await loginAndWait(page, "cashier");
   await page.goto("/pos");
   await page.getByLabel("جست‌وجوی مشتری با نام یا موبایل").fill("محمد");
   await page.locator(".ant-select-dropdown:visible").getByText("محمد حسینی").click();
-  await page.getByRole("button", { name: "پیراهن", exact: true }).click();
-  await page.getByRole("dialog", { name: "پیراهن" }).getByRole("button", { name: /خشکشویی/ }).click();
+  for (let i = 0; i < count; i++) {
+    await page.getByRole("button", { name: "پیراهن", exact: true }).click();
+    await page.getByRole("dialog", { name: "پیراهن" }).getByRole("button", { name: /خشکشویی/ }).click();
+  }
   await page.getByRole("button", { name: "ثبت سفارش" }).click();
   const ticket = (await page.getByTestId("ticket-number").textContent())!;
   const order = (await (await page.request.get(`/api/v1/orders/lookup?code=${ticket}`, { headers: API })).json()).data;
   await page.context().clearCookies();
-  return order.lines[0].pieces[0].tag_code;
+  return order.lines.flatMap((line: { pieces: Array<{ tag_code: string }> }) => line.pieces.map((piece) => piece.tag_code));
+}
+
+async function shirtAtCounter(page: Page): Promise<string> {
+  return (await shirtsAtCounter(page, 1))[0];
 }
 
 async function chooseStation(page: Page, name: string) {
@@ -107,4 +113,32 @@ test("a manager adds a station and holds a piece", async ({ page }) => {
   await page.getByLabel("کد قطعه", { exact: true }).press("Enter");
   await expect(page.getByTestId("scan-result")).toHaveAttribute("data-level", "error");
   await expect(page.getByTestId("scan-result")).toContainText("این قطعه نگه داشته شده است: منتظر تأیید مشتری برای لکه‌بری");
+});
+
+test("the counter gathers an order at the assembly screen and racks it in the suggested slot", async ({ page }) => {
+  const [first, second] = await shirtsAtCounter(page, 2);
+  const ticket = first.slice(0, first.lastIndexOf("-"));
+
+  await loginAndWait(page, "manager");
+  await page.goto("/assembly");
+  const scan = page.getByLabel("کد قطعه", { exact: true });
+  await scan.fill(first);
+  await scan.press("Enter");
+  await expect(page.getByTestId("assembly-piece").filter({ hasText: first })).toHaveAttribute("data-gathered", "true");
+  await expect(page.getByTestId("assembly-piece").filter({ hasText: second })).toHaveAttribute("data-gathered", "false");
+  await expect(page.getByText("۱ قطعه هنوز نرسیده است")).toBeVisible();
+  await expect(page.getByRole("button", { name: "تکمیل مونتاژ و آماده" })).toBeDisabled();
+
+  await scan.fill(second);
+  await scan.press("Enter");
+  await expect(page.getByText("همه قطعه‌ها رسیده‌اند؛ سفارش را در قفسه بگذارید.")).toBeVisible();
+  const slot = (await page.getByLabel("خانه قفسه").locator("xpath=ancestor::div[contains(@class,'ant-select')]").first().textContent())!.split("·")[0].trim();
+  await page.getByRole("button", { name: "تکمیل مونتاژ و آماده" }).click();
+  await expect(page.getByTestId("assembly-notice")).toContainText(`سفارش ${ticket} آماده شد و در قفسه ${slot} است.`);
+
+  // The rack shows the order in that slot; the order page agrees.
+  await page.goto("/racks");
+  await expect(page.getByLabel(`${slot}: ${ticket}`)).toBeVisible();
+  await page.goto(`/pieces?tag=${second}`);
+  await expect(page.getByText(`آماده تحویل در «شعبه مرکزی»، قفسه ${slot}.`)).toBeVisible();
 });

@@ -66,6 +66,12 @@ final class SettingsRegistry
                 'type' => 'string',
                 'rules' => ['nullable', 'string', 'regex:/^([0-6](,[0-6]){0,6})?$/'],
             ],
+            // Every piece must be scanned at the assembly screen before an order can be marked ready (no ticking pieces off by hand).
+            'production.assembly_scan_required' => [
+                'default' => false,
+                'type' => 'boolean',
+                'rules' => ['boolean'],
+            ],
             // Largest manual discount, in percent of the order, for staff without unlimited discount rights.
             'orders.max_discount_percent' => [
                 'default' => 10,

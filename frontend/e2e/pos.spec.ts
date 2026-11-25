@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { loginAndWait } from "./helpers";
+import { loginAndWait, markReady } from "./helpers";
 
 async function addItem(page: Page, category: string, item: string, service = "خشکشویی") {
   await page.locator(".ant-segmented-item").filter({ hasText: category }).click();
@@ -56,11 +56,9 @@ test("a cashier takes an order for a new customer at the counter", async ({ page
   await expect(page.getByRole("row", { name: new RegExp(`${ticket}-04`) })).toContainText("کت‌وشلوار");
 
   // The workshop finishes it.
-  await page.getByRole("button", { name: "آماده شد" }).click();
-  await page.getByRole("dialog").getByLabel("محل قفسه").fill("B-7");
-  await page.getByRole("button", { name: "تأیید" }).click();
+  await markReady(page, "B-07");
   await expect(page.locator(".ant-tag").filter({ hasText: "آماده تحویل" })).toBeVisible();
-  await expect(page.getByText("B-7")).toBeVisible();
+  await expect(page.locator(".ant-descriptions").getByText("B-07")).toBeVisible();
 
   await page.goto("/orders");
   await page.getByPlaceholder("شماره قبض، نام یا موبایل مشتری").fill("نسرین");

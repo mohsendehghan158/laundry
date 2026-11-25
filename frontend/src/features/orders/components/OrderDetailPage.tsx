@@ -16,6 +16,7 @@ import { dayjs, formatDateTime } from "@/shared/lib/date";
 import { formatNumber } from "@/shared/lib/digits";
 import { formatMoney } from "@/shared/lib/money";
 import { PageHeader } from "@/shared/ui/PageHeader";
+import { AssemblyDialog } from "@/features/production/components/AssemblyDialog";
 import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { openPrint } from "@/features/printing/api";
 import { useOrder, useTransitionOrder, useUpdateRack } from "../api";
@@ -32,7 +33,8 @@ export function OrderDetailPage() {
   const order = useOrder(Number.isFinite(id) ? id : null);
   const transition = useTransitionOrder();
   const updateRack = useUpdateRack();
-  const [asking, setAsking] = useState<"ready" | "cancelled" | null>(null);
+  const [asking, setAsking] = useState<"cancelled" | null>(null);
+  const [assembling, setAssembling] = useState(false);
   const [answer, setAnswer] = useState("");
   const [paying, setPaying] = useState<"pay" | "refund" | null>(null);
 
@@ -54,7 +56,7 @@ export function OrderDetailPage() {
   const money = (value: number) => `${formatMoney(value, unit)} ${t(`money.${unit}`)}`;
   const overdue = OPEN_STATUSES.includes(data.status) && dayjs(data.due_at).isBefore(dayjs());
 
-  const move = (to: OrderStatus, extra: { reason?: string; rack_location?: string | null } = {}) =>
+  const move = (to: OrderStatus, extra: { reason?: string } = {}) =>
     transition.mutate(
       { id: data.id, to, ...extra },
       {
@@ -143,8 +145,8 @@ export function OrderDetailPage() {
                 {data.status === "ready" ? t("orders.actions.backToProcess") : t("orders.actions.in_process")}
               </Button>
             )}
-            {can_("ready") && (
-              <Button type="primary" icon={<CheckOutlined />} onClick={() => setAsking("ready")}>
+            {["received", "in_process", "partially_ready"].includes(data.status) && (can("orders.update") || can("production.scan")) && (
+              <Button type="primary" icon={<CheckOutlined />} onClick={() => setAssembling(true)}>
                 {t("orders.actions.ready")}
               </Button>
             )}
@@ -295,29 +297,23 @@ export function OrderDetailPage() {
         </Col>
       </Row>
       <PaymentModal order={data} mode={paying ?? "pay"} open={paying !== null} onClose={() => setPaying(null)} />
+      <AssemblyDialog orderId={data.id} open={assembling} onClose={() => setAssembling(false)} />
       <Modal
         open={asking !== null}
-        title={asking === "ready" ? t("orders.actions.ready") : t("orders.actions.cancelled")}
+        title={t("orders.actions.cancelled")}
         okText={t("orders.actions.confirm")}
         cancelText={t("common.cancel")}
-        okButtonProps={{ danger: asking === "cancelled", disabled: asking === "cancelled" && answer.trim() === "" }}
+        okButtonProps={{ danger: true, disabled: answer.trim() === "" }}
         confirmLoading={transition.isPending}
         onCancel={() => {
           setAsking(null);
           setAnswer("");
         }}
-        onOk={() => (asking === "ready" ? move("ready", { rack_location: answer.trim() || null }) : move("cancelled", { reason: answer.trim() }))}
+        onOk={() => move("cancelled", { reason: answer.trim() })}
         destroyOnHidden
       >
-        <Typography.Paragraph>{asking === "ready" ? t("orders.actions.rackPrompt") : t("orders.actions.cancelPrompt")}</Typography.Paragraph>
-        <Input
-          autoFocus
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          placeholder={asking === "ready" ? t("orders.actions.rackPlaceholder") : t("orders.actions.cancelReason")}
-          maxLength={asking === "ready" ? 50 : 500}
-          aria-label={asking === "ready" ? t("orders.detail.rack") : t("orders.actions.cancelReason")}
-        />
+        <Typography.Paragraph>{t("orders.actions.cancelPrompt")}</Typography.Paragraph>
+        <Input autoFocus value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={t("orders.actions.cancelReason")} maxLength={500} aria-label={t("orders.actions.cancelReason")} />
       </Modal>
     </>
   );

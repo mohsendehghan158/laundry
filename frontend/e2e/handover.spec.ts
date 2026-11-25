@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAndWait } from "./helpers";
+import { loginAndWait, markReady } from "./helpers";
 
 test("a cashier prints an order, then hands it over by scanning a tag, in two parts", async ({ page }) => {
   await loginAndWait(page, "cashier");
@@ -26,19 +26,17 @@ test("a cashier prints an order, then hands it over by scanning a tag, in two pa
   await expect(page.getByTestId("tag")).toHaveCount(2);
   await expect(page.getByRole("img", { name: `${ticket}-02` })).toBeVisible();
 
-  // The workshop finishes it and puts it on rack C-3.
+  // The workshop finishes it and puts it in slot B-03.
   await page.goto(`/orders/${orderId}`);
-  await page.getByRole("button", { name: "آماده شد" }).click();
-  await page.getByRole("dialog").getByLabel("محل قفسه").fill("c-3");
-  await page.getByRole("button", { name: "تأیید" }).click();
-  await expect(page.locator(".ant-descriptions").getByText("C-3")).toBeVisible();
+  await markReady(page, "B-03");
+  await expect(page.locator(".ant-descriptions").getByText("B-03")).toBeVisible();
 
   // The customer comes back; the clerk scans the second shirt's tag.
   await page.goto("/handover");
   const scan = page.getByLabel("اسکن یا ورود شماره قبض / تگ");
   await scan.fill(`${ticket.toLowerCase()}-02`);
   await scan.press("Enter");
-  await expect(page.getByText("C-3", { exact: true })).toBeVisible();
+  await expect(page.getByText("B-03", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("مانده سفارش باید پیش از تحویل پرداخت شود.")).toBeVisible();
   await expect(page.getByRole("button", { name: "تحویل همه" })).toBeDisabled();
 

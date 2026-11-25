@@ -9,6 +9,8 @@ use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PieceStatus;
 use App\Modules\Orders\Events\OrderStatusChanged;
 use App\Modules\Orders\Models\Order;
+use App\Modules\Production\Enums\PieceEvent;
+use App\Modules\Production\Support\PieceHistory;
 use App\Support\Exceptions\ApiException;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +20,7 @@ final class TransitionOrder
      * Moves an order to another status if the state machine allows it,
      * keeps its pieces in step and appends to the status history.
      */
-    public function handle(User $actor, Order $order, OrderStatus $to, ?string $reason = null, ?string $rackLocation = null): Order
+    public function handle(User $actor, Order $order, OrderStatus $to, ?string $reason = null): Order
     {
         if (! $order->status->canMoveTo($to)) {
             throw ApiException::conflict('order_transition_not_allowed', [
@@ -31,22 +33,19 @@ final class TransitionOrder
             throw ApiException::conflict('order_has_payments');
         }
 
-        return DB::transaction(function () use ($actor, $order, $to, $reason, $rackLocation): Order {
+        return DB::transaction(function () use ($actor, $order, $to, $reason): Order {
             $from = $order->status;
             $now = now();
 
             $changes = ['status' => $to, 'version' => $order->version + 1];
 
-            if ($to === OrderStatus::Ready) {
-                $changes['ready_at'] = $now;
-                $changes['rack_location'] = $rackLocation ?? $order->rack_location;
-                $order->pieces()->where('status', PieceStatus::Received)->update(['status' => PieceStatus::Ready, 'ready_at' => $now]);
-            }
-
-            if ($to === OrderStatus::InProcess && $from === OrderStatus::Ready) {
-                // Sent back to the workshop (e.g. not clean enough).
-                $changes['ready_at'] = null;
-                $order->pieces()->where('status', PieceStatus::Ready)->update(['status' => PieceStatus::Received, 'ready_at' => null]);
+            if ($to === OrderStatus::InProcess && in_array($from, [OrderStatus::Ready, OrderStatus::PartiallyReady], true)) {
+                // Sent back to the workshop (not clean enough, say): off the rack, to be gathered again.
+                $changes += ['ready_at' => null, 'rack_location' => null];
+                foreach ($order->pieces()->whereIn('status', [PieceStatus::Ready, PieceStatus::Assembled])->get() as $piece) {
+                    $piece->update(['status' => PieceStatus::InProcess, 'ready_at' => null, 'assembled_at' => null, 'rack_slot_id' => null]);
+                    PieceHistory::record($piece, PieceEvent::SentBack, $actor, note: $reason);
+                }
             }
 
             if ($to === OrderStatus::Cancelled) {

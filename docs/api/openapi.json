@@ -234,6 +234,789 @@
                 }
             }
         },
+        "/assembly/scan": {
+            "post": {
+                "operationId": "assembly.scan",
+                "description": "Scanned at the assembly table: the piece joins its order's pile and\nthe order is returned as at GET /assembly/{order}, with the id of\nthe scanned piece. Fails with 409 `assembly_piece_blocked` (held,\naway, in rework or at another branch) or `assembly_piece_done`.",
+                "summary": "Gather a piece",
+                "tags": [
+                    "Assembly"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssemblyScanRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "order": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ticket_number": {
+                                                            "type": "string"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "due_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "is_express": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "is_overdue": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "customer_name": {
+                                                            "type": "string"
+                                                        },
+                                                        "branch": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "notes": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "rack_location": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "ticket_number",
+                                                        "status",
+                                                        "due_at",
+                                                        "is_express",
+                                                        "is_overdue",
+                                                        "customer_name",
+                                                        "branch",
+                                                        "notes",
+                                                        "rack_location"
+                                                    ]
+                                                },
+                                                "pieces": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tag_code": {
+                                                                "type": "string"
+                                                            },
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "color_name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "flag": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "flag_note": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "branch": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "name"
+                                                                ]
+                                                            },
+                                                            "slot": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "blocker": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "tag_code",
+                                                            "item_name",
+                                                            "color_name",
+                                                            "status",
+                                                            "flag",
+                                                            "flag_note",
+                                                            "branch",
+                                                            "slot",
+                                                            "blocker"
+                                                        ]
+                                                    }
+                                                },
+                                                "counts": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "assembled": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ready": {
+                                                            "type": "integer"
+                                                        },
+                                                        "waiting": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lost": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "total",
+                                                        "assembled",
+                                                        "ready",
+                                                        "waiting",
+                                                        "lost"
+                                                    ]
+                                                },
+                                                "complete": {
+                                                    "type": "boolean"
+                                                },
+                                                "suggestion": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "code": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "code"
+                                                    ]
+                                                },
+                                                "scan_required": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "order",
+                                                "pieces",
+                                                "counts",
+                                                "complete",
+                                                "suggestion",
+                                                "scan_required"
+                                            ]
+                                        },
+                                        "scanned_piece_id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "scanned_piece_id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/assembly/{order}": {
+            "get": {
+                "operationId": "assembly.show",
+                "description": "Its pieces (gathered, waiting and why), counts, whether it can be\ncompleted and the suggested rack slot.",
+                "summary": "Show an order at the assembly table",
+                "tags": [
+                    "Assembly"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "order": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ticket_number": {
+                                                            "type": "string"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "due_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "is_express": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "is_overdue": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "customer_name": {
+                                                            "type": "string"
+                                                        },
+                                                        "branch": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "notes": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "rack_location": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "ticket_number",
+                                                        "status",
+                                                        "due_at",
+                                                        "is_express",
+                                                        "is_overdue",
+                                                        "customer_name",
+                                                        "branch",
+                                                        "notes",
+                                                        "rack_location"
+                                                    ]
+                                                },
+                                                "pieces": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tag_code": {
+                                                                "type": "string"
+                                                            },
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "color_name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "flag": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "flag_note": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "branch": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "name"
+                                                                ]
+                                                            },
+                                                            "slot": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "blocker": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "tag_code",
+                                                            "item_name",
+                                                            "color_name",
+                                                            "status",
+                                                            "flag",
+                                                            "flag_note",
+                                                            "branch",
+                                                            "slot",
+                                                            "blocker"
+                                                        ]
+                                                    }
+                                                },
+                                                "counts": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "assembled": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ready": {
+                                                            "type": "integer"
+                                                        },
+                                                        "waiting": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lost": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "total",
+                                                        "assembled",
+                                                        "ready",
+                                                        "waiting",
+                                                        "lost"
+                                                    ]
+                                                },
+                                                "complete": {
+                                                    "type": "boolean"
+                                                },
+                                                "suggestion": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "code": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "code"
+                                                    ]
+                                                },
+                                                "scan_required": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "order",
+                                                "pieces",
+                                                "counts",
+                                                "complete",
+                                                "suggestion",
+                                                "scan_required"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/assembly/{order}/complete": {
+            "post": {
+                "operationId": "assembly.complete",
+                "description": "Racks the gathered pieces in a slot of the order's branch (or a\nfree-text place). The order becomes ready when no piece is left in\nwork; otherwise this fails with 409 `assembly_incomplete`, unless\n`partial` is set, which makes the order partially ready. Pieces can\nbe ticked off here (`piece_ids`) unless the organization requires\nscanning them.",
+                "summary": "Complete assembly and rack the order",
+                "tags": [
+                    "Assembly"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteAssemblyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "order": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ticket_number": {
+                                                            "type": "string"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "due_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "is_express": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "is_overdue": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "customer_name": {
+                                                            "type": "string"
+                                                        },
+                                                        "branch": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "notes": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "rack_location": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "ticket_number",
+                                                        "status",
+                                                        "due_at",
+                                                        "is_express",
+                                                        "is_overdue",
+                                                        "customer_name",
+                                                        "branch",
+                                                        "notes",
+                                                        "rack_location"
+                                                    ]
+                                                },
+                                                "pieces": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tag_code": {
+                                                                "type": "string"
+                                                            },
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "color_name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "flag": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "flag_note": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "branch": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "name"
+                                                                ]
+                                                            },
+                                                            "slot": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "blocker": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "tag_code",
+                                                            "item_name",
+                                                            "color_name",
+                                                            "status",
+                                                            "flag",
+                                                            "flag_note",
+                                                            "branch",
+                                                            "slot",
+                                                            "blocker"
+                                                        ]
+                                                    }
+                                                },
+                                                "counts": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "assembled": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ready": {
+                                                            "type": "integer"
+                                                        },
+                                                        "waiting": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lost": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "total",
+                                                        "assembled",
+                                                        "ready",
+                                                        "waiting",
+                                                        "lost"
+                                                    ]
+                                                },
+                                                "complete": {
+                                                    "type": "boolean"
+                                                },
+                                                "suggestion": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "code": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "code"
+                                                    ]
+                                                },
+                                                "scan_required": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "order",
+                                                "pieces",
+                                                "counts",
+                                                "complete",
+                                                "suggestion",
+                                                "scan_required"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "operationId": "auth.login",
@@ -3905,7 +4688,7 @@
         "/orders/{order}/transitions": {
             "post": {
                 "operationId": "orders.orderTransition",
-                "description": "Allowed moves are listed in the order's `available_transitions`.\nMarking it `ready` marks its pieces ready and can record where it is\nkept (`rack_location`); cancelling needs `orders.cancel` and a reason,\nand fails with 409 `order_has_payments` while payments are recorded.",
+                "description": "Allowed moves are listed in the order's `available_transitions`:\nstarting work, cancelling (needs `orders.cancel` and a reason; fails\nwith 409 `order_has_payments` while payments are recorded) and\nsending a ready order back to the workshop. An order becomes ready\nthrough assembly (POST /assembly/{order}/complete).",
                 "summary": "Change an order's status",
                 "tags": [
                     "OrderTransition"
@@ -4883,6 +5666,208 @@
                     }
                 },
                 "security": []
+            }
+        },
+        "/racks": {
+            "get": {
+                "operationId": "racks.index",
+                "description": "Racks of the user's branches with their slots and the orders waiting\nin each.",
+                "summary": "List racks",
+                "tags": [
+                    "Rack"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `RackResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/RackResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "racks.store",
+                "description": "Its slots are numbered from 1: code \"A\" with 3 slots gives A-01,\nA-02 and A-03.",
+                "summary": "Create a rack",
+                "tags": [
+                    "Rack"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveRackRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`RackResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RackResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/racks/{rack}": {
+            "put": {
+                "operationId": "racks.update",
+                "description": "Slots can be added; removing slots fails with 409 `rack_slots_in_use`\nwhile orders wait in them.",
+                "summary": "Update a rack",
+                "tags": [
+                    "Rack"
+                ],
+                "parameters": [
+                    {
+                        "name": "rack",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rack ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveRackRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`RackResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RackResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "racks.destroy",
+                "description": "Fails with 409 `rack_slots_in_use` while orders wait in it.",
+                "summary": "Delete a rack",
+                "tags": [
+                    "Rack"
+                ],
+                "parameters": [
+                    {
+                        "name": "rack",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rack ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
             }
         },
         "/reports/dashboard": {
@@ -5905,6 +6890,17 @@
                                                         "closed_days"
                                                     ]
                                                 },
+                                                "production": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "assembly_scan_required": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "assembly_scan_required"
+                                                    ]
+                                                },
                                                 "orders": {
                                                     "type": "object",
                                                     "properties": {
@@ -5922,6 +6918,7 @@
                                                 "tax",
                                                 "receipt",
                                                 "hours",
+                                                "production",
                                                 "orders"
                                             ]
                                         }
@@ -6045,6 +7042,17 @@
                                                         "closed_days"
                                                     ]
                                                 },
+                                                "production": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "assembly_scan_required": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "assembly_scan_required"
+                                                    ]
+                                                },
                                                 "orders": {
                                                     "type": "object",
                                                     "properties": {
@@ -6062,6 +7070,7 @@
                                                 "tax",
                                                 "receipt",
                                                 "hours",
+                                                "production",
                                                 "orders"
                                             ]
                                         }
@@ -7254,6 +8263,19 @@
                 ],
                 "title": "ActivityResource"
             },
+            "AssemblyScanRequest": {
+                "type": "object",
+                "properties": {
+                    "tag": {
+                        "type": "string",
+                        "maxLength": 40
+                    }
+                },
+                "required": [
+                    "tag"
+                ],
+                "title": "AssemblyScanRequest"
+            },
             "AuthUserResource": {
                 "type": "object",
                 "properties": {
@@ -7751,6 +8773,41 @@
                     "is_active"
                 ],
                 "title": "ColorResource"
+            },
+            "CompleteAssemblyRequest": {
+                "type": "object",
+                "properties": {
+                    "piece_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "description": "Pieces ticked off by hand at the counter (not allowed when scanning is required).",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 500
+                    },
+                    "rack_slot_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "A slot of the order's branch's racks, or a free-text place when the branch has none."
+                    },
+                    "rack_location": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 50
+                    },
+                    "partial": {
+                        "type": "boolean",
+                        "description": "Rack what has been gathered while other pieces are still in work."
+                    }
+                },
+                "title": "CompleteAssemblyRequest"
             },
             "CustomerAddressResource": {
                 "type": "object",
@@ -9223,6 +10280,30 @@
                     "status": {
                         "$ref": "#/components/schemas/PieceStatus"
                     },
+                    "flag": {
+                        "anyOf": [
+                            {
+                                "description": "Side state: rework, on_hold, outsourced, in_transit, damaged or lost.\n| |\n|---|\n| `rework` <br/> Failed quality control; goes back through the stations. |\n| `on_hold` <br/> Held on purpose (waiting for the customer's approval, say). |\n| `outsourced` <br/> At an outside vendor (rugs, leather, tailoring). |\n| `in_transit` <br/> On its way between branches. |\n| `damaged` <br/> Damaged in the shop; a claim is open. Still handed back. |\n| `lost` <br/> Cannot be found; a claim is open. |",
+                                "$ref": "#/components/schemas/PieceFlag"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "flag_note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "rack_slot": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The rack slot it waits in, once ready."
+                    },
                     "color_id": {
                         "type": [
                             "integer",
@@ -9296,6 +10377,9 @@
                     "tag_code",
                     "number",
                     "status",
+                    "flag",
+                    "flag_note",
+                    "rack_slot",
                     "color_id",
                     "color_name",
                     "brand",
@@ -9546,6 +10630,65 @@
                     "is_active"
                 ],
                 "title": "PromoCodeResource"
+            },
+            "RackResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "slots": {
+                        "type": "array",
+                        "description": "Ticket numbers of the orders waiting in each slot.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "code": {
+                                    "type": "string"
+                                },
+                                "orders": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "code",
+                                "orders"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "branch_id",
+                    "name",
+                    "code",
+                    "sort_order",
+                    "is_active",
+                    "slots"
+                ],
+                "title": "RackResource"
             },
             "RefundRequest": {
                 "type": "object",
@@ -9887,6 +11030,37 @@
                     }
                 },
                 "title": "SavePromoCodeRequest"
+            },
+            "SaveRackRequest": {
+                "type": "object",
+                "properties": {
+                    "branch_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Slot codes are built from it: code \"A\" gives A-01, A-02\u2026",
+                        "pattern": "^[A-Z0-9]{1,5}$"
+                    },
+                    "slot_count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 200
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveRackRequest"
             },
             "SaveServiceTypeRequest": {
                 "type": "object",
@@ -10410,7 +11584,6 @@
                         "description": "The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at \"received\".\n",
                         "enum": [
                             "in_process",
-                            "ready",
                             "cancelled"
                         ]
                     },
@@ -10419,16 +11592,8 @@
                             "string",
                             "null"
                         ],
-                        "description": "Required when cancelling.",
+                        "description": "Required when cancelling; recorded when sending an order back to the workshop.",
                         "maxLength": 500
-                    },
-                    "rack_location": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "description": "Where the finished order is kept, e.g. \"A-12\"; used when marking it ready.",
-                        "maxLength": 50
                     }
                 },
                 "required": [
@@ -10912,6 +12077,14 @@
                                     "null"
                                 ],
                                 "pattern": "^([0-6](,[0-6]){0,6})?$"
+                            }
+                        }
+                    },
+                    "production": {
+                        "type": "object",
+                        "properties": {
+                            "assembly_scan_required": {
+                                "type": "boolean"
                             }
                         }
                     },
