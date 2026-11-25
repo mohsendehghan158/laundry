@@ -61,6 +61,7 @@ export type Settings = Json<operations["setting.show"]>["data"];
 export type PermissionGroup = Json<operations["role.permissions"]>["data"][number];
 export type CounterCatalog = Json<operations["catalog.catalog"]>["data"];
 export type PriceCell = Json<operations["price.index"]>["data"][number];
+export type PriceImport = Json<operations["price.import"]>["data"];
 export type PricePreview = Json<operations["orders.orderPreview"]>["data"];
 export type NotificationTemplate = Json<operations["notificationTemplate.index"]>["data"][number];
 export type NotificationLog = Schemas["NotificationLogResource"];

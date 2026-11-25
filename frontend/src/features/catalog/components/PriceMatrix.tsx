@@ -9,6 +9,7 @@ import type { Item } from "@/shared/api/types";
 import { useCurrencyUnit } from "@/shared/hooks/useCurrencyUnit";
 import { formatMoney } from "@/shared/lib/money";
 import { MoneyInput } from "@/shared/ui/MoneyInput";
+import { PriceImport } from "./PriceImport";
 import { indexPrices, priceKey, useCatalogList, usePrices, useUpdatePrices, type PriceChange } from "../api";
 
 /**
@@ -140,17 +141,20 @@ export function PriceMatrix({ editable }: { editable: boolean }) {
           options={(categories.data ?? []).map((c) => ({ value: c.id, label: c.name }))}
           style={{ width: 220 }}
         />
-        {editable && (
-          <Flex gap={8} align="center">
-            <Typography.Text type={edits.size > 0 ? "warning" : "secondary"}>{t("matrix.unsaved", { count: edits.size })}</Typography.Text>
-            <Button disabled={edits.size === 0} onClick={() => setEdits(new Map())}>
-              {t("matrix.discard")}
-            </Button>
-            <Button type="primary" disabled={edits.size === 0} loading={update.isPending} onClick={saveAll}>
-              {tc("save")}
-            </Button>
-          </Flex>
-        )}
+        <Flex gap={8} align="center" wrap>
+          <PriceImport editable={editable} blocked={edits.size > 0} />
+          {editable && (
+            <>
+              <Typography.Text type={edits.size > 0 ? "warning" : "secondary"}>{t("matrix.unsaved", { count: edits.size })}</Typography.Text>
+              <Button disabled={edits.size === 0} onClick={() => setEdits(new Map())}>
+                {t("matrix.discard")}
+              </Button>
+              <Button type="primary" disabled={edits.size === 0} loading={update.isPending} onClick={saveAll}>
+                {tc("save")}
+              </Button>
+            </>
+          )}
+        </Flex>
       </Flex>
       <Table<Item>
         rowKey="id"

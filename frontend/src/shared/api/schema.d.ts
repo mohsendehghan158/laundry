@@ -833,6 +833,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/prices/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the price list as Excel
+         * @description One row per item, one column per active service, amounts in the
+         *     display unit; an empty cell means the service is not offered. Edit
+         *     it and send it back to POST /prices/import.
+         */
+        get: operations["price.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/prices/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import prices from Excel
+         * @description Compares an edited price list workbook with the current prices and
+         *     lists what would change, rows it cannot use (`errors`) and columns
+         *     it ignored (`warnings`). With `apply`, saves the changes, but only
+         *     when there are no errors. Emptied cells remove the price.
+         */
+        post: operations["price.import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/promo-codes": {
         parameters: {
             query?: never;
@@ -1449,6 +1494,16 @@ export interface components {
         HandOverOrderRequest: {
             /** @description The ready pieces the customer takes now; the others stay on the rack. */
             piece_ids: number[];
+        };
+        /** ImportPricesRequest */
+        ImportPricesRequest: {
+            /**
+             * Format: binary
+             * @description The workbook downloaded from GET /prices/export, edited.
+             */
+            file: string;
+            /** @description false (default): only compare; true: also save, when the sheet has no errors. */
+            apply?: boolean;
         };
         /** ItemCategoryResource */
         ItemCategoryResource: {
@@ -4104,6 +4159,74 @@ export interface operations {
                             service_type_id: number;
                             price: number;
                         }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "price.export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: "attachment; filename=\"price-list.xlsx\"";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "price.import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["ImportPricesRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            changes: {
+                                item_id: number;
+                                item: string;
+                                service_type_id: number;
+                                service: string;
+                                old: number | null;
+                                new: number | null;
+                            }[];
+                            errors: {
+                                row: number | null;
+                                message: string;
+                            }[];
+                            warnings: {
+                                row: number | null;
+                                message: string;
+                            }[];
+                            applied: boolean;
+                        };
                     };
                 };
             };

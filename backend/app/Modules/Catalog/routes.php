@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('prices', [PriceController::class, 'index']);
     Route::put('prices', [PriceController::class, 'update']);
+    Route::get('prices/export', [PriceController::class, 'export']);
+    Route::post('prices/import', [PriceController::class, 'import']);
 
     Route::apiResource('service-types', ServiceTypeController::class)->except('show');
     Route::apiResource('item-categories', ItemCategoryController::class)->except('show');

@@ -399,7 +399,7 @@
     "default": "Default",
     "hours": "{count, number} hours",
     "matrix": {
-      "help": "Enter each item's price for each service. An empty cell means the service is not offered for that item.",
+      "help": "Enter each item's price for each service. An empty cell means the service is not offered for that item. For many changes, download the Excel file, edit it and upload it back.",
       "unsaved": "{count, plural, =0 {No changes} one {# unsaved change} other {# unsaved changes}}",
       "discard": "Discard changes",
       "item": "Item",
@@ -408,7 +408,27 @@
       "allCategories": "All categories"
     },
     "codeInvalid": "Capital letters and digits only.",
-    "needCategory": "Create a category on the “Categories” tab first."
+    "needCategory": "Create a category on the “Categories” tab first.",
+    "sheet": {
+      "download": "Download Excel",
+      "upload": "Upload from Excel",
+      "unsavedFirst": "Save or discard the table's unsaved changes first.",
+      "previewTitle": "Changes in \"{file}\"",
+      "errorsTitle": "{count, plural, one {# row has a problem} other {# rows have problems}}; nothing is saved until fixed.",
+      "row": "Row {row}",
+      "noChanges": "No price in this file differs from the current ones.",
+      "apply": "Apply {count, number} changes",
+      "applied": "{count, number} prices updated.",
+      "notOffered": "not offered",
+      "added": "new",
+      "removed": "removed",
+      "columns": {
+        "item": "Item",
+        "service": "Service",
+        "old": "Current price ({unit})",
+        "new": "New price ({unit})"
+      }
+    }
   },
   "customers": {
     "title": "Customers",

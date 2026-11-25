@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/shared/api/client";
+import { api, apiDownload } from "@/shared/api/client";
 import type {
   Color,
   CounterCatalog,
@@ -9,6 +9,7 @@ import type {
   Item,
   ItemCategory,
   PriceCell,
+  PriceImport,
   ServiceType,
   TurnaroundTier,
   Upcharge,
@@ -78,6 +79,29 @@ export function useUpdatePrices() {
     onSuccess: (prices) => {
       queryClient.setQueryData(catalogKeys.prices, prices);
       queryClient.invalidateQueries({ queryKey: catalogKeys.counter });
+    },
+  });
+}
+
+export function useExportPrices() {
+  return useMutation({ mutationFn: () => apiDownload("/prices/export") });
+}
+
+/** Compares an edited price list workbook with the prices; with `apply`, saves it. */
+export function useImportPrices() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ file, apply }: { file: File; apply: boolean }) => {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("apply", apply ? "1" : "0");
+      return (await api.post<Wrapped<PriceImport>>("/prices/import", form)).data;
+    },
+    onSuccess: (result) => {
+      if (result.applied) {
+        queryClient.invalidateQueries({ queryKey: catalogKeys.prices });
+        queryClient.invalidateQueries({ queryKey: catalogKeys.counter });
+      }
     },
   });
 }

@@ -102,7 +102,9 @@ async function send(path: string, options: RequestOptions, csrfRetry: boolean): 
       headers["X-XSRF-TOKEN"] = token;
     }
   }
-  if (options.body !== undefined) {
+  // FormData (file uploads) sets its own multipart content type.
+  const multipart = options.body instanceof FormData;
+  if (options.body !== undefined && !multipart) {
     headers["Content-Type"] = "application/json";
   }
 
@@ -110,7 +112,7 @@ async function send(path: string, options: RequestOptions, csrfRetry: boolean): 
     method,
     headers,
     credentials: "same-origin",
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body: options.body === undefined ? undefined : multipart ? (options.body as FormData) : JSON.stringify(options.body),
     signal: options.signal,
   });
 

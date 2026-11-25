@@ -5,11 +5,18 @@ declare(strict_types=1);
 namespace App\Modules\Catalog\Http\Controllers;
 
 use App\Modules\Catalog\Actions\UpdatePrices;
+use App\Modules\Catalog\Http\Requests\ImportPricesRequest;
 use App\Modules\Catalog\Http\Requests\UpdatePricesRequest;
 use App\Modules\Catalog\Models\Price;
 use App\Modules\Catalog\Models\PriceList;
+use App\Modules\Catalog\Support\PriceSheet;
+use App\Modules\Organization\Support\Settings;
+use App\Support\Export\XlsxReader;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class PriceController
 {
@@ -45,6 +52,61 @@ class PriceController
         $updatePrices->handle($request->actor(), $cells);
 
         return response()->json(['data' => $this->matrix()]);
+    }
+
+    /**
+     * Download the price list as Excel
+     *
+     * One row per item, one column per active service, amounts in the
+     * display unit; an empty cell means the service is not offered. Edit
+     * it and send it back to POST /prices/import.
+     */
+    public function export(Settings $settings): Response
+    {
+        Gate::authorize('catalog.view');
+
+        return response($this->sheet($settings)->build(), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="price-list.xlsx"',
+        ]);
+    }
+
+    /**
+     * Import prices from Excel
+     *
+     * Compares an edited price list workbook with the current prices and
+     * lists what would change, rows it cannot use (`errors`) and columns
+     * it ignored (`warnings`). With `apply`, saves the changes, but only
+     * when there are no errors. Emptied cells remove the price.
+     *
+     * @response array{data: array{changes: list<array{item_id: int, item: string, service_type_id: int, service: string, old: int|null, new: int|null}>, errors: list<array{row: int|null, message: string}>, warnings: list<array{row: int|null, message: string}>, applied: bool}}
+     */
+    public function import(ImportPricesRequest $request, Settings $settings, UpdatePrices $updatePrices): JsonResponse
+    {
+        try {
+            $rows = XlsxReader::firstSheet((string) $request->file('file')?->getRealPath());
+        } catch (InvalidArgumentException) {
+            throw ValidationException::withMessages(['file' => __('catalog.sheet.unreadable')]);
+        }
+
+        $result = $this->sheet($settings)->compare($rows);
+        $applied = false;
+
+        if ($request->boolean('apply') && $result['errors'] === [] && $result['changes'] !== []) {
+            $updatePrices->handle($request->actor(), array_map(fn (array $change): array => [
+                'item_id' => $change['item_id'],
+                'service_type_id' => $change['service_type_id'],
+                'price' => $change['new'],
+            ], $result['changes']));
+            $applied = true;
+        }
+
+        return response()->json(['data' => [...$result, 'applied' => $applied]]);
+    }
+
+    private function sheet(Settings $settings): PriceSheet
+    {
+        return new PriceSheet($settings->get('general.currency_unit') === 'toman');
     }
 
     /**

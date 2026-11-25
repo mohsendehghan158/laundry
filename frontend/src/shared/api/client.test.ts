@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { api, ApiError, buildQuery, onUnauthenticated } from "./client";
+import { api, apiDownload, ApiError, buildQuery, onUnauthenticated } from "./client";
 
 function json(status: number, body: unknown) {
   return new Response(status === 204 ? null : JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -50,6 +50,32 @@ describe("api client", () => {
     const init = fetchMock.mock.calls[1][1];
     expect((init?.headers as Record<string, string>)["X-XSRF-TOKEN"]).toBe("abc=123");
     expect(init?.body).toBe(JSON.stringify({ name: "x" }));
+  });
+
+  it("uploads FormData as multipart, leaving the content type to the browser", async () => {
+    document.cookie = "XSRF-TOKEN=t";
+    fetchMock.mockResolvedValueOnce(json(200, { data: {} }));
+    const form = new FormData();
+    form.append("apply", "0");
+
+    await api.post("/prices/import", form);
+
+    const init = fetchMock.mock.calls[0][1];
+    expect(init?.body).toBe(form);
+    expect((init?.headers as Record<string, string>)["Content-Type"]).toBeUndefined();
+  });
+
+  it("saves a downloaded file under the server's name, or throws the API error", async () => {
+    const createObjectURL = vi.fn(() => "blob:x");
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }));
+    fetchMock.mockResolvedValueOnce(
+      new Response("bytes", { status: 200, headers: { "Content-Disposition": 'attachment; filename="price-list.xlsx"' } }),
+    );
+    expect(await apiDownload("/prices/export")).toBe("price-list.xlsx");
+    expect(createObjectURL).toHaveBeenCalled();
+
+    fetchMock.mockResolvedValueOnce(json(403, { message: "نه", code: "forbidden" }));
+    await expect(apiDownload("/prices/export")).rejects.toMatchObject({ status: 403, message: "نه" });
   });
 
   it("renews the CSRF token once on 419 and retries", async () => {

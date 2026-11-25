@@ -670,7 +670,7 @@ erDiagram
 | گروه | نمونه مسیرها |
 |---|---|
 | احراز هویت | `POST /auth/login`، `POST /auth/pin`، `POST /auth/logout`، `GET /me`، `POST /customer/auth/otp`، `POST /customer/auth/verify` |
-| کاتالوگ | `GET /catalog` (یک‌جا برای صندوق)، CRUD روی `items`، `service-types`، `price-lists`، `upcharges` |
+| کاتالوگ | `GET /catalog` (یک‌جا برای صندوق)، CRUD روی `items`، `service-types`، `price-lists`، `upcharges`؛ `GET`/`PUT /prices` (ماتریس قیمت)، `GET /prices/export` و `POST /prices/import` (اکسل، با پیش‌نمایش) |
 | مشتریان | `GET /customers?filter[q]=0912`، CRUD، `GET /customers/{id}/orders`، `POST /customers/{id}/wallet/adjust` |
 | سفارش | `POST /orders`، `GET /orders`، `GET /orders/{id}`، `PATCH /orders/{id}`، `POST /orders/{id}/transitions`، `POST /orders/{id}/handover`، `POST /orders/price-preview` |
 | قطعه و کارگاه | `POST /scans` (تکی و دسته‌ای)، `GET /pieces/{tag}`، `GET /production/board`، `POST /assembly/{order}/complete`، `POST /racks/assign`، `POST /transfers` |

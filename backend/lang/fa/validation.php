@@ -69,6 +69,7 @@ return [
         'string' => ':attribute نباید بیشتر از :max نویسه باشد.',
     ],
     'mimes' => ':attribute باید فایلی از نوع :values باشد.',
+    'extensions' => 'پسوند :attribute باید یکی از این‌ها باشد: :values.',
     'min' => [
         'array' => ':attribute باید دست‌کم :min مورد داشته باشد.',
         'file' => 'حجم :attribute باید دست‌کم :min کیلوبایت باشد.',

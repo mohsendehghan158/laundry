@@ -4178,6 +4178,184 @@
                 }
             }
         },
+        "/prices/export": {
+            "get": {
+                "operationId": "price.export",
+                "description": "One row per item, one column per active service, amounts in the\ndisplay unit; an empty cell means the service is not offered. Edit\nit and send it back to POST /prices/import.",
+                "summary": "Download the price list as Excel",
+                "tags": [
+                    "Price"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "attachment; filename=\"price-list.xlsx\""
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/prices/import": {
+            "post": {
+                "operationId": "price.import",
+                "description": "Compares an edited price list workbook with the current prices and\nlists what would change, rows it cannot use (`errors`) and columns\nit ignored (`warnings`). With `apply`, saves the changes, but only\nwhen there are no errors. Emptied cells remove the price.",
+                "summary": "Import prices from Excel",
+                "tags": [
+                    "Price"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImportPricesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "changes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "item_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "item": {
+                                                                "type": "string"
+                                                            },
+                                                            "service_type_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "service": {
+                                                                "type": "string"
+                                                            },
+                                                            "old": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "new": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "item_id",
+                                                            "item",
+                                                            "service_type_id",
+                                                            "service",
+                                                            "old",
+                                                            "new"
+                                                        ]
+                                                    }
+                                                },
+                                                "errors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "row": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "message": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "row",
+                                                            "message"
+                                                        ]
+                                                    }
+                                                },
+                                                "warnings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "row": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "message": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "row",
+                                                            "message"
+                                                        ]
+                                                    }
+                                                },
+                                                "applied": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "changes",
+                                                "errors",
+                                                "warnings",
+                                                "applied"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/promo-codes": {
             "get": {
                 "operationId": "promo-codes.index",
@@ -7060,6 +7238,25 @@
                     "piece_ids"
                 ],
                 "title": "HandOverOrderRequest"
+            },
+            "ImportPricesRequest": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "The workbook downloaded from GET /prices/export, edited."
+                    },
+                    "apply": {
+                        "type": "boolean",
+                        "description": "false (default): only compare; true: also save, when the sheet has no errors."
+                    }
+                },
+                "required": [
+                    "file"
+                ],
+                "title": "ImportPricesRequest"
             },
             "ItemCategoryResource": {
                 "type": "object",
