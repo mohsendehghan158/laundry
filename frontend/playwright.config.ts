@@ -43,6 +43,8 @@ export default defineConfig({
         CACHE_STORE: "file",
         QUEUE_CONNECTION: "sync",
         APP_URL: "http://localhost:3000",
+        // Every customer portal sign-in code is this (ignored in production).
+        OTP_FIXED_CODE: "12345",
       },
     },
     {

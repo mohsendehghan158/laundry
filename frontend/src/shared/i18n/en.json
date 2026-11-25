@@ -1217,5 +1217,58 @@
     },
     "noData": "Nothing recorded in this period.",
     "dayEmpty": "{date}: no order became ready"
+  },
+  "portal": {
+    "title": "Customer portal",
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Enter your mobile number and we will text you a sign-in code.",
+      "mobile": "Mobile number",
+      "mobileInvalid": "Enter a mobile number like 09121234567.",
+      "sendCode": "Text me a code",
+      "codeSentTo": "A 5-digit code was texted to {mobile}.",
+      "code": "Sign-in code",
+      "codeInvalid": "Enter the 5-digit code from the text message.",
+      "verify": "Sign in",
+      "changeMobile": "Change number",
+      "resendIn": "Send again in {seconds, number} seconds",
+      "resend": "Send the code again",
+      "resent": "A new code was texted."
+    },
+    "name": {
+      "title": "Welcome",
+      "subtitle": "Tell us your name to finish setting up your account.",
+      "label": "Full name",
+      "submit": "Continue"
+    },
+    "nav": {
+      "orders": "My orders",
+      "logout": "Sign out"
+    },
+    "orders": {
+      "empty": "You have no orders yet.",
+      "emptyHint": "Orders you place at a branch show up here.",
+      "error": "Your orders could not be loaded.",
+      "due": "Due",
+      "pieces": "{count, number} pieces",
+      "balance": "Balance",
+      "settled": "Settled"
+    },
+    "order": {
+      "back": "Back to orders",
+      "notFound": "This order was not found.",
+      "branch": "Branch",
+      "receivedAt": "Received",
+      "dueAt": "Due",
+      "items": "Items",
+      "payments": "Payments",
+      "subtotal": "Items total",
+      "discount": "Discount",
+      "tax": "VAT",
+      "total": "Total",
+      "paid": "Paid",
+      "balance": "Balance",
+      "readyNotice": "Your order is ready; you can pick it up at the branch."
+    }
   }
 }
