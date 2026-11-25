@@ -3,6 +3,7 @@ import {
   ContactsOutlined,
   FileTextOutlined,
   GiftOutlined,
+  MessageOutlined,
   ExportOutlined,
   WalletOutlined,
   ShopOutlined,
@@ -19,7 +20,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "pos" | "handover" | "orders" | "register" | "promotions" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
@@ -43,6 +44,7 @@ export const NAV: NavGroup[] = [
     items: [
       { href: "/catalog", label: "catalog", icon: <TagsOutlined />, permission: "catalog.view" },
       { href: "/promotions", label: "promotions", icon: <GiftOutlined />, permission: "promotions.manage" },
+      { href: "/notifications", label: "notifications", icon: <MessageOutlined />, permission: ["notifications.view", "notifications.manage"] },
       { href: "/branches", label: "branches", icon: <ApartmentOutlined />, permission: "branches.view" },
       { href: "/users", label: "users", icon: <TeamOutlined />, permission: "users.view" },
       { href: "/roles", label: "roles", icon: <SafetyCertificateOutlined />, permission: "roles.view" },

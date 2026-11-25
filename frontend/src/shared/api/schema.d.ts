@@ -491,6 +491,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/notification-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List sent messages
+         * @description Newest first.
+         */
+        get: operations["notificationLog.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notification-logs/{notificationLog}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a failed message again */
+        post: operations["notificationLog.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notification-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List message templates
+         * @description One per event, with the organization's wording or the built-in one,
+         *     and the placeholders that can be used.
+         */
+        get: operations["notificationTemplate.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notification-templates/{event}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change a message template */
+        put: operations["notificationTemplate.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orders": {
         parameters: {
             query?: never;
@@ -798,6 +873,29 @@ export interface paths {
          * @description Orders that used it keep their discount.
          */
         delete: operations["promo-codes.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/track/{publicId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Track an order (public)
+         * @description For the link in the customer's SMS and on their receipt. Needs no
+         *     sign-in; the id is the order's unguessable public id. Shows where
+         *     the order is and what is owed, but nothing personal: no name, no
+         *     phone number, no item details.
+         */
+        get: operations["orders.publicTracking"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1315,6 +1413,33 @@ export interface components {
             password: string;
             /** @description Keep the session alive after the browser closes. */
             remember?: boolean;
+        };
+        /**
+         * NotificationEvent
+         * @description Moments the customer is told about, each with built-in wording that an organization may replace. Placeholders: {customer} {ticket} {total} {balance} {due} {link} {organization} {branch} {rack}.
+         * @enum {string}
+         */
+        NotificationEvent: "order_received" | "order_ready" | "order_completed" | "order_cancelled";
+        /** NotificationLogResource */
+        NotificationLogResource: {
+            id: number;
+            event: components["schemas"]["NotificationEvent"];
+            channel: string;
+            recipient: string;
+            body: string;
+            /** @enum {string} */
+            status: "queued" | "sent" | "failed";
+            provider: string | null;
+            error: string | null;
+            attempts: number;
+            order: {
+                id: number;
+                ticket_number: string;
+            } | null;
+            /** Format: date-time */
+            sent_at: string | null;
+            /** Format: date-time */
+            created_at: string | null;
         };
         /** OpenShiftRequest */
         OpenShiftRequest: {
@@ -1909,7 +2034,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -1934,6 +2059,12 @@ export interface components {
             orders?: {
                 max_discount_percent?: number;
             };
+        };
+        /** UpdateTemplateRequest */
+        UpdateTemplateRequest: {
+            /** @description Placeholders such as {ticket} are filled in when sending. */
+            body: string;
+            is_active: boolean;
         };
         /** UpdateUserRequest */
         UpdateUserRequest: {
@@ -3225,6 +3356,160 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "notificationLog.index": {
+        parameters: {
+            query?: {
+                "filter[order_id]"?: number;
+                /** @description queued, sent or failed. */
+                "filter[status]"?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `NotificationLogResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NotificationLogResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "notificationLog.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The notification log ID */
+                notificationLog: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `NotificationLogResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NotificationLogResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "notificationTemplate.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @enum {string} */
+                            event: "order_received" | "order_ready" | "order_completed" | "order_cancelled";
+                            body: string;
+                            default_body: string;
+                            is_active: boolean;
+                            customized: boolean;
+                        }[];
+                        placeholders: string[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "notificationTemplate.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The event ID */
+                event: components["schemas"]["NotificationEvent"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTemplateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @enum {string} */
+                            event: "order_received" | "order_ready" | "order_completed" | "order_cancelled";
+                            body: string;
+                            default_body: string;
+                            is_active: boolean;
+                            customized: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "orders.index": {
         parameters: {
             query?: {
@@ -3869,6 +4154,65 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "orders.publicTracking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            ticket_number: string;
+                            status: string;
+                            organization: string;
+                            branch: {
+                                name: string;
+                                phone: string | null;
+                                address: string | null;
+                            };
+                            received_at: string;
+                            due_at: string;
+                            ready_at: string | null;
+                            completed_at: string | null;
+                            piece_count: number;
+                            total: number;
+                            paid_amount: number;
+                            balance: number;
+                            /** @enum {string} */
+                            currency_unit: "toman" | "rial";
+                            history: {
+                                status: string;
+                                at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            404: components["responses"]["ModelNotFoundException"];
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
         };
     };
     "role.permissions": {

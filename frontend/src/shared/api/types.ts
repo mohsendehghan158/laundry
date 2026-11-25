@@ -62,6 +62,9 @@ export type PermissionGroup = Json<operations["role.permissions"]>["data"][numbe
 export type CounterCatalog = Json<operations["catalog.catalog"]>["data"];
 export type PriceCell = Json<operations["price.index"]>["data"][number];
 export type PricePreview = Json<operations["orders.orderPreview"]>["data"];
+export type NotificationTemplate = Json<operations["notificationTemplate.index"]>["data"][number];
+export type NotificationLog = Schemas["NotificationLogResource"];
+export type PublicTracking = Json<operations["orders.publicTracking"]>["data"];
 
 /** Laravel's paginated resource collection. */
 export type Paginated<T> = {

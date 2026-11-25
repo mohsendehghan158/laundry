@@ -9,6 +9,7 @@ use App\Modules\Billing\Support\PromoCodes;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PaymentStatus;
+use App\Modules\Orders\Events\OrderStatusChanged;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\OrderPricer;
 use App\Modules\Orders\Support\OrderWriter;
@@ -88,6 +89,7 @@ final class CreateOrder
                 $this->writer->writeLines($order, $priced);
 
                 $order->history()->create(['from_status' => null, 'to_status' => OrderStatus::Received, 'user_id' => $actor->id]);
+                OrderStatusChanged::dispatch($order, null, OrderStatus::Received);
 
                 if ($priced['discount_amount'] > 0) {
                     activity('order')->causedBy($actor)->performedOn($order)->event('discounted')

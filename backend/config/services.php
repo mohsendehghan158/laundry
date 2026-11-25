@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    // Text messages to customers. "log" writes them to the log (development);
+    // "kavenegar" sends them through kavenegar.com.
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'log'),
+        'kavenegar' => [
+            'key' => env('KAVENEGAR_API_KEY'),
+            'sender' => env('KAVENEGAR_SENDER'),
+        ],
+    ],
+
 ];

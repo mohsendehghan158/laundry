@@ -42,6 +42,8 @@ final class PermissionRegistry
             // shifts.operate = open, close and use the register; shifts.view = review past shifts.
             'billing' => ['payments.create', 'payments.refund', 'shifts.operate', 'shifts.view'],
             'promotions' => ['promotions.manage'],
+            // manage = edit message texts and resend; view = the send log.
+            'notifications' => ['notifications.manage', 'notifications.view'],
         ];
     }
 
@@ -73,12 +75,13 @@ final class PermissionRegistry
                 'customers.view', 'customers.manage', 'customers.delete',
                 'orders.view', 'orders.create', 'orders.update', 'orders.cancel', 'orders.discount', 'orders.handover', 'orders.handover_unpaid',
                 'payments.create', 'payments.refund', 'shifts.operate', 'shifts.view',
+                'notifications.view',
             ],
             'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'orders.handover', 'payments.create', 'shifts.operate'],
             'plant_operator' => ['orders.view', 'orders.update'],
             'driver' => ['customers.view'],
             'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view'],
-            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create'],
+            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create', 'notifications.view'],
         ];
     }
 }

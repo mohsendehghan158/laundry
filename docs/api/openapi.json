@@ -2514,6 +2514,414 @@
                 }
             }
         },
+        "/notification-logs": {
+            "get": {
+                "operationId": "notificationLog.index",
+                "description": "Newest first.",
+                "summary": "List sent messages",
+                "tags": [
+                    "NotificationLog"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[order_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "description": "queued, sent or failed.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `NotificationLogResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/NotificationLogResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/notification-logs/{notificationLog}/retry": {
+            "post": {
+                "operationId": "notificationLog.retry",
+                "summary": "Send a failed message again",
+                "tags": [
+                    "NotificationLog"
+                ],
+                "parameters": [
+                    {
+                        "name": "notificationLog",
+                        "in": "path",
+                        "required": true,
+                        "description": "The notification log ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`NotificationLogResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationLogResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/notification-templates": {
+            "get": {
+                "operationId": "notificationTemplate.index",
+                "description": "One per event, with the organization's wording or the built-in one,\nand the placeholders that can be used.",
+                "summary": "List message templates",
+                "tags": [
+                    "NotificationTemplate"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "event": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "order_received",
+                                                            "order_ready",
+                                                            "order_completed",
+                                                            "order_cancelled"
+                                                        ]
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_body": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "customized": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "event",
+                                                    "body",
+                                                    "default_body",
+                                                    "is_active",
+                                                    "customized"
+                                                ]
+                                            }
+                                        },
+                                        "placeholders": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "placeholders"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/notification-templates/{event}": {
+            "put": {
+                "operationId": "notificationTemplate.update",
+                "summary": "Change a message template",
+                "tags": [
+                    "NotificationTemplate"
+                ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "$ref": "#/components/schemas/NotificationEvent"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTemplateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "event": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "order_received",
+                                                        "order_ready",
+                                                        "order_completed",
+                                                        "order_cancelled"
+                                                    ]
+                                                },
+                                                "body": {
+                                                    "type": "string"
+                                                },
+                                                "default_body": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "customized": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "event",
+                                                "body",
+                                                "default_body",
+                                                "is_active",
+                                                "customized"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/orders": {
             "get": {
                 "operationId": "orders.index",
@@ -3947,6 +4355,176 @@
                         "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
+            }
+        },
+        "/public/track/{publicId}": {
+            "get": {
+                "operationId": "orders.publicTracking",
+                "description": "For the link in the customer's SMS and on their receipt. Needs no\nsign-in; the id is the order's unguessable public id. Shows where\nthe order is and what is owed, but nothing personal: no name, no\nphone number, no item details.",
+                "summary": "Track an order (public)",
+                "tags": [
+                    "PublicTracking"
+                ],
+                "parameters": [
+                    {
+                        "name": "publicId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "ticket_number": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "organization": {
+                                                    "type": "string"
+                                                },
+                                                "branch": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "phone": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "address": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "phone",
+                                                        "address"
+                                                    ]
+                                                },
+                                                "received_at": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "ready_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "completed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "piece_count": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "paid_amount": {
+                                                    "type": "integer"
+                                                },
+                                                "balance": {
+                                                    "type": "integer"
+                                                },
+                                                "currency_unit": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "toman",
+                                                        "rial"
+                                                    ]
+                                                },
+                                                "history": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "status",
+                                                            "at"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "ticket_number",
+                                                "status",
+                                                "organization",
+                                                "branch",
+                                                "received_at",
+                                                "due_at",
+                                                "ready_at",
+                                                "completed_at",
+                                                "piece_count",
+                                                "total",
+                                                "paid_amount",
+                                                "balance",
+                                                "currency_unit",
+                                                "history"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                },
+                "security": []
             }
         },
         "/permissions": {
@@ -6198,6 +6776,107 @@
                 ],
                 "title": "LoginRequest"
             },
+            "NotificationEvent": {
+                "type": "string",
+                "description": "Moments the customer is told about, each with built-in wording that an organization may replace. Placeholders: {customer} {ticket} {total} {balance} {due} {link} {organization} {branch} {rack}.\n",
+                "enum": [
+                    "order_received",
+                    "order_ready",
+                    "order_completed",
+                    "order_cancelled"
+                ],
+                "title": "NotificationEvent"
+            },
+            "NotificationLogResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "event": {
+                        "$ref": "#/components/schemas/NotificationEvent"
+                    },
+                    "channel": {
+                        "type": "string"
+                    },
+                    "recipient": {
+                        "type": "string"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "queued",
+                            "sent",
+                            "failed"
+                        ]
+                    },
+                    "provider": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "attempts": {
+                        "type": "integer"
+                    },
+                    "order": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "ticket_number": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "ticket_number"
+                        ]
+                    },
+                    "sent_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "event",
+                    "channel",
+                    "recipient",
+                    "body",
+                    "status",
+                    "provider",
+                    "error",
+                    "attempts",
+                    "order",
+                    "sent_at",
+                    "created_at"
+                ],
+                "title": "NotificationLogResource"
+            },
             "OpenShiftRequest": {
                 "type": "object",
                 "properties": {
@@ -8410,7 +9089,9 @@
                                 "payments.refund",
                                 "shifts.operate",
                                 "shifts.view",
-                                "promotions.manage"
+                                "promotions.manage",
+                                "notifications.manage",
+                                "notifications.view"
                             ]
                         },
                         "uniqueItems": true
@@ -8501,6 +9182,24 @@
                     }
                 },
                 "title": "UpdateSettingsRequest"
+            },
+            "UpdateTemplateRequest": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "description": "Placeholders such as {ticket} are filled in when sending.",
+                        "maxLength": 500
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "body",
+                    "is_active"
+                ],
+                "title": "UpdateTemplateRequest"
             },
             "UpdateUserRequest": {
                 "type": "object",

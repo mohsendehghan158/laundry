@@ -6,7 +6,13 @@ use App\Modules\Orders\Http\Controllers\OrderController;
 use App\Modules\Orders\Http\Controllers\OrderCounterController;
 use App\Modules\Orders\Http\Controllers\OrderPreviewController;
 use App\Modules\Orders\Http\Controllers\OrderTransitionController;
+use App\Modules\Orders\Http\Controllers\PublicTrackingController;
 use Illuminate\Support\Facades\Route;
+
+// Public: the tracking link in SMS messages and on receipts.
+Route::get('public/track/{publicId}', PublicTrackingController::class)
+    ->where('publicId', '[0-9A-Za-z]{26}')
+    ->middleware('throttle:public');
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('orders/price-preview', OrderPreviewController::class);

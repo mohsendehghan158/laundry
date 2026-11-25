@@ -44,5 +44,7 @@ return [
         'handover_not_ready' => 'The order is not ready yet.',
         'handover_unpaid' => 'The order has an unpaid balance; take the payment first.',
         'handover_piece_unavailable' => 'Some chosen pieces are not ready or not part of this order.',
+
+        'notification_not_failed' => 'Only failed messages can be sent again.',
     ],
 ];

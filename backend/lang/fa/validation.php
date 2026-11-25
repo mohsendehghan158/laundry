@@ -212,5 +212,6 @@ return [
         'first_order_only' => 'فقط اولین سفارش',
         'piece_ids' => 'قطعه‌ها',
         'piece_ids.*' => 'قطعه',
+        'body' => 'متن پیام',
     ],
 ];

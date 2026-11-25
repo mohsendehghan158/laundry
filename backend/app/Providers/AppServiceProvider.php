@@ -38,6 +38,9 @@ class AppServiceProvider extends ServiceProvider
         // trying many usernames.
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(20)->by((string) $request->ip()));
 
+        // Pages anyone can open without signing in.
+        RateLimiter::for('public', fn (Request $request) => Limit::perMinute(60)->by((string) $request->ip()));
+
         Scramble::configure()->withDocumentTransformers(function (OpenApi $openApi): void {
             $openApi->secure(SecurityScheme::apiKey('cookie', 'laundry_session'));
         });

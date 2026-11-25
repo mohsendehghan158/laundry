@@ -7,6 +7,7 @@ namespace App\Modules\Orders\Actions;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PieceStatus;
+use App\Modules\Orders\Events\OrderStatusChanged;
 use App\Modules\Orders\Models\Order;
 use App\Support\Exceptions\ApiException;
 use Illuminate\Support\Facades\DB;
@@ -51,7 +52,12 @@ final class HandOverOrder
                 $order->history()->create(['from_status' => $order->status, 'to_status' => OrderStatus::Completed, 'user_id' => $actor->id]);
             }
 
+            $from = $order->status;
             $order->update($changes);
+
+            if ($remaining === 0) {
+                OrderStatusChanged::dispatch($order, $from, OrderStatus::Completed);
+            }
 
             activity('order')->causedBy($actor)->performedOn($order)->event('handed_over')
                 ->withProperties([

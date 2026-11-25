@@ -7,6 +7,7 @@ namespace App\Modules\Orders\Actions;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PieceStatus;
+use App\Modules\Orders\Events\OrderStatusChanged;
 use App\Modules\Orders\Models\Order;
 use App\Support\Exceptions\ApiException;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,7 @@ final class TransitionOrder
 
             $order->update($changes);
             $order->history()->create(['from_status' => $from, 'to_status' => $to, 'user_id' => $actor->id, 'reason' => $reason]);
+            OrderStatusChanged::dispatch($order, $from, $to);
 
             if ($to === OrderStatus::Cancelled) {
                 activity('order')->causedBy($actor)->performedOn($order)->event('cancelled')

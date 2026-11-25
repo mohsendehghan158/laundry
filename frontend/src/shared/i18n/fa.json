@@ -63,7 +63,8 @@
     "orders": "سفارش‌ها",
     "register": "صندوق و شیفت",
     "promotions": "کدهای تخفیف",
-    "handover": "تحویل سفارش"
+    "handover": "تحویل سفارش",
+    "notifications": "پیامک‌ها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -157,7 +158,8 @@
       "customers": "مشتریان",
       "orders": "سفارش‌ها",
       "billing": "صندوق و پرداخت",
-      "promotions": "تخفیف و بازاریابی"
+      "promotions": "تخفیف و بازاریابی",
+      "notifications": "پیامک و اعلان"
     },
     "permissions": {
       "organization": {
@@ -216,6 +218,10 @@
       },
       "promotions": {
         "manage": "مدیریت کدهای تخفیف"
+      },
+      "notifications": {
+        "manage": "تنظیم متن پیامک‌ها",
+        "view": "مشاهده پیامک‌های ارسالی"
       }
     }
   },
@@ -271,7 +277,8 @@
       "customer": "مشتریان",
       "order": "سفارش‌ها",
       "cash": "صندوق",
-      "promo": "کدهای تخفیف"
+      "promo": "کدهای تخفیف",
+      "notifications": "پیامک‌ها"
     },
     "events": {
       "created": "ایجاد",
@@ -666,5 +673,82 @@
     "payFirst": "مانده سفارش باید پیش از تحویل پرداخت شود.",
     "action": "تحویل",
     "rackEdit": "تغییر محل قفسه"
+  },
+  "notifications": {
+    "title": "پیامک‌ها",
+    "tabs": {
+      "log": "پیام‌های ارسالی",
+      "templates": "متن پیام‌ها"
+    },
+    "templatesHelp": "متن هر پیامک را تغییر دهید یا خاموشش کنید. عبارت‌های داخل آکولاد هنگام ارسال با اطلاعات سفارش پر می‌شوند.",
+    "events": {
+      "order_received": "ثبت سفارش",
+      "order_ready": "آماده تحویل",
+      "order_completed": "تحویل سفارش",
+      "order_cancelled": "لغو سفارش"
+    },
+    "placeholders": {
+      "customer": "نام مشتری",
+      "ticket": "شماره قبض",
+      "total": "مبلغ کل",
+      "balance": "مانده",
+      "due": "موعد تحویل",
+      "link": "لینک پیگیری",
+      "organization": "نام کسب‌وکار",
+      "branch": "نام شعبه",
+      "rack": "محل قفسه"
+    },
+    "sample": {
+      "customer": "سارا محمدی",
+      "organization": "خشکشویی نمونه",
+      "branch": "شعبه مرکزی"
+    },
+    "active": "فعال",
+    "on": "روشن",
+    "off": "خاموش",
+    "preview": "پیش‌نمایش",
+    "restoreDefault": "بازگشت به متن پیش‌فرض",
+    "columns": {
+      "time": "زمان",
+      "event": "رویداد",
+      "recipient": "گیرنده",
+      "body": "متن"
+    },
+    "statuses": {
+      "queued": "در صف",
+      "sent": "ارسال‌شده",
+      "failed": "ناموفق"
+    },
+    "more": "بیشتر",
+    "retry": "ارسال دوباره",
+    "resent": "پیامک دوباره ارسال شد.",
+    "stillFailing": "ارسال باز هم ناموفق بود."
+  },
+  "tracking": {
+    "notFound": "سفارشی با این نشانی پیدا نشد.",
+    "error": "اطلاعات سفارش بارگذاری نشد. دوباره تلاش کنید.",
+    "statuses": {
+      "received": "پذیرش شد",
+      "in_process": "در حال انجام",
+      "partially_ready": "بخشی آماده",
+      "ready": "آماده تحویل",
+      "completed": "تحویل شد",
+      "cancelled": "لغو شد",
+      "pending_pickup": "منتظر جمع‌آوری",
+      "picked_up": "جمع‌آوری شد",
+      "out_for_delivery": "در مسیر تحویل",
+      "draft": "پیش‌نویس"
+    },
+    "cancelled": "این سفارش لغو شده است.",
+    "expected": "پیش‌بینی:",
+    "readyNotice": "سفارش شما آماده است؛ برای دریافت آن به شعبه مراجعه کنید.",
+    "received": "زمان پذیرش",
+    "due": "موعد تحویل",
+    "pieces": "تعداد قطعه",
+    "total": "مبلغ کل",
+    "balance": "مانده",
+    "settled": "تسویه شده",
+    "toman": "تومان",
+    "rial": "ریال"
   }
 }

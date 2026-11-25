@@ -23,5 +23,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Everything except the login page, API/Sanctum rewrites, Next internals and static files.
-  matcher: ["/((?!login|api|sanctum|_next|favicon.ico|.*\\.[a-zA-Z0-9]+$).*)"],
+  matcher: ["/((?!login|track|api|sanctum|_next|favicon.ico|.*\\.[a-zA-Z0-9]+$).*)"],
 };

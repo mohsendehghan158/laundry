@@ -63,7 +63,8 @@
     "orders": "Orders",
     "register": "Register",
     "promotions": "Promo codes",
-    "handover": "Handover"
+    "handover": "Handover",
+    "notifications": "SMS"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -157,7 +158,8 @@
       "customers": "Customers",
       "orders": "Orders",
       "billing": "Register & payments",
-      "promotions": "Promotions"
+      "promotions": "Promotions",
+      "notifications": "Messages"
     },
     "permissions": {
       "organization": {
@@ -216,6 +218,10 @@
       },
       "promotions": {
         "manage": "Manage promo codes"
+      },
+      "notifications": {
+        "manage": "Edit message texts",
+        "view": "View sent messages"
       }
     }
   },
@@ -271,7 +277,8 @@
       "customer": "Customers",
       "order": "Orders",
       "cash": "Register",
-      "promo": "Promo codes"
+      "promo": "Promo codes",
+      "notifications": "Messages"
     },
     "events": {
       "created": "Created",
@@ -666,5 +673,82 @@
     "payFirst": "The balance must be paid before handover.",
     "action": "Hand over",
     "rackEdit": "Change rack"
+  },
+  "notifications": {
+    "title": "SMS",
+    "tabs": {
+      "log": "Sent messages",
+      "templates": "Message texts"
+    },
+    "templatesHelp": "Change the text of each message or switch it off. Words in braces are filled in with the order's details when sending.",
+    "events": {
+      "order_received": "Order received",
+      "order_ready": "Ready for collection",
+      "order_completed": "Order collected",
+      "order_cancelled": "Order cancelled"
+    },
+    "placeholders": {
+      "customer": "Customer name",
+      "ticket": "Ticket number",
+      "total": "Total",
+      "balance": "Balance",
+      "due": "Due time",
+      "link": "Tracking link",
+      "organization": "Business name",
+      "branch": "Branch name",
+      "rack": "Rack location"
+    },
+    "sample": {
+      "customer": "Sara Mohammadi",
+      "organization": "Sample Laundry",
+      "branch": "Central branch"
+    },
+    "active": "Active",
+    "on": "On",
+    "off": "Off",
+    "preview": "Preview",
+    "restoreDefault": "Restore the default text",
+    "columns": {
+      "time": "Time",
+      "event": "Event",
+      "recipient": "To",
+      "body": "Text"
+    },
+    "statuses": {
+      "queued": "Queued",
+      "sent": "Sent",
+      "failed": "Failed"
+    },
+    "more": "more",
+    "retry": "Send again",
+    "resent": "Message sent again.",
+    "stillFailing": "Sending failed again."
+  },
+  "tracking": {
+    "notFound": "No order found at this address.",
+    "error": "Could not load the order. Please try again.",
+    "statuses": {
+      "received": "Received",
+      "in_process": "In process",
+      "partially_ready": "Partly ready",
+      "ready": "Ready",
+      "completed": "Collected",
+      "cancelled": "Cancelled",
+      "pending_pickup": "Awaiting pickup",
+      "picked_up": "Picked up",
+      "out_for_delivery": "Out for delivery",
+      "draft": "Draft"
+    },
+    "cancelled": "This order was cancelled.",
+    "expected": "Expected:",
+    "readyNotice": "Your order is ready; collect it at the branch.",
+    "received": "Received",
+    "due": "Due",
+    "pieces": "Pieces",
+    "total": "Total",
+    "balance": "Balance",
+    "settled": "Settled",
+    "toman": "toman",
+    "rial": "rial"
   }
 }

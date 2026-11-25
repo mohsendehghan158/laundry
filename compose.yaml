@@ -23,6 +23,10 @@ x-api-env: &api-env
   CACHE_STORE: redis
   QUEUE_CONNECTION: redis
   MAIL_MAILER: log
+  # Customer text messages: log (written to the API log) or kavenegar.
+  SMS_DRIVER: ${SMS_DRIVER:-log}
+  KAVENEGAR_API_KEY: ${KAVENEGAR_API_KEY:-}
+  KAVENEGAR_SENDER: ${KAVENEGAR_SENDER:-}
 
 services:
   postgres:
