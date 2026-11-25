@@ -347,6 +347,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/claims": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List damage and loss claims
+         * @description Of the user's branches' orders, newest first: open ones, or all with `status`.
+         */
+        get: operations["claim.index"];
+        put?: never;
+        /**
+         * Open a claim
+         * @description Against a piece: `lost` flags it lost (it no longer holds its order
+         *     back); `damaged` flags it damaged (it is still handed back). Fails
+         *     with 409 `claim_already_open` for a second open claim of a kind.
+         */
+        post: operations["claim.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/claims/{claim}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve a claim
+         * @description Settled with the customer; record how and any compensation paid.
+         */
+        post: operations["claim.resolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/claims/{claim}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject a claim
+         * @description Not upheld; a lost piece rejected this way has been found and goes back to work.
+         */
+        post: operations["claim.reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/colors": {
         parameters: {
             query?: never;
@@ -918,6 +984,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/pieces/{piece}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a photo of a piece
+         * @description At intake, to record damage, or before and after. At most 12 per piece.
+         */
+        post: operations["photo.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/media/{media}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show a photo
+         * @description The image itself, for those who can see the piece.
+         */
+        get: operations["photo.show"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a photo
+         * @description By whoever took it, or a workshop manager.
+         */
+        delete: operations["photo.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/pieces/{tag}": {
         parameters: {
             query?: never;
@@ -1404,6 +1514,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shipments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List outsourcing shipments
+         * @description Of the user's branches, newest first: those still at the vendor, or
+         *     all with `status`.
+         */
+        get: operations["shipments.index"];
+        put?: never;
+        /**
+         * Send pieces to a vendor
+         * @description All the scanned pieces go, or none: fails with 409
+         *     `outsourcing_pieces_refused` naming each piece that cannot leave.
+         */
+        post: operations["shipments.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shipments/{shipment}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Show a shipment */
+        get: operations["shipments.show"];
+        /** Update a shipment's cost, expected return or note */
+        put: operations["shipments.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shipments/{shipment}/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check pieces back in from the vendor
+         * @description Tag by tag; back pieces return to work at the branch. The shipment
+         *     closes once every piece is back.
+         */
+        post: operations["shipment.receive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stations": {
         parameters: {
             query?: never;
@@ -1462,6 +1637,172 @@ export interface paths {
         get: operations["station.activity"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfer-destinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Where transfers can go
+         * @description Every active branch of the organization (a counter sends to the
+         *     plant even when its staff do not work there).
+         */
+        get: operations["transfer.destinations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List transfers
+         * @description Transfers from or to the user's branches, newest first: the open
+         *     and in-transit ones, or all with `status`.
+         */
+        get: operations["transfers.index"];
+        put?: never;
+        /**
+         * Start a transfer
+         * @description An open transfer at the sending branch; scan pieces onto it, then send it.
+         */
+        post: operations["transfers.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers/{transfer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show a transfer
+         * @description With its pieces (the manifest) and which have been checked in.
+         */
+        get: operations["transfers.show"];
+        put?: never;
+        post?: never;
+        /** Cancel an open transfer */
+        delete: operations["transfers.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers/{transfer}/pieces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add pieces to a transfer
+         * @description Scanned at the sending branch, tag by tag: pieces must be in work
+         *     there, not held, away or lost, and not on another open transfer.
+         */
+        post: operations["transfer.addPieces"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers/{transfer}/pieces/{piece}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take a piece off an open transfer */
+        delete: operations["transfer.removePiece"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers/{transfer}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a transfer
+         * @description Its pieces are in transit until checked in at the other branch.
+         */
+        post: operations["transfer.send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers/{transfer}/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check pieces in
+         * @description Scanned at the receiving branch as they come out of the bags.
+         */
+        post: operations["transfer.receive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transfers/{transfer}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close a transfer
+         * @description Records the bags counted at arrival. With `all`, pieces not scanned
+         *     in are checked in too; otherwise they stay in transit as missing.
+         */
+        post: operations["transfer.close"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1595,6 +1936,45 @@ export interface paths {
          * @description Fails with 409 `user_cannot_delete_self` or `user_last_owner`.
          */
         delete: operations["users.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vendors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List vendors */
+        get: operations["vendors.index"];
+        put?: never;
+        /** Add a vendor */
+        post: operations["vendors.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vendors/{vendor}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a vendor */
+        put: operations["vendors.update"];
+        post?: never;
+        /**
+         * Delete a vendor
+         * @description Past shipments keep their vendor.
+         */
+        delete: operations["vendors.destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1764,6 +2144,50 @@ export interface components {
                 created_at: string;
             }[];
         };
+        /**
+         * ClaimKind
+         * @enum {string}
+         */
+        ClaimKind: "damaged" | "lost";
+        /** ClaimResource */
+        ClaimResource: {
+            id: number;
+            number: string;
+            kind: components["schemas"]["ClaimKind"];
+            status: components["schemas"]["ClaimStatus"];
+            description: string;
+            resolution: string | null;
+            /** @description Rials paid to the customer. */
+            compensation: number | null;
+            order: {
+                id: number;
+                ticket_number: string;
+                customer_name: string;
+                customer_mobile: string;
+            };
+            piece: {
+                id: number;
+                tag_code: string;
+                item_name: string;
+                color_name: string | null;
+            };
+            creator_name: string | null;
+            resolver_name: string | null;
+            /** Format: date-time */
+            resolved_at: string | null;
+            /** Format: date-time */
+            created_at: string | null;
+        };
+        /**
+         * ClaimStatus
+         * @description | |
+         *     |---|
+         *     | `open` <br/>  |
+         *     | `resolved` <br/> Settled with the customer (compensation, repair…). |
+         *     | `rejected` <br/> Not upheld: not the shop's doing, or the lost piece was found. |
+         * @enum {string}
+         */
+        ClaimStatus: "open" | "resolved" | "rejected";
         /** CloseShiftRequest */
         CloseShiftRequest: {
             /** @description Cash counted in the drawer at closing, in rials. */
@@ -1912,6 +2336,12 @@ export interface components {
             sent_at: string | null;
             /** Format: date-time */
             created_at: string | null;
+        };
+        /** OpenClaimRequest */
+        OpenClaimRequest: {
+            piece_id: number;
+            kind: components["schemas"]["ClaimKind"];
+            description: string;
         };
         /** OpenShiftRequest */
         OpenShiftRequest: {
@@ -2104,6 +2534,14 @@ export interface components {
          * @enum {string}
          */
         PaymentStatus: "unpaid" | "partially_paid" | "paid" | "refunded";
+        /** PhotoRequest */
+        PhotoRequest: {
+            /**
+             * Format: binary
+             * @description Maximum file size: 8192 kilobytes.
+             */
+            photo: string;
+        };
         /** PieceDetailResource */
         PieceDetailResource: {
             id: number;
@@ -2152,6 +2590,33 @@ export interface components {
                 };
             };
             events: components["schemas"]["PieceEventResource"][];
+            photos: {
+                id: number;
+                url: string;
+                uploader_name: string | null;
+                created_at: string;
+            }[];
+            claims: {
+                id: number;
+                number: string;
+                kind: string;
+                status: string;
+                description: string;
+            }[];
+            /** @description On a transfer or at a vendor right now. @var array{kind: 'transfer'|'shipment', id: int, number: string, to: string}|null */
+            movement: null | {
+                /** @constant */
+                kind: "shipment";
+                id: number;
+                number: string;
+                to: string;
+            } | {
+                /** @constant */
+                kind: "transfer";
+                id: number;
+                number: string;
+                to: string;
+            };
         };
         /**
          * PieceEvent
@@ -2448,6 +2913,13 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /** SaveVendorRequest */
+        SaveVendorRequest: {
+            name: string;
+            phone?: string | null;
+            services?: string | null;
+            is_active?: boolean;
+        };
         /** ScanRequest */
         ScanRequest: {
             station_id: number;
@@ -2467,11 +2939,61 @@ export interface components {
             sort_order: number;
             is_active: boolean;
         };
+        /** SettleClaimRequest */
+        SettleClaimRequest: {
+            resolution: string;
+            /** @description Paid to the customer, in rials (when resolving). */
+            compensation?: number | null;
+        };
         /**
          * ShiftStatus
          * @enum {string}
          */
         ShiftStatus: "open" | "closed";
+        /** ShipmentResource */
+        ShipmentResource: {
+            id: number;
+            number: string;
+            status: components["schemas"]["ShipmentStatus"];
+            vendor: {
+                id: number;
+                name: string;
+                phone: string | null;
+            };
+            branch: {
+                id: number;
+                name: string;
+            };
+            /** Format: date-time */
+            expected_at: string | null;
+            is_late: boolean;
+            cost: number | null;
+            note: string | null;
+            piece_count: number;
+            returned_count: number;
+            sender_name: string | null;
+            /** Format: date-time */
+            sent_at: string;
+            /** Format: date-time */
+            closed_at: string | null;
+            pieces: {
+                id: number;
+                tag_code: string;
+                item_name: string;
+                ticket_number: string;
+                order_id: number;
+                returned: boolean;
+            }[];
+        };
+        /**
+         * ShipmentStatus
+         * @description | |
+         *     |---|
+         *     | `sent` <br/> At the vendor; some pieces may already be back. |
+         *     | `closed` <br/> Every piece is back. |
+         * @enum {string}
+         */
+        ShipmentStatus: "sent" | "closed";
         /**
          * StationKind
          * @description | |
@@ -2532,6 +3054,24 @@ export interface components {
                 reason?: string | null;
             } | null;
         };
+        /** StoreShipmentRequest */
+        StoreShipmentRequest: {
+            vendor_id: number;
+            /** @description The branch the pieces leave from (and come back to). */
+            branch_id: number;
+            tags: string[];
+            /** Format: date-time */
+            expected_at?: string | null;
+            /** @description What the vendor charges, in rials. */
+            cost?: number | null;
+            note?: string | null;
+        };
+        /** StoreTransferRequest */
+        StoreTransferRequest: {
+            from_branch_id: number;
+            to_branch_id: number;
+            note?: string | null;
+        };
         /** StoreUserRequest */
         StoreUserRequest: {
             name: string;
@@ -2549,6 +3089,61 @@ export interface components {
             /** @enum {string} */
             locale?: "fa" | "en";
         };
+        /**
+         * TagsRequest
+         * @description One tag or a batch scanned onto (or off) a transfer or shipment.
+         */
+        TagsRequest: {
+            tags: string[];
+        };
+        /** TransferResource */
+        TransferResource: {
+            id: number;
+            number: string;
+            status: components["schemas"]["TransferStatus"];
+            from_branch: {
+                id: number;
+                name: string;
+            };
+            to_branch: {
+                id: number;
+                name: string;
+            };
+            bags_sent: number | null;
+            bags_received: number | null;
+            note: string | null;
+            piece_count: number;
+            received_count: number;
+            creator_name: string | null;
+            sender_name: string | null;
+            /** Format: date-time */
+            sent_at: string | null;
+            receiver_name: string | null;
+            /** Format: date-time */
+            received_at: string | null;
+            /** Format: date-time */
+            created_at: string | null;
+            pieces?: {
+                id: number;
+                tag_code: string;
+                item_name: string;
+                color_name: string | null;
+                ticket_number: string;
+                order_id: number;
+                received: boolean;
+            }[];
+        };
+        /**
+         * TransferStatus
+         * @description | |
+         *     |---|
+         *     | `open` <br/> Being filled at the sending branch. |
+         *     | `sent` <br/> On its way. |
+         *     | `received` <br/> Checked in at the receiving branch (missing pieces stay in transit). |
+         *     | `cancelled` <br/>  |
+         * @enum {string}
+         */
+        TransferStatus: "open" | "sent" | "received" | "cancelled";
         /** TransitionOrderRequest */
         TransitionOrderRequest: {
             /**
@@ -2729,6 +3324,14 @@ export interface components {
             }[];
             /** Format: date-time */
             created_at: string | null;
+        };
+        /** VendorResource */
+        VendorResource: {
+            id: number;
+            name: string;
+            phone: string | null;
+            services: string | null;
+            is_active: boolean;
         };
     };
     responses: {
@@ -3626,6 +4229,144 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "claim.index": {
+        parameters: {
+            query?: {
+                /** @description open, resolved or rejected; default: open. */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ClaimResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ClaimResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "claim.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenClaimRequest"];
+            };
+        };
+        responses: {
+            /** @description `ClaimResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ClaimResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "claim.resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The claim ID */
+                claim: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettleClaimRequest"];
+            };
+        };
+        responses: {
+            /** @description `ClaimResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ClaimResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "claim.reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The claim ID */
+                claim: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettleClaimRequest"];
+            };
+        };
+        responses: {
+            /** @description `ClaimResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ClaimResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "colors.index": {
@@ -4917,6 +5658,99 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "photo.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The piece ID */
+                piece: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["PhotoRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "photo.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The media ID */
+                media: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Transfer-Encoding": "chunked";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "photo.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The media ID */
+                media: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "piece.show": {
         parameters: {
             query?: never;
@@ -5943,6 +6777,178 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "shipments.index": {
+        parameters: {
+            query?: {
+                /** @description sent or closed; default: sent. */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ShipmentResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShipmentResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "shipments.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreShipmentRequest"];
+            };
+        };
+        responses: {
+            /** @description `ShipmentResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShipmentResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "shipments.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The shipment ID */
+                shipment: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `ShipmentResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShipmentResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "shipments.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The shipment ID */
+                shipment: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    cost?: number | null;
+                    /** Format: date-time */
+                    expected_at?: string | null;
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description `ShipmentResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShipmentResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "shipment.receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The shipment ID */
+                shipment: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShipmentResource"];
+                        results: {
+                            tag: string;
+                            ok: boolean;
+                            message: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "stations.index": {
         parameters: {
             query?: {
@@ -6095,6 +7101,311 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "transfer.destinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            name: string;
+                            type: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "transfers.index": {
+        parameters: {
+            query?: {
+                /** @description open, sent, received or cancelled; default: open and sent. */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `TransferResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "transfers.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreTransferRequest"];
+            };
+        };
+        responses: {
+            /** @description `TransferResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "transfers.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `TransferResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "transfers.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "transfer.addPieces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"];
+                        results: {
+                            tag: string;
+                            ok: boolean;
+                            message: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "transfer.removePiece": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+                /** @description The piece ID */
+                piece: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `TransferResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "transfer.send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    bags: number;
+                };
+            };
+        };
+        responses: {
+            /** @description `TransferResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "transfer.receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"];
+                        results: {
+                            tag: string;
+                            ok: boolean;
+                            message: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "transfer.close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The transfer ID */
+                transfer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    bags?: number | null;
+                    all?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description `TransferResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TransferResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "turnaround-tiers.index": {
@@ -6475,6 +7786,130 @@ export interface operations {
             path: {
                 /** @description The user ID */
                 user: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "vendors.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `VendorResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["VendorResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "vendors.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveVendorRequest"];
+            };
+        };
+        responses: {
+            /** @description `VendorResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["VendorResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "vendors.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The vendor ID */
+                vendor: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveVendorRequest"];
+            };
+        };
+        responses: {
+            /** @description `VendorResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["VendorResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "vendors.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The vendor ID */
+                vendor: number;
             };
             cookie?: never;
         };

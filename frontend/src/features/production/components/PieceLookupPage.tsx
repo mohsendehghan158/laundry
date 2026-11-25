@@ -1,18 +1,20 @@
 "use client";
 
-import { EnvironmentOutlined, PauseCircleOutlined, PlayCircleOutlined, ThunderboltFilled } from "@ant-design/icons";
-import { Alert, App, Button, Card, Col, Descriptions, Empty, Flex, Input, Modal, Row, Skeleton, Space, Tag, Timeline, Typography } from "antd";
+import { CameraOutlined, DeleteOutlined, EnvironmentOutlined, PauseCircleOutlined, PlayCircleOutlined, ThunderboltFilled, WarningOutlined } from "@ant-design/icons";
+import { Alert, App, Button, Card, Col, Descriptions, Empty, Flex, Image, Input, Modal, Popconfirm, Row, Skeleton, Space, Tag, Timeline, Typography, Upload } from "antd";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { isApiError } from "@/shared/api/client";
 import { errorMessage } from "@/shared/api/formErrors";
-import type { OrderStatus, PieceDetail } from "@/shared/api/types";
+import type { ClaimKind, ClaimStatus, OrderStatus, PieceDetail } from "@/shared/api/types";
 import { usePermission } from "@/shared/hooks/usePermission";
 import { formatDateTime } from "@/shared/lib/date";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { usePiece, usePieceHold } from "../api";
+import { useDeletePhoto, useUploadPhoto } from "../movementApi";
+import { ClaimDialog } from "./ClaimDialog";
 import { PIECE_FLAG_COLOR, PIECE_STATUS_COLOR } from "../status";
 import { normalizeTag } from "../tags";
 
@@ -21,7 +23,9 @@ function WhereIs({ piece }: { piece: PieceDetail }) {
   const t = useTranslations("pieceLookup.where");
   const branch = piece.branch?.name ?? "—";
   if (piece.status === "handed_over") return t("handedOver", { date: formatDateTime(piece.handed_over_at) });
+  if (piece.flag === "in_transit" && piece.movement) return t("inTransfer", { number: piece.movement.number, to: piece.movement.to });
   if (piece.flag === "in_transit") return t("inTransit", { from: branch });
+  if (piece.flag === "outsourced" && piece.movement) return t("atVendor", { vendor: piece.movement.to, number: piece.movement.number });
   if (piece.flag === "outsourced") return t("outsourced");
   if (piece.flag === "lost") return t("lost");
   if (piece.status === "ready") return t("rack", { branch, rack: piece.rack_location ?? "—" });
@@ -80,6 +84,97 @@ function HoldButton({ piece }: { piece: PieceDetail }) {
         <Input.TextArea aria-label={t("pieceLookup.holdReason")} placeholder={t("pieceLookup.holdReason")} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} autoFocus />
       </Modal>
     </>
+  );
+}
+
+function Photos({ piece }: { piece: PieceDetail }) {
+  const t = useTranslations();
+  const { message } = App.useApp();
+  const { can, me } = usePermission();
+  const upload = useUploadPhoto();
+  const remove = useDeletePhoto();
+  const canUpload = can("production.scan") || can("orders.update");
+
+  return (
+    <Card
+      title={t("pieceLookup.photos")}
+      style={{ marginTop: 16 }}
+      extra={
+        canUpload && (
+          <Upload
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              upload.mutate({ pieceId: piece.id, file }, { onSuccess: () => message.success(t("pieceLookup.photoAdded")), onError: (error) => message.error(errorMessage(error, t("common.error"))) });
+              return false;
+            }}
+          >
+            <Button icon={<CameraOutlined />} loading={upload.isPending}>
+              {t("pieceLookup.addPhoto")}
+            </Button>
+          </Upload>
+        )
+      }
+    >
+      {piece.photos.length === 0 ? (
+        <Typography.Text type="secondary">{t("pieceLookup.noPhotos")}</Typography.Text>
+      ) : (
+        <Image.PreviewGroup>
+          <Flex wrap gap={8}>
+            {piece.photos.map((photo) => (
+              <Flex key={photo.id} vertical align="center" gap={4}>
+                <Image src={photo.url} alt={`${piece.tag_code} · ${formatDateTime(photo.created_at)}`} width={96} height={96} style={{ objectFit: "cover", borderRadius: 6 }} />
+                {(photo.uploader_name === me?.name || can("production.manage")) && (
+                  <Popconfirm title={t("pieceLookup.deletePhoto")} okText={t("common.delete")} cancelText={t("common.cancel")} okButtonProps={{ danger: true }} onConfirm={() => remove.mutate(photo)}>
+                    <Button type="text" size="small" danger icon={<DeleteOutlined />} aria-label={t("pieceLookup.deletePhoto")} />
+                  </Popconfirm>
+                )}
+              </Flex>
+            ))}
+          </Flex>
+        </Image.PreviewGroup>
+      )}
+    </Card>
+  );
+}
+
+function Claims({ piece }: { piece: PieceDetail }) {
+  const t = useTranslations();
+  const { can } = usePermission();
+  const [open, setOpen] = useState(false);
+  if (!can("claims.view") && !can("claims.manage")) return null;
+
+  return (
+    <Card
+      title={t("pieceLookup.claims")}
+      style={{ marginTop: 16 }}
+      extra={
+        can("claims.manage") && (
+          <Button icon={<WarningOutlined />} onClick={() => setOpen(true)}>
+            {t("pieceLookup.reportClaim")}
+          </Button>
+        )
+      }
+    >
+      {piece.claims.length === 0 ? (
+        <Typography.Text type="secondary">{t("pieceLookup.noClaims")}</Typography.Text>
+      ) : (
+        <Flex vertical gap={6}>
+          {piece.claims.map((claim) => (
+            <Space key={claim.id} wrap>
+              <Typography.Text className="ltr" strong>
+                {claim.number}
+              </Typography.Text>
+              <Tag color={claim.kind === "lost" ? "red" : "volcano"}>{t(`claims.kinds.${claim.kind as ClaimKind}`)}</Tag>
+              <Tag>{t(`claims.statuses.${claim.status as ClaimStatus}`)}</Tag>
+              <Typography.Text>{claim.description}</Typography.Text>
+            </Space>
+          ))}
+        </Flex>
+      )}
+      <ClaimDialog open={open} onClose={() => setOpen(false)} piece={{ id: piece.id, tag_code: piece.tag_code, item_name: piece.item_name }} />
+    </Card>
   );
 }
 
@@ -176,6 +271,8 @@ export function PieceLookupPage() {
                 <Descriptions.Item label={t("pieceLookup.pieces")}>{t("station.pieceCount", { count: data.order.piece_count })}</Descriptions.Item>
               </Descriptions>
             </Card>
+            <Photos piece={data} />
+            <Claims piece={data} />
           </Col>
           <Col xs={24} lg={10}>
             <Card title={t("pieceLookup.history")}>

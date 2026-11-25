@@ -55,6 +55,14 @@ return [
         'assembly_incomplete' => 'Not every piece has been gathered. Missing: :tags',
         'rack_slots_in_use' => 'Orders still wait in these rack slots.',
 
+        'transfer_empty' => 'No piece has been chosen.',
+        'transfer_not_sent' => 'This transfer has not been sent yet.',
+        'transfer_wrong_status' => 'Not possible for a transfer that is :status.',
+        'claim_not_allowed' => 'This claim cannot be opened for this piece.',
+        'claim_already_open' => 'This piece already has an open claim of this kind.',
+        'claim_closed' => 'This claim is closed.',
+        'photo_limit' => 'A piece can have at most :max photos.',
+
         'notification_not_failed' => 'Only failed messages can be sent again.',
     ],
 ];

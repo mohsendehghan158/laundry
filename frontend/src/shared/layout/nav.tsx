@@ -4,6 +4,9 @@ import {
   InboxOutlined,
   AppstoreOutlined,
   FundProjectionScreenOutlined,
+  SwapOutlined,
+  ShareAltOutlined,
+  WarningOutlined,
   ScanOutlined,
   SearchOutlined,
   ContactsOutlined,
@@ -27,7 +30,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "reports" | "board" | "station" | "assembly" | "racks" | "pieces" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "reports" | "board" | "station" | "assembly" | "racks" | "pieces" | "transfers" | "outsourcing" | "claims" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
@@ -54,6 +57,9 @@ export const NAV: NavGroup[] = [
       { href: "/assembly", label: "assembly", icon: <InboxOutlined />, permission: ["production.scan", "orders.update"] },
       { href: "/racks", label: "racks", icon: <AppstoreOutlined />, permission: ["production.view", "orders.view"] },
       { href: "/pieces", label: "pieces", icon: <SearchOutlined />, permission: ["production.view", "orders.view"] },
+      { href: "/transfers", label: "transfers", icon: <SwapOutlined />, permission: "production.transfer" },
+      { href: "/outsourcing", label: "outsourcing", icon: <ShareAltOutlined />, permission: "production.outsource" },
+      { href: "/claims", label: "claims", icon: <WarningOutlined />, permission: "claims.view" },
     ],
   },
   {

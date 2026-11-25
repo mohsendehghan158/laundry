@@ -30,6 +30,28 @@ return [
         'elsewhere' => 'at ":branch"; send it to this branch first.',
     ],
     'rack_slot_other_branch' => 'This rack slot is not at the order\'s pickup branch.',
+    'move' => [
+        'order_closed' => 'This piece\'s order is not open.',
+        'done' => 'This piece is assembled, ready or handed over.',
+        'elsewhere' => 'This piece is at ":branch", not here.',
+        'flagged' => 'This piece is :flag.',
+        'in_transfer' => 'This piece is on open transfer :number.',
+        'not_listed' => 'This piece is not on :number.',
+    ],
+    'flags' => [
+        'rework' => 'in rework',
+        'on_hold' => 'on hold',
+        'outsourced' => 'at a vendor',
+        'in_transit' => 'in transit',
+        'damaged' => 'damaged',
+        'lost' => 'lost',
+    ],
+    'transfer_statuses' => [
+        'open' => 'open',
+        'sent' => 'in transit',
+        'received' => 'received',
+        'cancelled' => 'cancelled',
+    ],
     'events' => [
         'scanned' => 'Scanned at station',
         'qc_passed' => 'Passed quality control',

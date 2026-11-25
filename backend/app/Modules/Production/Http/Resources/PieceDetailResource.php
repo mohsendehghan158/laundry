@@ -6,8 +6,12 @@ namespace App\Modules\Production\Http\Resources;
 
 use App\Modules\Orders\Models\Piece;
 use App\Modules\Orders\Models\PieceDefect;
+use App\Modules\Production\Http\Controllers\PhotoController;
+use App\Modules\Production\Models\Claim;
+use App\Modules\Production\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 /**
  * A piece with where it is, its order and its history.
@@ -62,6 +66,41 @@ class PieceDetailResource extends JsonResource
                 'branch' => ['id' => $order->branch->id, 'name' => $order->branch->name],
             ],
             'events' => PieceEventResource::collection($this->events),
+            /** @var list<array{id: int, url: string, uploader_name: string|null, created_at: string}> */
+            'photos' => $this->photos->map(fn (Media $media): array => PhotoController::describe($media))->values()->all(),
+            /** @var list<array{id: int, number: string, kind: string, status: string, description: string}> */
+            'claims' => $this->claims->map(fn (Claim $claim): array => ['id' => $claim->id, 'number' => $claim->number, 'kind' => $claim->kind->value, 'status' => $claim->status->value, 'description' => $claim->description])->values()->all(),
+            /** On a transfer or at a vendor right now. @var array{kind: 'transfer'|'shipment', id: int, number: string, to: string}|null */
+            'movement' => $this->movement(),
         ];
+    }
+
+    /**
+     * @return array{kind: 'transfer'|'shipment', id: int, number: string, to: string}|null
+     */
+    private function movement(): ?array
+    {
+        $transfer = DB::table('transfer_pieces')
+            ->join('transfers', 'transfers.id', '=', 'transfer_pieces.transfer_id')
+            ->join('branches', 'branches.id', '=', 'transfers.to_branch_id')
+            ->where('transfer_pieces.piece_id', $this->id)
+            ->whereNull('transfer_pieces.received_at')
+            ->whereIn('transfers.status', ['open', 'sent', 'received'])
+            ->orderByDesc('transfers.id')
+            ->first(['transfers.id', 'transfers.number', 'branches.name']);
+
+        if ($transfer !== null) {
+            return ['kind' => 'transfer', 'id' => (int) $transfer->id, 'number' => (string) $transfer->number, 'to' => (string) $transfer->name];
+        }
+
+        $shipment = DB::table('outsourcing_shipment_pieces')
+            ->join('outsourcing_shipments', 'outsourcing_shipments.id', '=', 'outsourcing_shipment_pieces.outsourcing_shipment_id')
+            ->join('vendors', 'vendors.id', '=', 'outsourcing_shipments.vendor_id')
+            ->where('outsourcing_shipment_pieces.piece_id', $this->id)
+            ->whereNull('outsourcing_shipment_pieces.returned_at')
+            ->orderByDesc('outsourcing_shipments.id')
+            ->first(['outsourcing_shipments.id', 'outsourcing_shipments.number', 'vendors.name']);
+
+        return $shipment === null ? null : ['kind' => 'shipment', 'id' => (int) $shipment->id, 'number' => (string) $shipment->number, 'to' => (string) $shipment->name];
     }
 }

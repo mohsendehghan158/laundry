@@ -13,6 +13,7 @@ use App\Modules\Organization\Models\Organization;
 use App\Modules\Production\Models\Rack;
 use App\Modules\Production\Models\RackSlot;
 use App\Modules\Production\Models\Station;
+use App\Modules\Production\Models\Vendor;
 use Illuminate\Database\Seeder;
 
 /**
@@ -47,6 +48,9 @@ class DatabaseSeeder extends Seeder
         $this->rack($organization, $central, 'قفسه A', 'A', 20, 0);
         $this->rack($organization, $central, 'قفسه B', 'B', 20, 1);
         $this->rack($organization, $west, 'قفسه A', 'A', 12, 0);
+
+        Vendor::query()->forceCreate(['organization_id' => $organization->id, 'name' => 'قالیشویی نگین', 'phone' => '021-55667788', 'services' => 'فرش، پرده و مبل']);
+        Vendor::query()->forceCreate(['organization_id' => $organization->id, 'name' => 'خیاطی آرین', 'phone' => '021-66778899', 'services' => 'تعمیر و کوتاه کردن']);
 
         $catalog->run($organization->id);
         $customers->run($organization->id);

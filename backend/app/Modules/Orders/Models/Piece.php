@@ -8,6 +8,8 @@ use App\Modules\Orders\Enums\PieceStatus;
 use App\Modules\Organization\Concerns\BelongsToOrganization;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Production\Enums\PieceFlag;
+use App\Modules\Production\Models\Claim;
+use App\Modules\Production\Models\Media;
 use App\Modules\Production\Models\PieceScan;
 use App\Modules\Production\Models\QcInspection;
 use App\Modules\Production\Models\RackSlot;
@@ -124,6 +126,22 @@ class Piece extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(QcInspection::class)->orderBy('id');
+    }
+
+    /**
+     * @return HasMany<Media, $this>
+     */
+    public function photos(): HasMany
+    {
+        return $this->hasMany(Media::class)->orderBy('id');
+    }
+
+    /**
+     * @return HasMany<Claim, $this>
+     */
+    public function claims(): HasMany
+    {
+        return $this->hasMany(Claim::class)->orderBy('id');
     }
 
     /** Can be worked on or gathered now (not held, away or lost). */

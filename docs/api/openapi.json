@@ -2332,6 +2332,253 @@
                 }
             }
         },
+        "/claims": {
+            "get": {
+                "operationId": "claim.index",
+                "description": "Of the user's branches' orders, newest first: open ones, or all with `status`.",
+                "summary": "List damage and loss claims",
+                "tags": [
+                    "Claim"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "open, resolved or rejected; default: open.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ClaimResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ClaimResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "claim.store",
+                "description": "Against a piece: `lost` flags it lost (it no longer holds its order\nback); `damaged` flags it damaged (it is still handed back). Fails\nwith 409 `claim_already_open` for a second open claim of a kind.",
+                "summary": "Open a claim",
+                "tags": [
+                    "Claim"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OpenClaimRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ClaimResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ClaimResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/claims/{claim}/resolve": {
+            "post": {
+                "operationId": "claim.resolve",
+                "description": "Settled with the customer; record how and any compensation paid.",
+                "summary": "Resolve a claim",
+                "tags": [
+                    "Claim"
+                ],
+                "parameters": [
+                    {
+                        "name": "claim",
+                        "in": "path",
+                        "required": true,
+                        "description": "The claim ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SettleClaimRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ClaimResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ClaimResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/claims/{claim}/reject": {
+            "post": {
+                "operationId": "claim.reject",
+                "description": "Not upheld; a lost piece rejected this way has been found and goes back to work.",
+                "summary": "Reject a claim",
+                "tags": [
+                    "Claim"
+                ],
+                "parameters": [
+                    {
+                        "name": "claim",
+                        "in": "path",
+                        "required": true,
+                        "description": "The claim ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SettleClaimRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ClaimResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ClaimResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/colors": {
             "get": {
                 "operationId": "colors.index",
@@ -5067,6 +5314,165 @@
                 }
             }
         },
+        "/pieces/{piece}/photos": {
+            "post": {
+                "operationId": "photo.store",
+                "description": "At intake, to record damage, or before and after. At most 12 per piece.",
+                "summary": "Add a photo of a piece",
+                "tags": [
+                    "Photo"
+                ],
+                "parameters": [
+                    {
+                        "name": "piece",
+                        "in": "path",
+                        "required": true,
+                        "description": "The piece ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PhotoRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/media/{media}": {
+            "get": {
+                "operationId": "photo.show",
+                "description": "The image itself, for those who can see the piece.",
+                "summary": "Show a photo",
+                "tags": [
+                    "Photo"
+                ],
+                "parameters": [
+                    {
+                        "name": "media",
+                        "in": "path",
+                        "required": true,
+                        "description": "The media ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "photo.destroy",
+                "description": "By whoever took it, or a workshop manager.",
+                "summary": "Delete a photo",
+                "tags": [
+                    "Photo"
+                ],
+                "parameters": [
+                    {
+                        "name": "media",
+                        "in": "path",
+                        "required": true,
+                        "description": "The media ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/pieces/{tag}": {
             "get": {
                 "operationId": "piece.show",
@@ -7388,6 +7794,339 @@
                 }
             }
         },
+        "/shipments": {
+            "get": {
+                "operationId": "shipments.index",
+                "description": "Of the user's branches, newest first: those still at the vendor, or\nall with `status`.",
+                "summary": "List outsourcing shipments",
+                "tags": [
+                    "Shipment"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "sent or closed; default: sent.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ShipmentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ShipmentResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "shipments.store",
+                "description": "All the scanned pieces go, or none: fails with 409\n`outsourcing_pieces_refused` naming each piece that cannot leave.",
+                "summary": "Send pieces to a vendor",
+                "tags": [
+                    "Shipment"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreShipmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ShipmentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShipmentResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/shipments/{shipment}": {
+            "get": {
+                "operationId": "shipments.show",
+                "summary": "Show a shipment",
+                "tags": [
+                    "Shipment"
+                ],
+                "parameters": [
+                    {
+                        "name": "shipment",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipment ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ShipmentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShipmentResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "shipments.update",
+                "summary": "Update a shipment's cost, expected return or note",
+                "tags": [
+                    "Shipment"
+                ],
+                "parameters": [
+                    {
+                        "name": "shipment",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipment ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "cost": {
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ],
+                                        "minimum": 0,
+                                        "maximum": 100000000000
+                                    },
+                                    "expected_at": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date-time"
+                                    },
+                                    "note": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ShipmentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShipmentResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/shipments/{shipment}/receive": {
+            "post": {
+                "operationId": "shipment.receive",
+                "description": "Tag by tag; back pieces return to work at the branch. The shipment\ncloses once every piece is back.",
+                "summary": "Check pieces back in from the vendor",
+                "tags": [
+                    "Shipment"
+                ],
+                "parameters": [
+                    {
+                        "name": "shipment",
+                        "in": "path",
+                        "required": true,
+                        "description": "The shipment ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ShipmentResource"
+                                        },
+                                        "results": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "tag": {
+                                                        "type": "string"
+                                                    },
+                                                    "ok": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "message": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "tag",
+                                                    "ok",
+                                                    "message"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "results"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/stations": {
             "get": {
                 "operationId": "stations.index",
@@ -7677,6 +8416,658 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/transfer-destinations": {
+            "get": {
+                "operationId": "transfer.destinations",
+                "description": "Every active branch of the organization (a counter sends to the\nplant even when its staff do not work there).",
+                "summary": "Where transfers can go",
+                "tags": [
+                    "Transfer"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "type"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/transfers": {
+            "get": {
+                "operationId": "transfers.index",
+                "description": "Transfers from or to the user's branches, newest first: the open\nand in-transit ones, or all with `status`.",
+                "summary": "List transfers",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "open, sent, received or cancelled; default: open and sent.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `TransferResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/TransferResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "transfers.store",
+                "description": "An open transfer at the sending branch; scan pieces onto it, then send it.",
+                "summary": "Start a transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreTransferRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`TransferResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/TransferResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "pieces"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/transfers/{transfer}": {
+            "get": {
+                "operationId": "transfers.show",
+                "description": "With its pieces (the manifest) and which have been checked in.",
+                "summary": "Show a transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`TransferResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/TransferResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "pieces"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "transfers.destroy",
+                "summary": "Cancel an open transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/transfers/{transfer}/pieces": {
+            "post": {
+                "operationId": "transfer.addPieces",
+                "description": "Scanned at the sending branch, tag by tag: pieces must be in work\nthere, not held, away or lost, and not on another open transfer.",
+                "summary": "Add pieces to a transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TransferResource"
+                                        },
+                                        "results": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "tag": {
+                                                        "type": "string"
+                                                    },
+                                                    "ok": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "message": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "tag",
+                                                    "ok",
+                                                    "message"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "results"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/transfers/{transfer}/pieces/{piece}": {
+            "delete": {
+                "operationId": "transfer.removePiece",
+                "summary": "Take a piece off an open transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "piece",
+                        "in": "path",
+                        "required": true,
+                        "description": "The piece ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`TransferResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/TransferResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "pieces"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/transfers/{transfer}/send": {
+            "post": {
+                "operationId": "transfer.send",
+                "description": "Its pieces are in transit until checked in at the other branch.",
+                "summary": "Send a transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "bags": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 500
+                                    }
+                                },
+                                "required": [
+                                    "bags"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`TransferResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/TransferResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "pieces"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/transfers/{transfer}/receive": {
+            "post": {
+                "operationId": "transfer.receive",
+                "description": "Scanned at the receiving branch as they come out of the bags.",
+                "summary": "Check pieces in",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TransferResource"
+                                        },
+                                        "results": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "tag": {
+                                                        "type": "string"
+                                                    },
+                                                    "ok": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "message": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "tag",
+                                                    "ok",
+                                                    "message"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "results"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/transfers/{transfer}/close": {
+            "post": {
+                "operationId": "transfer.close",
+                "description": "Records the bags counted at arrival. With `all`, pieces not scanned\nin are checked in too; otherwise they stay in transit as missing.",
+                "summary": "Close a transfer",
+                "tags": [
+                    "Transfer"
+                ],
+                "parameters": [
+                    {
+                        "name": "transfer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The transfer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "bags": {
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ],
+                                        "minimum": 0,
+                                        "maximum": 500
+                                    },
+                                    "all": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`TransferResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/TransferResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "pieces"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
@@ -8449,6 +9840,204 @@
                     }
                 }
             }
+        },
+        "/vendors": {
+            "get": {
+                "operationId": "vendors.index",
+                "summary": "List vendors",
+                "tags": [
+                    "Vendor"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `VendorResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/VendorResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "vendors.store",
+                "summary": "Add a vendor",
+                "tags": [
+                    "Vendor"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveVendorRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`VendorResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/VendorResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/vendors/{vendor}": {
+            "put": {
+                "operationId": "vendors.update",
+                "summary": "Update a vendor",
+                "tags": [
+                    "Vendor"
+                ],
+                "parameters": [
+                    {
+                        "name": "vendor",
+                        "in": "path",
+                        "required": true,
+                        "description": "The vendor ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveVendorRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`VendorResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/VendorResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "vendors.destroy",
+                "description": "Past shipments keep their vendor.",
+                "summary": "Delete a vendor",
+                "tags": [
+                    "Vendor"
+                ],
+                "parameters": [
+                    {
+                        "name": "vendor",
+                        "in": "path",
+                        "required": true,
+                        "description": "The vendor ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -9015,6 +10604,148 @@
                 ],
                 "title": "CashShiftResource"
             },
+            "ClaimKind": {
+                "type": "string",
+                "enum": [
+                    "damaged",
+                    "lost"
+                ],
+                "title": "ClaimKind"
+            },
+            "ClaimResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/ClaimKind"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ClaimStatus"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "resolution": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "compensation": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Rials paid to the customer."
+                    },
+                    "order": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "ticket_number": {
+                                "type": "string"
+                            },
+                            "customer_name": {
+                                "type": "string"
+                            },
+                            "customer_mobile": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "ticket_number",
+                            "customer_name",
+                            "customer_mobile"
+                        ]
+                    },
+                    "piece": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "tag_code": {
+                                "type": "string"
+                            },
+                            "item_name": {
+                                "type": "string"
+                            },
+                            "color_name": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "tag_code",
+                            "item_name",
+                            "color_name"
+                        ]
+                    },
+                    "creator_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "resolver_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "resolved_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "kind",
+                    "status",
+                    "description",
+                    "resolution",
+                    "compensation",
+                    "order",
+                    "piece",
+                    "creator_name",
+                    "resolver_name",
+                    "resolved_at",
+                    "created_at"
+                ],
+                "title": "ClaimResource"
+            },
+            "ClaimStatus": {
+                "type": "string",
+                "description": "| |\n|---|\n| `open` <br/>  |\n| `resolved` <br/> Settled with the customer (compensation, repair\u2026). |\n| `rejected` <br/> Not upheld: not the shop's doing, or the lost piece was found. |",
+                "enum": [
+                    "open",
+                    "resolved",
+                    "rejected"
+                ],
+                "title": "ClaimStatus"
+            },
             "CloseShiftRequest": {
                 "type": "object",
                 "properties": {
@@ -9507,6 +11238,27 @@
                     "created_at"
                 ],
                 "title": "NotificationLogResource"
+            },
+            "OpenClaimRequest": {
+                "type": "object",
+                "properties": {
+                    "piece_id": {
+                        "type": "integer"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/ClaimKind"
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 1000
+                    }
+                },
+                "required": [
+                    "piece_id",
+                    "kind",
+                    "description"
+                ],
+                "title": "OpenClaimRequest"
             },
             "OpenShiftRequest": {
                 "type": "object",
@@ -10224,6 +11976,21 @@
                 ],
                 "title": "PaymentStatus"
             },
+            "PhotoRequest": {
+                "type": "object",
+                "properties": {
+                    "photo": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Maximum file size: 8192 kilobytes."
+                    }
+                },
+                "required": [
+                    "photo"
+                ],
+                "title": "PhotoRequest"
+            },
             "PieceDetailResource": {
                 "type": "object",
                 "properties": {
@@ -10421,6 +12188,121 @@
                         "items": {
                             "$ref": "#/components/schemas/PieceEventResource"
                         }
+                    },
+                    "photos": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "url": {
+                                    "type": "string"
+                                },
+                                "uploader_name": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "created_at": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "url",
+                                "uploader_name",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    "claims": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "number": {
+                                    "type": "string"
+                                },
+                                "kind": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "number",
+                                "kind",
+                                "status",
+                                "description"
+                            ]
+                        }
+                    },
+                    "movement": {
+                        "description": "On a transfer or at a vendor right now. @var array{kind: 'transfer'|'shipment', id: int, number: string, to: string}|null",
+                        "anyOf": [
+                            {
+                                "type": "null"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "const": "shipment"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "number": {
+                                        "type": "string"
+                                    },
+                                    "to": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "kind",
+                                    "id",
+                                    "number",
+                                    "to"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "const": "transfer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "number": {
+                                        "type": "string"
+                                    },
+                                    "to": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "kind",
+                                    "id",
+                                    "number",
+                                    "to"
+                                ]
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -10444,7 +12326,10 @@
                     "ready_at",
                     "handed_over_at",
                     "order",
-                    "events"
+                    "events",
+                    "photos",
+                    "claims",
+                    "movement"
                 ],
                 "title": "PieceDetailResource"
             },
@@ -11486,6 +13371,36 @@
                 ],
                 "title": "SaveUpchargeRequest"
             },
+            "SaveVendorRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 30
+                    },
+                    "services": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "SaveVendorRequest"
+            },
             "ScanRequest": {
                 "type": "object",
                 "properties": {
@@ -11568,6 +13483,28 @@
                 ],
                 "title": "ServiceTypeResource"
             },
+            "SettleClaimRequest": {
+                "type": "object",
+                "properties": {
+                    "resolution": {
+                        "type": "string",
+                        "maxLength": 1000
+                    },
+                    "compensation": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Paid to the customer, in rials (when resolving).",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    }
+                },
+                "required": [
+                    "resolution"
+                ],
+                "title": "SettleClaimRequest"
+            },
             "ShiftStatus": {
                 "type": "string",
                 "enum": [
@@ -11575,6 +13512,165 @@
                     "closed"
                 ],
                 "title": "ShiftStatus"
+            },
+            "ShipmentResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ShipmentStatus"
+                    },
+                    "vendor": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "phone"
+                        ]
+                    },
+                    "branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "expected_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "is_late": {
+                        "type": "boolean"
+                    },
+                    "cost": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "piece_count": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "returned_count": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "sender_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sent_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "closed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "pieces": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "tag_code": {
+                                    "type": "string"
+                                },
+                                "item_name": {
+                                    "type": "string"
+                                },
+                                "ticket_number": {
+                                    "type": "string"
+                                },
+                                "order_id": {
+                                    "type": "integer"
+                                },
+                                "returned": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "tag_code",
+                                "item_name",
+                                "ticket_number",
+                                "order_id",
+                                "returned"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "vendor",
+                    "branch",
+                    "expected_at",
+                    "is_late",
+                    "cost",
+                    "note",
+                    "piece_count",
+                    "returned_count",
+                    "sender_name",
+                    "sent_at",
+                    "closed_at",
+                    "pieces"
+                ],
+                "title": "ShipmentResource"
+            },
+            "ShipmentStatus": {
+                "type": "string",
+                "description": "| |\n|---|\n| `sent` <br/> At the vendor; some pieces may already be back. |\n| `closed` <br/> Every piece is back. |",
+                "enum": [
+                    "sent",
+                    "closed"
+                ],
+                "title": "ShipmentStatus"
             },
             "StationKind": {
                 "type": "string",
@@ -11804,6 +13900,79 @@
                 ],
                 "title": "StoreOrderRequest"
             },
+            "StoreShipmentRequest": {
+                "type": "object",
+                "properties": {
+                    "vendor_id": {
+                        "type": "integer"
+                    },
+                    "branch_id": {
+                        "type": "integer",
+                        "description": "The branch the pieces leave from (and come back to)."
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40
+                        },
+                        "minItems": 1,
+                        "maxItems": 500
+                    },
+                    "expected_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "cost": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "What the vendor charges, in rials.",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "vendor_id",
+                    "branch_id",
+                    "tags"
+                ],
+                "title": "StoreShipmentRequest"
+            },
+            "StoreTransferRequest": {
+                "type": "object",
+                "properties": {
+                    "from_branch_id": {
+                        "type": "integer"
+                    },
+                    "to_branch_id": {
+                        "type": "integer"
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "from_branch_id",
+                    "to_branch_id"
+                ],
+                "title": "StoreTransferRequest"
+            },
             "StoreUserRequest": {
                 "type": "object",
                 "properties": {
@@ -11869,6 +14038,203 @@
                     "roles"
                 ],
                 "title": "StoreUserRequest"
+            },
+            "TagsRequest": {
+                "type": "object",
+                "description": "One tag or a batch scanned onto (or off) a transfer or shipment.",
+                "properties": {
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40
+                        },
+                        "minItems": 1,
+                        "maxItems": 500
+                    }
+                },
+                "required": [
+                    "tags"
+                ],
+                "title": "TagsRequest"
+            },
+            "TransferResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/TransferStatus"
+                    },
+                    "from_branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "to_branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "bags_sent": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "bags_received": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "piece_count": {
+                        "type": "integer"
+                    },
+                    "received_count": {
+                        "type": "integer"
+                    },
+                    "creator_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sender_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sent_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "receiver_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "received_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "pieces": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "tag_code": {
+                                    "type": "string"
+                                },
+                                "item_name": {
+                                    "type": "string"
+                                },
+                                "color_name": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "ticket_number": {
+                                    "type": "string"
+                                },
+                                "order_id": {
+                                    "type": "integer"
+                                },
+                                "received": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "tag_code",
+                                "item_name",
+                                "color_name",
+                                "ticket_number",
+                                "order_id",
+                                "received"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "from_branch",
+                    "to_branch",
+                    "bags_sent",
+                    "bags_received",
+                    "note",
+                    "piece_count",
+                    "received_count",
+                    "creator_name",
+                    "sender_name",
+                    "sent_at",
+                    "receiver_name",
+                    "received_at",
+                    "created_at"
+                ],
+                "title": "TransferResource"
+            },
+            "TransferStatus": {
+                "type": "string",
+                "description": "| |\n|---|\n| `open` <br/> Being filled at the sending branch. |\n| `sent` <br/> On its way. |\n| `received` <br/> Checked in at the receiving branch (missing pieces stay in transit). |\n| `cancelled` <br/>  |",
+                "enum": [
+                    "open",
+                    "sent",
+                    "received",
+                    "cancelled"
+                ],
+                "title": "TransferStatus"
             },
             "TransitionOrderRequest": {
                 "type": "object",
@@ -12563,6 +14929,40 @@
                     "created_at"
                 ],
                 "title": "UserResource"
+            },
+            "VendorResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "services": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "phone",
+                    "services",
+                    "is_active"
+                ],
+                "title": "VendorResource"
             }
         },
         "responses": {

@@ -72,7 +72,10 @@
     "stations": "ایستگاه‌های کارگاه",
     "assembly": "مونتاژ سفارش",
     "racks": "قفسه‌ها",
-    "board": "تابلوی تولید"
+    "board": "تابلوی تولید",
+    "transfers": "بارنامه‌ها",
+    "outsourcing": "برون‌سپاری",
+    "claims": "خسارت و مفقودی"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -950,7 +953,9 @@
       "lost": "مفقود اعلام شده است.",
       "rack": "آماده تحویل در «{branch}»، قفسه {rack}.",
       "station": "در «{branch}»، آخرین بار در ایستگاه «{station}».",
-      "branch": "در «{branch}»، هنوز در ایستگاهی اسکن نشده است."
+      "branch": "در «{branch}»، هنوز در ایستگاهی اسکن نشده است.",
+      "inTransfer": "در بارنامه {number} به مقصد «{to}» در راه است.",
+      "atVendor": "نزد پیمانکار «{vendor}» است ({number})."
     },
     "hold": "نگه داشتن",
     "release": "آزاد کردن",
@@ -969,7 +974,15 @@
     "pickupBranch": "شعبه تحویل",
     "pieces": "قطعه‌های سفارش",
     "history": "تاریخچه",
-    "noHistory": "هنوز رویدادی ثبت نشده است."
+    "noHistory": "هنوز رویدادی ثبت نشده است.",
+    "photos": "عکس‌ها",
+    "addPhoto": "عکس جدید",
+    "photoAdded": "عکس ذخیره شد.",
+    "noPhotos": "عکسی ثبت نشده است.",
+    "deletePhoto": "این عکس حذف شود؟",
+    "claims": "خسارت و مفقودی",
+    "reportClaim": "ثبت خسارت یا مفقودی",
+    "noClaims": "پرونده‌ای ثبت نشده است."
   },
   "assembly": {
     "title": "مونتاژ سفارش",
@@ -1044,5 +1057,127 @@
     "rework": "{count, number} دوباره‌کاری",
     "onHold": "{count, number} نگه‌داشته",
     "overdueAlert": "این سفارش‌ها از موعد گذشتند"
+  },
+  "transfers": {
+    "title": "بارنامه‌ها",
+    "subtitle": "جابه‌جایی قطعه‌ها بین شعبه و کارگاه با بارنامه و شمارش کیسه",
+    "new": "بارنامه جدید",
+    "start": "شروع",
+    "newHelp": "پس از شروع، قطعه‌ها را اسکن کنید و با تعداد کیسه بفرستید.",
+    "empty": "بارنامه‌ای نیست.",
+    "notFound": "بارنامه پیدا نشد.",
+    "backToList": "بازگشت به بارنامه‌ها",
+    "route": "از {from} به {to}",
+    "filters": {
+      "active": "باز و در راه",
+      "received": "دریافت‌شده",
+      "cancelled": "لغوشده"
+    },
+    "statuses": {
+      "open": "باز",
+      "sent": "در راه",
+      "received": "دریافت‌شده",
+      "cancelled": "لغوشده"
+    },
+    "fields": {
+      "number": "شماره",
+      "route": "مسیر",
+      "from": "از شعبه",
+      "to": "به شعبه",
+      "pieces": "قطعه",
+      "bags": "کیسه",
+      "bagsReceived": "کیسه دریافتی",
+      "sentAt": "ارسال",
+      "receivedAt": "دریافت",
+      "createdBy": "ثبت‌کننده",
+      "note": "توضیح",
+      "arrived": "رسید"
+    },
+    "manifest": "چاپ بارنامه",
+    "manifestTitle": "فهرست قطعه‌ها ({count, number})",
+    "noPieces": "هنوز قطعه‌ای اسکن نشده است.",
+    "scanToAdd": "اسکن قطعه‌ها برای افزودن به بارنامه",
+    "scanToReceive": "اسکن قطعه‌ها هنگام باز کردن کیسه‌ها",
+    "bagsPrompt": "تعداد کیسه‌ها:",
+    "send": "ارسال",
+    "sent": "بارنامه فرستاده شد.",
+    "cancel": "لغو بارنامه",
+    "cancelConfirm": "این بارنامه لغو شود؟",
+    "close": "بستن بارنامه",
+    "closeConfirm": "تأیید دریافت",
+    "closed": "بارنامه بسته شد.",
+    "bagsCounted": "کیسه‌های شمرده‌شده:",
+    "bagMismatch": "{sent, number} کیسه فرستاده شده ولی {counted, number} کیسه شمرده شد.",
+    "closeMissing": "{count, number} قطعه اسکن نشده است و «در راه» می‌ماند.",
+    "trustAll": "همه {count, number} قطعه اسکن‌نشده رسیده‌اند (کیسه پلمب)",
+    "missing": "{count, number} قطعه نرسیده است",
+    "manifestHeading": "بارنامه {number}",
+    "printedAt": "تاریخ: {date}",
+    "printTicket": "قبض",
+    "printTag": "تگ",
+    "printItem": "قلم",
+    "printChecked": "تحویل",
+    "printSender": "فرستنده: {name}",
+    "printCarrier": "حمل‌کننده",
+    "printReceiver": "تحویل‌گیرنده"
+  },
+  "outsourcing": {
+    "title": "برون‌سپاری",
+    "subtitle": "کارهایی که نزد پیمانکار بیرونی است، تا برگشت همه قطعه‌ها",
+    "send": "ارسال به پیمانکار",
+    "sendConfirm": "ارسال {count, number} قطعه",
+    "sent": "{number} فرستاده شد.",
+    "empty": "موردی نیست.",
+    "scanBack": "اسکن قطعه‌های برگشتی",
+    "tabs": {
+      "sent": "نزد پیمانکار",
+      "closed": "برگشته",
+      "vendors": "پیمانکارها"
+    },
+    "newVendor": "پیمانکار جدید",
+    "editVendor": "ویرایش پیمانکار",
+    "deleteVendor": "پیمانکار «{name}» حذف شود؟",
+    "fields": {
+      "vendor": "پیمانکار",
+      "branch": "شعبه",
+      "pieces": "قطعه‌ها",
+      "expected": "موعد برگشت",
+      "cost": "هزینه",
+      "back": "برگشته",
+      "phone": "تلفن",
+      "services": "خدمات"
+    }
+  },
+  "claims": {
+    "title": "خسارت و مفقودی",
+    "subtitle": "پرونده‌های آسیب و گم‌شدن قطعه‌ها و نحوه رسیدگی",
+    "new": "پرونده جدید",
+    "open": "ثبت پرونده",
+    "opened": "پرونده {number} ثبت شد.",
+    "empty": "پرونده‌ای نیست.",
+    "resolve": "رسیدگی شد",
+    "reject": "رد",
+    "found": "پیدا شد",
+    "resolveTitle": "رسیدگی به {number}",
+    "rejectTitle": "بستن {number} بدون جبران",
+    "kinds": {
+      "damaged": "آسیب",
+      "lost": "مفقودی"
+    },
+    "statuses": {
+      "open": "باز",
+      "resolved": "رسیدگی‌شده",
+      "rejected": "ردشده"
+    },
+    "fields": {
+      "number": "شماره",
+      "kind": "نوع",
+      "piece": "قطعه",
+      "customer": "مشتری",
+      "description": "شرح",
+      "resolution": "نحوه رسیدگی",
+      "compensation": "مبلغ جبران",
+      "created": "ثبت"
+    }
   }
 }

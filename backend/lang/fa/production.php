@@ -30,6 +30,28 @@ return [
         'elsewhere' => 'در «:branch» است؛ اول به این شعبه فرستاده شود.',
     ],
     'rack_slot_other_branch' => 'این خانه قفسه متعلق به شعبه تحویل سفارش نیست.',
+    'move' => [
+        'order_closed' => 'سفارش این قطعه باز نیست.',
+        'done' => 'این قطعه مونتاژ، آماده یا تحویل شده است.',
+        'elsewhere' => 'این قطعه در «:branch» است، نه اینجا.',
+        'flagged' => 'این قطعه :flag است.',
+        'in_transfer' => 'این قطعه در بارنامه باز :number است.',
+        'not_listed' => 'این قطعه در :number نیست.',
+    ],
+    'flags' => [
+        'rework' => 'در دوباره‌کاری',
+        'on_hold' => 'نگه‌داشته',
+        'outsourced' => 'نزد پیمانکار',
+        'in_transit' => 'در راه',
+        'damaged' => 'آسیب‌دیده',
+        'lost' => 'مفقود',
+    ],
+    'transfer_statuses' => [
+        'open' => 'باز',
+        'sent' => 'در راه',
+        'received' => 'دریافت‌شده',
+        'cancelled' => 'لغوشده',
+    ],
     'events' => [
         'scanned' => 'اسکن در ایستگاه',
         'qc_passed' => 'قبول در کنترل کیفیت',

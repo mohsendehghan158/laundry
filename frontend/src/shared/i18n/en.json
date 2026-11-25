@@ -72,7 +72,10 @@
     "stations": "Workshop stations",
     "assembly": "Assembly",
     "racks": "Racks",
-    "board": "Production board"
+    "board": "Production board",
+    "transfers": "Transfers",
+    "outsourcing": "Outsourcing",
+    "claims": "Damage and loss"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -950,7 +953,9 @@
       "lost": "Reported lost.",
       "rack": "Ready at \"{branch}\", rack {rack}.",
       "station": "At \"{branch}\", last seen at \"{station}\".",
-      "branch": "At \"{branch}\", not scanned at a station yet."
+      "branch": "At \"{branch}\", not scanned at a station yet.",
+      "inTransfer": "On transfer {number} to \"{to}\".",
+      "atVendor": "At vendor \"{vendor}\" ({number})."
     },
     "hold": "Hold",
     "release": "Release",
@@ -969,7 +974,15 @@
     "pickupBranch": "Pickup branch",
     "pieces": "Pieces in the order",
     "history": "History",
-    "noHistory": "Nothing recorded yet."
+    "noHistory": "Nothing recorded yet.",
+    "photos": "Photos",
+    "addPhoto": "Add photo",
+    "photoAdded": "Photo saved.",
+    "noPhotos": "No photos yet.",
+    "deletePhoto": "Delete this photo?",
+    "claims": "Damage and loss",
+    "reportClaim": "Report damage or loss",
+    "noClaims": "No claims."
   },
   "assembly": {
     "title": "Assembly",
@@ -1044,5 +1057,127 @@
     "rework": "{count, number} rework",
     "onHold": "{count, number} on hold",
     "overdueAlert": "These orders just passed their due time"
+  },
+  "transfers": {
+    "title": "Transfers",
+    "subtitle": "Moving pieces between branches and the plant, with a manifest and a bag count",
+    "new": "New transfer",
+    "start": "Start",
+    "newHelp": "Then scan the pieces and send them with the number of bags.",
+    "empty": "No transfers.",
+    "notFound": "Transfer not found.",
+    "backToList": "Back to transfers",
+    "route": "From {from} to {to}",
+    "filters": {
+      "active": "Open and in transit",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    },
+    "statuses": {
+      "open": "Open",
+      "sent": "In transit",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    },
+    "fields": {
+      "number": "Number",
+      "route": "Route",
+      "from": "From branch",
+      "to": "To branch",
+      "pieces": "Pieces",
+      "bags": "Bags",
+      "bagsReceived": "Bags received",
+      "sentAt": "Sent",
+      "receivedAt": "Received",
+      "createdBy": "Created by",
+      "note": "Note",
+      "arrived": "Arrived"
+    },
+    "manifest": "Print manifest",
+    "manifestTitle": "Pieces ({count, number})",
+    "noPieces": "No pieces scanned yet.",
+    "scanToAdd": "Scan pieces onto the transfer",
+    "scanToReceive": "Scan pieces as the bags are opened",
+    "bagsPrompt": "Number of bags:",
+    "send": "Send",
+    "sent": "Transfer sent.",
+    "cancel": "Cancel transfer",
+    "cancelConfirm": "Cancel this transfer?",
+    "close": "Close transfer",
+    "closeConfirm": "Confirm receipt",
+    "closed": "Transfer closed.",
+    "bagsCounted": "Bags counted:",
+    "bagMismatch": "{sent, number} bags were sent but {counted, number} were counted.",
+    "closeMissing": "{count, number} pieces were not scanned and stay in transit.",
+    "trustAll": "All {count, number} unscanned pieces have arrived (sealed bag)",
+    "missing": "{count, number} pieces have not arrived",
+    "manifestHeading": "Transfer {number}",
+    "printedAt": "Date: {date}",
+    "printTicket": "Ticket",
+    "printTag": "Tag",
+    "printItem": "Item",
+    "printChecked": "Checked",
+    "printSender": "Sender: {name}",
+    "printCarrier": "Carrier",
+    "printReceiver": "Receiver"
+  },
+  "outsourcing": {
+    "title": "Outsourcing",
+    "subtitle": "Work at outside vendors, until every piece is back",
+    "send": "Send to vendor",
+    "sendConfirm": "Send {count, number} pieces",
+    "sent": "{number} sent.",
+    "empty": "Nothing here.",
+    "scanBack": "Scan pieces coming back",
+    "tabs": {
+      "sent": "At vendors",
+      "closed": "Back",
+      "vendors": "Vendors"
+    },
+    "newVendor": "New vendor",
+    "editVendor": "Edit vendor",
+    "deleteVendor": "Delete the vendor \"{name}\"?",
+    "fields": {
+      "vendor": "Vendor",
+      "branch": "Branch",
+      "pieces": "Pieces",
+      "expected": "Expected back",
+      "cost": "Cost",
+      "back": "Back",
+      "phone": "Phone",
+      "services": "Services"
+    }
+  },
+  "claims": {
+    "title": "Damage and loss",
+    "subtitle": "Damaged and lost pieces and how each case was settled",
+    "new": "New claim",
+    "open": "Open claim",
+    "opened": "Claim {number} opened.",
+    "empty": "No claims.",
+    "resolve": "Resolve",
+    "reject": "Reject",
+    "found": "Found",
+    "resolveTitle": "Resolve {number}",
+    "rejectTitle": "Close {number} without compensation",
+    "kinds": {
+      "damaged": "Damage",
+      "lost": "Loss"
+    },
+    "statuses": {
+      "open": "Open",
+      "resolved": "Resolved",
+      "rejected": "Rejected"
+    },
+    "fields": {
+      "number": "Number",
+      "kind": "Kind",
+      "piece": "Piece",
+      "customer": "Customer",
+      "description": "Description",
+      "resolution": "Resolution",
+      "compensation": "Compensation",
+      "created": "Opened"
+    }
   }
 }
