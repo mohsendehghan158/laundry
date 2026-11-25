@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 {
     public const string PASSWORD = 'password';
 
-    public function run(SyncPermissions $syncPermissions, DemoCatalogSeeder $catalog, DemoCustomerSeeder $customers): void
+    public function run(SyncPermissions $syncPermissions, DemoCatalogSeeder $catalog, DemoCustomerSeeder $customers, DemoLogisticsSeeder $logistics): void
     {
         $syncPermissions->handle();
 
@@ -54,6 +54,7 @@ class DatabaseSeeder extends Seeder
 
         $catalog->run($organization->id);
         $customers->run($organization->id);
+        $logistics->run($organization->id, $central, $west);
     }
 
     private function branch(

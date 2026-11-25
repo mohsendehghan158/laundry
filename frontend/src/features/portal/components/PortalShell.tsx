@@ -2,7 +2,7 @@
 
 import { LogoutOutlined } from "@ant-design/icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Flex, Form, Input, Layout, Spin, theme, Typography } from "antd";
+import { Button, Card, Flex, Form, Input, Layout, Segmented, Spin, theme, Typography } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -104,7 +104,25 @@ export function PortalShell({ children }: { children: ReactNode }) {
         </Flex>
       </Layout.Header>
       <Layout.Content style={{ padding: 16 }}>
-        <div style={{ maxWidth: WIDTH, margin: "0 auto" }}>{customer.data.needs_name ? <NameStep /> : children}</div>
+        <div style={{ maxWidth: WIDTH, margin: "0 auto" }}>
+          {customer.data.needs_name ? (
+            <NameStep />
+          ) : (
+            <>
+              <Segmented
+                block
+                value={pathname.startsWith("/my/addresses") ? "/my/addresses" : "/my"}
+                onChange={(href) => router.push(href)}
+                options={[
+                  { value: "/my", label: t("nav.orders") },
+                  { value: "/my/addresses", label: t("nav.addresses") },
+                ]}
+                style={{ marginBottom: 16 }}
+              />
+              {children}
+            </>
+          )}
+        </div>
       </Layout.Content>
     </Layout>
   );

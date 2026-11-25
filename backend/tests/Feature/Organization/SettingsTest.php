@@ -18,6 +18,7 @@ it('returns defaults until a setting is changed', function () {
             'hours' => ['opening' => '09:00', 'closing' => '21:00', 'closed_days' => '5'],
             'production' => ['assembly_scan_required' => false],
             'orders' => ['max_discount_percent' => 10],
+            'logistics' => ['booking_days' => 7, 'lead_minutes' => 120],
         ]]);
 });
 

@@ -63,7 +63,7 @@ function OrganizationForm() {
   );
 }
 
-function SettingsForm({ section }: { section: "general" | "tax" | "receipt" | "production" }) {
+function SettingsForm({ section }: { section: "general" | "tax" | "receipt" | "production" | "logistics" }) {
   const t = useTranslations();
   const { message } = App.useApp();
   const { can } = usePermission();
@@ -152,6 +152,26 @@ function SettingsForm({ section }: { section: "general" | "tax" | "receipt" | "p
           <Switch />
         </Form.Item>
       )}
+      {section === "logistics" && (
+        <>
+          <Form.Item
+            name={["logistics", "booking_days"]}
+            label={t("settings.fields.bookingDays")}
+            extra={t("settings.fields.bookingDaysHelp")}
+            rules={[{ required: true, message: t("common.required") }]}
+          >
+            <InputNumber<number> min={1} max={30} formatter={inputNumberFormatter} parser={(text) => parseAmount(text) ?? 1} style={{ width: 160 }} />
+          </Form.Item>
+          <Form.Item
+            name={["logistics", "lead_minutes"]}
+            label={t("settings.fields.leadMinutes")}
+            extra={t("settings.fields.leadMinutesHelp")}
+            rules={[{ required: true, message: t("common.required") }]}
+          >
+            <InputNumber<number> min={0} max={2880} step={30} formatter={inputNumberFormatter} parser={(text) => parseAmount(text) ?? 0} style={{ width: 160 }} />
+          </Form.Item>
+        </>
+      )}
       {editable && (
         <Flex>
           <Button type="primary" htmlType="submit" loading={update.isPending}>
@@ -179,6 +199,7 @@ export function SettingsPage() {
             { key: "tax", label: t("settings.tabs.tax"), children: <SettingsForm section="tax" /> },
             { key: "receipt", label: t("settings.tabs.receipt"), children: <SettingsForm section="receipt" /> },
             { key: "production", label: t("settings.tabs.production"), children: <SettingsForm section="production" /> },
+            { key: "logistics", label: t("settings.tabs.logistics"), children: <SettingsForm section="logistics" /> },
           ]}
         />
       </Card>

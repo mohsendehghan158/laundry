@@ -5,11 +5,15 @@ declare(strict_types=1);
 use App\Modules\Portal\Http\Controllers\CustomerAddressController;
 use App\Modules\Portal\Http\Controllers\CustomerAuthController;
 use App\Modules\Portal\Http\Controllers\CustomerOrderController;
+use App\Modules\Portal\Http\Controllers\CustomerSlotController;
+use App\Modules\Portal\Http\Controllers\ZoneCheckController;
 use Illuminate\Support\Facades\Route;
 
 // The customer portal. Public routes run in the portal's organization.
 Route::middleware('portal')->group(function (): void {
     Route::get('portal/settings', [CustomerAuthController::class, 'settings'])->middleware('throttle:public');
+    // Is this point on the map served by pickup and delivery?
+    Route::get('public/zones/check', ZoneCheckController::class)->middleware('throttle:public');
     Route::post('customer/auth/otp', [CustomerAuthController::class, 'otp'])->middleware('throttle:otp');
     Route::post('customer/auth/verify', [CustomerAuthController::class, 'verify'])->middleware('throttle:otp')->name('customer.auth.verify');
 });
@@ -23,6 +27,8 @@ Route::middleware(['auth:customer', 'customer.context'])->prefix('customer')->gr
     Route::post('addresses', [CustomerAddressController::class, 'store']);
     Route::put('addresses/{address}', [CustomerAddressController::class, 'update'])->whereNumber('address');
     Route::delete('addresses/{address}', [CustomerAddressController::class, 'destroy'])->whereNumber('address');
+
+    Route::get('slots', CustomerSlotController::class);
 
     Route::get('orders', [CustomerOrderController::class, 'index']);
     Route::get('orders/{publicId}', [CustomerOrderController::class, 'show'])->where('publicId', '[0-9A-Za-z]{26}');

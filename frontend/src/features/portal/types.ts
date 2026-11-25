@@ -6,6 +6,7 @@
  * (`php artisan scramble:export`, then `npm run api:types`), replace these
  * with aliases in shared/api/types.ts like every other resource.
  */
+import type { LatLng, PublicZone } from "@/features/logistics/types";
 import type { CurrencyUnit } from "@/shared/lib/money";
 
 /** GET /portal/settings — shown before sign-in. */
@@ -66,3 +67,28 @@ export type PortalOrder = {
   timeline?: Array<{ status: PortalOrderStatus; at: string }>;
   payments?: Array<{ method: "cash" | "card" | "transfer"; kind: "payment" | "refund"; amount: number; at: string }>;
 };
+
+/** GET /customer/addresses */
+export type PortalAddress = {
+  id: number;
+  title: string | null;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  is_default: boolean;
+  /** The service zone the point is in; null = no pickup or delivery there. */
+  zone: PublicZone | null;
+};
+
+export type PortalAddressInput = {
+  title?: string | null;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  is_default?: boolean;
+};
+
+/** GET /public/zones/check */
+export type ZoneCheck = { served: boolean; zone: PublicZone | null };
+
+export type { LatLng };

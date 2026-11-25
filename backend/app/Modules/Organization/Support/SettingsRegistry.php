@@ -78,6 +78,18 @@ final class SettingsRegistry
                 'type' => 'number',
                 'rules' => ['numeric', 'min:0', 'max:100'],
             ],
+            // Pickup and delivery: how many days ahead customers can book (today included),
+            // and how soon a window may start to still be offered.
+            'logistics.booking_days' => [
+                'default' => 7,
+                'type' => 'number',
+                'rules' => ['integer', 'min:1', 'max:30'],
+            ],
+            'logistics.lead_minutes' => [
+                'default' => 120,
+                'type' => 'number',
+                'rules' => ['integer', 'min:0', 'max:2880'],
+            ],
         ];
     }
 

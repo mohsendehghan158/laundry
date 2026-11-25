@@ -76,7 +76,10 @@
     "transfers": "Transfers",
     "outsourcing": "Outsourcing",
     "claims": "Damage and loss",
-    "productionReport": "Production report"
+    "productionReport": "Production report",
+    "logistics": "Pickup and delivery",
+    "zones": "Service zones",
+    "slots": "Time windows"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -194,7 +197,8 @@
       "notifications": "Messages",
       "reports": "Reports",
       "production": "Workshop",
-      "claims": "Damage and loss"
+      "claims": "Damage and loss",
+      "logistics": "Pickup and delivery"
     },
     "permissions": {
       "organization": {
@@ -272,6 +276,10 @@
       "claims": {
         "view": "View damage and loss claims",
         "manage": "Open and settle damage and loss claims"
+      },
+      "logistics": {
+        "view": "View service zones and time windows",
+        "manage": "Set up zones, windows and their capacity"
       }
     }
   },
@@ -283,7 +291,8 @@
       "general": "General",
       "tax": "Tax",
       "receipt": "Receipt",
-      "production": "Workshop"
+      "production": "Workshop",
+      "logistics": "Pickup and delivery"
     },
     "fields": {
       "organizationName": "Business name",
@@ -295,7 +304,11 @@
       "headerText": "Receipt header",
       "footerText": "Receipt footer",
       "assemblyScanRequired": "Require scanning at assembly",
-      "assemblyScanRequiredHelp": "When on, an order becomes ready only once every piece has been scanned at the assembly screen; pieces cannot be ticked off by hand."
+      "assemblyScanRequiredHelp": "When on, an order becomes ready only once every piece has been scanned at the assembly screen; pieces cannot be ticked off by hand.",
+      "bookingDays": "Days customers can book ahead",
+      "bookingDaysHelp": "Customers can pick a window from today through this many days.",
+      "leadMinutes": "Minimum notice before a window (minutes)",
+      "leadMinutesHelp": "Windows starting sooner than this are not offered to customers."
     }
   },
   "activity": {
@@ -1243,7 +1256,8 @@
     },
     "nav": {
       "orders": "My orders",
-      "logout": "Sign out"
+      "logout": "Sign out",
+      "addresses": "Addresses"
     },
     "orders": {
       "empty": "You have no orders yet.",
@@ -1269,6 +1283,97 @@
       "paid": "Paid",
       "balance": "Balance",
       "readyNotice": "Your order is ready; you can pick it up at the branch."
+    },
+    "addresses": {
+      "title": "My addresses",
+      "empty": "You have no saved addresses.",
+      "emptyHint": "Add an address and its point on the map for pickup and delivery at your door.",
+      "add": "Add address",
+      "edit": "Edit address",
+      "default": "Default",
+      "makeDefault": "Make default",
+      "deleteConfirm": "Delete this address?",
+      "fields": {
+        "title": "Label",
+        "titlePlaceholder": "Home, work…",
+        "address": "Full address",
+        "addressPlaceholder": "Street, alley, number, unit",
+        "point": "Point on the map",
+        "pointHelp": "Tap the map or drag the pin onto your front door.",
+        "isDefault": "Default address"
+      },
+      "pointRequired": "Mark the address on the map.",
+      "myLocation": "My location",
+      "locationDenied": "Location access was not given; tap the map instead.",
+      "checking": "Checking the service area…",
+      "served": "In the “{zone}” service zone",
+      "fee": "Delivery fee: {amount}",
+      "freeDelivery": "Free delivery",
+      "freeOver": "free for orders from {amount}",
+      "minOrder": "Minimum order: {amount}",
+      "notServed": "This point is outside the pickup and delivery area. You can save the address, but door-to-door orders are not possible there."
+    }
+  },
+  "logistics": {
+    "weekdays": {
+      "sun": "Sunday",
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday"
+    },
+    "zones": {
+      "title": "Service zones",
+      "subtitle": "Where you pick up from and deliver to, and what delivery costs in each area.",
+      "new": "New zone",
+      "edit": "Edit zone",
+      "empty": "No zones yet.",
+      "drawHelp": "Click the map to add the zone's corners. Drag a corner to move it; click a corner to remove it.",
+      "needCorners": "Put at least three corners on the map.",
+      "corners": "{count, number} corners",
+      "undoCorner": "Remove last corner",
+      "clearCorners": "Clear all",
+      "cornerHint": "Drag, or click to remove",
+      "fee": "Delivery fee",
+      "free": "free",
+      "freeFrom": "free from {amount}",
+      "minFrom": "minimum order {amount}",
+      "deleteConfirm": "Delete the zone “{name}”?",
+      "fields": {
+        "name": "Zone name",
+        "branch": "Serving branch",
+        "branchHelp": "This branch's drivers pick up and deliver in the zone.",
+        "deliveryFee": "Delivery fee",
+        "freeOver": "Free delivery from order total",
+        "minOrder": "Minimum online order",
+        "optional": "Optional; leave empty for none."
+      }
+    },
+    "slots": {
+      "title": "Pickup and delivery windows",
+      "subtitle": "Each branch's weekly pattern and how many stops each window takes; customers book from these.",
+      "weekly": "Weekly pattern",
+      "upcoming": "Upcoming windows",
+      "noWindows": "No windows",
+      "addWindow": "Add window",
+      "editWindow": "Edit window",
+      "places": "{count, number} places",
+      "deleteConfirm": "Delete this weekly window?",
+      "deleteHelp": "Its future windows go too, except those already booked.",
+      "date": "Day",
+      "time": "Time",
+      "booked": "Booked",
+      "capacity": "Capacity",
+      "capacityHelp": "How many pickups or deliveries the window takes.",
+      "open": "Open",
+      "closed": "Closed",
+      "empty": "No windows for the coming days; set up the weekly pattern first.",
+      "weekday": "Weekday",
+      "from": "From",
+      "to": "To",
+      "timeFormat": "Enter a time like 09:00."
     }
   }
 }

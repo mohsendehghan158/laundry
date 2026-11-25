@@ -1,5 +1,7 @@
 import {
   ApartmentOutlined,
+  CarOutlined,
+  ClockCircleOutlined,
   BarChartOutlined,
   ClusterOutlined,
   InboxOutlined,
@@ -31,13 +33,13 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "reports" | "productionReport" | "board" | "station" | "assembly" | "racks" | "pieces" | "transfers" | "outsourcing" | "claims" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "reports" | "productionReport" | "board" | "station" | "assembly" | "racks" | "pieces" | "transfers" | "outsourcing" | "claims" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity" | "zones" | "slots";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
 };
 
-export type NavGroup = { label?: "management" | "workshop"; items: NavItem[] };
+export type NavGroup = { label?: "management" | "workshop" | "logistics"; items: NavItem[] };
 
 export const NAV: NavGroup[] = [
   {
@@ -61,6 +63,13 @@ export const NAV: NavGroup[] = [
       { href: "/transfers", label: "transfers", icon: <SwapOutlined />, permission: "production.transfer" },
       { href: "/outsourcing", label: "outsourcing", icon: <ShareAltOutlined />, permission: "production.outsource" },
       { href: "/claims", label: "claims", icon: <WarningOutlined />, permission: "claims.view" },
+    ],
+  },
+  {
+    label: "logistics",
+    items: [
+      { href: "/logistics/zones", label: "zones", icon: <CarOutlined />, permission: "logistics.view" },
+      { href: "/logistics/slots", label: "slots", icon: <ClockCircleOutlined />, permission: "logistics.view" },
     ],
   },
   {

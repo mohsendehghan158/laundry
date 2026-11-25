@@ -47,6 +47,8 @@ final class PermissionRegistry
             'production' => ['production.view', 'production.scan', 'production.manage', 'production.transfer', 'production.outsource'],
             'claims' => ['claims.view', 'claims.manage'],
             'reports' => ['reports.view', 'reports.production'],
+            // manage = service zones, weekly windows and individual slots.
+            'logistics' => ['logistics.view', 'logistics.manage'],
         ];
     }
 
@@ -82,12 +84,13 @@ final class PermissionRegistry
                 'production.view', 'production.scan', 'production.manage', 'production.transfer', 'production.outsource',
                 'claims.view', 'claims.manage',
                 'reports.view', 'reports.production',
+                'logistics.view', 'logistics.manage',
             ],
             'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'orders.handover', 'payments.create', 'shifts.operate', 'production.view', 'production.transfer', 'claims.view'],
             'plant_operator' => ['catalog.view', 'orders.view', 'orders.update', 'production.view', 'production.scan', 'production.transfer', 'production.outsource', 'claims.view', 'reports.production'],
-            'driver' => ['customers.view'],
+            'driver' => ['customers.view', 'logistics.view'],
             'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view', 'production.view', 'claims.view', 'reports.view', 'reports.production'],
-            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create', 'notifications.view', 'production.view', 'claims.view'],
+            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create', 'notifications.view', 'production.view', 'claims.view', 'logistics.view'],
         ];
     }
 }

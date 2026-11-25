@@ -1,17 +1,25 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, isApiError } from "@/shared/api/client";
 import type { Wrapped } from "@/shared/api/types";
 import { toLatinDigits } from "@/shared/lib/digits";
-import type { OtpSent, PortalCustomer, PortalOrder, PortalSettings } from "./types";
+import type { LatLng, OtpSent, PortalAddress, PortalAddressInput, PortalCustomer, PortalOrder, PortalSettings, ZoneCheck } from "./types";
 
 export const portalKeys = {
   settings: ["portal", "settings"] as const,
   customer: ["portal", "customer"] as const,
   orders: ["portal", "orders"] as const,
   order: (publicId: string) => ["portal", "orders", publicId] as const,
+  addresses: ["portal", "addresses"] as const,
+  zoneCheck: (point: LatLng | null) => ["portal", "zone-check", point?.join(",") ?? ""] as const,
 };
+
+/** What belongs to one customer must not be shown to the next one on this device. */
+function forgetCustomerData(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.removeQueries({ queryKey: portalKeys.orders });
+  queryClient.removeQueries({ queryKey: portalKeys.addresses });
+}
 
 /** The business's name and display unit; public, needed before sign-in. */
 export function usePortalSettings() {
@@ -68,7 +76,7 @@ export function useVerifyOtp() {
     mutationFn: async (input: { mobile: string; code: string }) =>
       (await api.post<Wrapped<PortalCustomer>>("/customer/auth/verify", { mobile: input.mobile, code: toLatinDigits(input.code) })).data,
     onSuccess: (customer) => {
-      queryClient.removeQueries({ queryKey: ["portal", "orders"] });
+      forgetCustomerData(queryClient);
       queryClient.setQueryData(portalKeys.customer, customer);
     },
   });
@@ -87,7 +95,7 @@ export function useCustomerLogout() {
   return useMutation({
     mutationFn: () => api.post<void>("/customer/auth/logout"),
     onSettled: () => {
-      queryClient.removeQueries({ queryKey: ["portal", "orders"] });
+      forgetCustomerData(queryClient);
       queryClient.setQueryData(portalKeys.customer, null);
     },
   });
@@ -106,5 +114,44 @@ export function useMyOrder(publicId: string) {
     queryKey: portalKeys.order(publicId),
     queryFn: async () => (await api.get<Wrapped<PortalOrder>>(`/customer/orders/${publicId}`)).data,
     refetchInterval: 60_000,
+  });
+}
+
+export function useAddresses() {
+  return useQuery({
+    queryKey: portalKeys.addresses,
+    queryFn: async () => (await api.get<Wrapped<PortalAddress[]>>("/customer/addresses")).data,
+  });
+}
+
+export function useSaveAddress() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, input }: { id?: number; input: PortalAddressInput }) =>
+      (id === undefined
+        ? await api.post<Wrapped<PortalAddress>>("/customer/addresses", input)
+        : await api.put<Wrapped<PortalAddress>>(`/customer/addresses/${id}`, input)
+      ).data,
+    // Making one address the default changes the others too.
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: portalKeys.addresses }),
+  });
+}
+
+export function useDeleteAddress() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.delete(`/customer/addresses/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: portalKeys.addresses }),
+  });
+}
+
+/** Whether a point on the map is served, as the customer moves the pin. */
+export function useZoneCheck(point: LatLng | null) {
+  return useQuery({
+    queryKey: portalKeys.zoneCheck(point),
+    queryFn: async () => (await api.get<Wrapped<ZoneCheck>>("/public/zones/check", { latitude: point![0], longitude: point![1] })).data,
+    enabled: point !== null,
+    staleTime: 10 * 60_000,
+    placeholderData: keepPreviousData,
   });
 }

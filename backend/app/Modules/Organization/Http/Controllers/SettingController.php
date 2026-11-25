@@ -17,7 +17,7 @@ class SettingController
      *
      * Every setting of the organization, with defaults for those never changed.
      *
-     * @response array{data: array{general: array{currency_unit: 'toman'|'rial', timezone: string}, tax: array{vat_percent: float, prices_include_vat: bool}, receipt: array{header_text: string|null, footer_text: string|null}, hours: array{opening: string, closing: string, closed_days: string|null}, production: array{assembly_scan_required: bool}, orders: array{max_discount_percent: float}}}
+     * @response array{data: array{general: array{currency_unit: 'toman'|'rial', timezone: string}, tax: array{vat_percent: float, prices_include_vat: bool}, receipt: array{header_text: string|null, footer_text: string|null}, hours: array{opening: string, closing: string, closed_days: string|null}, production: array{assembly_scan_required: bool}, orders: array{max_discount_percent: float}, logistics: array{booking_days: int, lead_minutes: int}}}
      */
     public function show(Settings $settings): JsonResponse
     {
@@ -31,7 +31,7 @@ class SettingController
      *
      * Send only the settings that change.
      *
-     * @response array{data: array{general: array{currency_unit: 'toman'|'rial', timezone: string}, tax: array{vat_percent: float, prices_include_vat: bool}, receipt: array{header_text: string|null, footer_text: string|null}, hours: array{opening: string, closing: string, closed_days: string|null}, production: array{assembly_scan_required: bool}, orders: array{max_discount_percent: float}}}
+     * @response array{data: array{general: array{currency_unit: 'toman'|'rial', timezone: string}, tax: array{vat_percent: float, prices_include_vat: bool}, receipt: array{header_text: string|null, footer_text: string|null}, hours: array{opening: string, closing: string, closed_days: string|null}, production: array{assembly_scan_required: bool}, orders: array{max_discount_percent: float}, logistics: array{booking_days: int, lead_minutes: int}}}
      */
     public function update(UpdateSettingsRequest $request, UpdateSettings $updateSettings, Settings $settings): JsonResponse
     {

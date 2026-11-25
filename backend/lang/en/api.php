@@ -69,6 +69,14 @@ return [
         'otp_expired' => 'The code has expired or is wrong; ask for a new one.',
         'otp_wrong' => 'Wrong code. :left tries left.',
 
+        'zone_polygon_invalid' => 'A zone needs at least three corners that enclose an area on the map.',
+        'slot_ends_before_start' => 'The window must end after it starts.',
+        'slot_overlap' => 'This window overlaps another one on the same day.',
+        'slot_capacity_below_booked' => 'The capacity cannot be lower than the places already booked.',
+        'slot_full' => 'This window is full or closed; pick another one.',
+        'address_not_served' => 'This address is outside the pickup and delivery area.',
+        'address_without_point' => 'This address has no point on the map.',
+
         'notification_not_failed' => 'Only failed messages can be sent again.',
     ],
 ];
