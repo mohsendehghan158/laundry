@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Models;
 
+use App\Modules\Billing\Models\Payment;
+use App\Modules\Billing\Models\PromoCode;
 use App\Modules\Customers\Models\Customer;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Database\Factories\OrderFactory;
@@ -49,6 +51,7 @@ use Illuminate\Support\Carbon;
  * @property string $discount_value
  * @property int $discount_amount
  * @property string|null $discount_reason
+ * @property int|null $promo_code_id
  * @property int $tax_amount
  * @property int $total
  * @property int $paid_amount
@@ -151,6 +154,22 @@ class Order extends Model
     public function history(): HasMany
     {
         return $this->hasMany(OrderStatusChange::class)->orderBy('id');
+    }
+
+    /**
+     * @return BelongsTo<PromoCode, $this>
+     */
+    public function promoCode(): BelongsTo
+    {
+        return $this->belongsTo(PromoCode::class)->withTrashed();
+    }
+
+    /**
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->orderBy('id');
     }
 
     public function balance(): int

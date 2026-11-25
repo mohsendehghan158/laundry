@@ -29,6 +29,6 @@ class OrderTransitionController
 
         $order = $transition->handle($request->actor(), $order, $to, $request->validated('reason'), $request->validated('rack_location'));
 
-        return new OrderResource($order->load(['branch', 'customer', 'creator', 'lines.upcharges', 'lines.pieces.defects', 'history.user'])->loadCount('pieces'));
+        return new OrderResource($order->load(['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'history.user', 'payments.user'])->loadCount('pieces'));
     }
 }

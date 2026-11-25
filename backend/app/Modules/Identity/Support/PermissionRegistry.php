@@ -38,6 +38,9 @@ final class PermissionRegistry
             'customers' => ['customers.view', 'customers.manage', 'customers.delete'],
             // update = change lines and status; discount = up to the configured cap.
             'orders' => ['orders.view', 'orders.create', 'orders.update', 'orders.cancel', 'orders.discount', 'orders.discount_unlimited'],
+            // shifts.operate = open, close and use the register; shifts.view = review past shifts.
+            'billing' => ['payments.create', 'payments.refund', 'shifts.operate', 'shifts.view'],
+            'promotions' => ['promotions.manage'],
         ];
     }
 
@@ -68,11 +71,12 @@ final class PermissionRegistry
                 'catalog.view',
                 'customers.view', 'customers.manage', 'customers.delete',
                 'orders.view', 'orders.create', 'orders.update', 'orders.cancel', 'orders.discount',
+                'payments.create', 'payments.refund', 'shifts.operate', 'shifts.view',
             ],
-            'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount'],
+            'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'payments.create', 'shifts.operate'],
             'plant_operator' => ['orders.view', 'orders.update'],
             'driver' => ['customers.view'],
-            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view'],
+            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view'],
             'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create'],
         ];
     }

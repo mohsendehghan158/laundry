@@ -1,10 +1,11 @@
 "use client";
 
-import { CheckCircleFilled, PercentageOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { CheckCircleFilled, DollarOutlined, GiftOutlined, PercentageOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { Alert, App, Button, Card, Col, Descriptions, Divider, Empty, Flex, Input, InputNumber, Modal, Popover, Radio, Result, Row, Segmented, Select, Skeleton, Space, Typography } from "antd";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from "react";
+import { useMemo, useReducer, useRef, useState } from "react";
+import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { useCounterCatalog } from "@/features/catalog/api";
 import { useCreateOrder, usePricePreview } from "@/features/orders/api";
 import { errorMessage } from "@/shared/api/formErrors";
@@ -18,19 +19,10 @@ import { formatNumber, inputNumberFormatter, toPersianDigits } from "@/shared/li
 import { formatMoney, parseAmount } from "@/shared/lib/money";
 import { MoneyInput } from "@/shared/ui/MoneyInput";
 import { cartReducer, emptyCart, toPayload, type CartDiscount } from "../cart";
+import { useCounterBranch } from "../useCounterBranch";
 import { CartLineCard } from "./CartLineCard";
 import { CustomerPicker } from "./CustomerPicker";
 import { ItemGrid } from "./ItemGrid";
-
-const BRANCH_KEY = "pos.branchId";
-
-function readRememberedBranch(): number | null {
-  try {
-    return Number(window.localStorage.getItem(BRANCH_KEY)) || null;
-  } catch {
-    return null;
-  }
-}
 
 function newIdempotencyKey(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
@@ -39,32 +31,17 @@ function newIdempotencyKey(): string {
 export function PosPage() {
   const t = useTranslations();
   const { message } = App.useApp();
-  const { can, me } = usePermission();
+  const { can } = usePermission();
   const unit = useCurrencyUnit();
   const catalog = useCounterCatalog();
   const [cart, dispatch] = useReducer(cartReducer, emptyCart);
   const [created, setCreated] = useState<Order | null>(null);
+  const [paying, setPaying] = useState(false);
+  const [promoDraft, setPromoDraft] = useState("");
   const idempotencyKey = useRef(newIdempotencyKey());
   const create = useCreateOrder();
 
-  // Counter branches the user works in; the choice is remembered on this device.
-  const branches = useMemo(() => (me?.branches ?? []).filter((branch) => branch.type !== "plant"), [me]);
-  const [chosenBranch, setChosenBranch] = useState<number | null>(null);
-  const rememberedBranch = useSyncExternalStore(
-    () => () => {},
-    () => readRememberedBranch(),
-    () => null,
-  );
-  const branchId =
-    [chosenBranch, rememberedBranch].find((id) => id !== null && branches.some((b) => b.id === id)) ?? branches[0]?.id ?? null;
-  const chooseBranch = (id: number) => {
-    setChosenBranch(id);
-    try {
-      window.localStorage.setItem(BRANCH_KEY, String(id));
-    } catch {
-      // Private mode: the choice simply is not remembered.
-    }
-  };
+  const { branches, branchId, choose: chooseBranch } = useCounterBranch();
 
   const payload = useMemo(() => (cart.lines.length > 0 ? toPayload(cart) : null), [cart]);
   const debouncedPayload = useDebouncedValue(payload, 250);
@@ -97,6 +74,7 @@ export function PosPage() {
       {
         onSuccess: (order) => {
           setCreated(order);
+          setPromoDraft("");
           dispatch({ type: "reset" });
           idempotencyKey.current = newIdempotencyKey();
         },
@@ -150,6 +128,18 @@ export function PosPage() {
               />
             )}
 
+            <Input
+              prefix={<GiftOutlined />}
+              placeholder={t("pos.promoCode")}
+              value={promoDraft}
+              onChange={(e) => setPromoDraft(e.target.value)}
+              onBlur={() => dispatch({ type: "setPromoCode", code: promoDraft })}
+              onPressEnter={() => dispatch({ type: "setPromoCode", code: promoDraft })}
+              allowClear
+              dir="ltr"
+              maxLength={30}
+              aria-label={t("pos.promoCode")}
+            />
             <Input.TextArea placeholder={t("pos.orderNotes")} value={cart.notes} onChange={(e) => dispatch({ type: "setNotes", notes: e.target.value })} autoSize={{ minRows: 1, maxRows: 3 }} maxLength={2000} />
 
             {previewError && <Alert type="error" showIcon title={previewError} />}
@@ -210,6 +200,11 @@ export function PosPage() {
               </Flex>
             }
             extra={[
+              created.balance > 0 && can("payments.create") && (
+                <Button key="pay" icon={<DollarOutlined />} onClick={() => setPaying(true)}>
+                  {t("billing.pay")}
+                </Button>
+              ),
               <Link key="view" href={`/orders/${created.id}`}>
                 <Button>{t("pos.viewOrder")}</Button>
               </Link>,
@@ -220,6 +215,15 @@ export function PosPage() {
           />
         )}
       </Modal>
+      {created && (
+        <PaymentModal
+          order={created}
+          mode="pay"
+          open={paying}
+          onClose={() => setPaying(false)}
+          onDone={() => setCreated(null)}
+        />
+      )}
     </>
   );
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Services;
 
+use App\Modules\Billing\Models\PromoCode;
+use App\Modules\Billing\Support\PromoCodes;
 use App\Modules\Catalog\Enums\PriceUnit;
 use App\Modules\Catalog\Models\Color;
 use App\Modules\Catalog\Models\DefectType;
@@ -28,7 +30,7 @@ use Illuminate\Validation\ValidationException;
  *
  * @phpstan-type PricedPiece array{color_id: int|null, color_name: string|null, brand: string|null, notes: string|null, defects: list<array{defect_type_id: int, name: string, kind: string}>}
  * @phpstan-type PricedLine array{item_id: int, service_type_id: int, item_name: string, service_name: string, service_code: string, unit: PriceUnit, quantity: string, unit_price: int, base_amount: int, upcharge_amount: int, surcharge_amount: int, line_total: int, notes: string|null, upcharges: list<array{upcharge_id: int, name: string, type: string, value: int, amount: int}>, piece_count: int, pieces: list<PricedPiece>}
- * @phpstan-type Priced array{lines: list<PricedLine>, tier: TurnaroundTier|null, duration_hours: int, surcharge_percent: int, subtotal: int, discount_type: DiscountType|null, discount_value: string, discount_amount: int, tax_amount: int, total: int}
+ * @phpstan-type Priced array{lines: list<PricedLine>, tier: TurnaroundTier|null, duration_hours: int, surcharge_percent: int, subtotal: int, discount_type: DiscountType|null, discount_value: string, discount_amount: int, promo: PromoCode|null, tax_amount: int, total: int}
  */
 final class OrderPricer
 {
@@ -39,13 +41,15 @@ final class OrderPricer
         private readonly PriceCalculator $calculator,
         private readonly DueDateCalculator $dueDates,
         private readonly Settings $settings,
+        private readonly PromoCodes $promoCodes,
     ) {}
 
     /**
-     * @param  array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null}  $input  validated request data
+     * @param  array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null, promo_code?: string|null, customer_id?: int|null}  $input  validated request data
+     * @param  int|null  $orderId  the order being edited, so its own use of a promo code is not counted
      * @return Priced
      */
-    public function price(array $input): array
+    public function price(array $input, ?int $orderId = null): array
     {
         $lines = $input['lines'];
         $items = Item::query()->whereIn('id', array_column($lines, 'item_id'))->get()->keyBy('id');
@@ -107,13 +111,20 @@ final class OrderPricer
 
         $discount = $this->discount($input['discount'] ?? null);
         $vat = $this->settings->get('tax.vat_percent');
-        $quote = $this->calculator->calculate(
-            array_values($engineLines),
-            $surchargePercent,
-            $discount,
-            PriceCalculator::basisPoints(is_numeric($vat) ? $vat : 0),
-            (bool) $this->settings->get('tax.prices_include_vat'),
-        );
+        $vatBasisPoints = PriceCalculator::basisPoints(is_numeric($vat) ? $vat : 0);
+        $includesVat = (bool) $this->settings->get('tax.prices_include_vat');
+        $quote = $this->calculator->calculate(array_values($engineLines), $surchargePercent, $discount, $vatBasisPoints, $includesVat);
+
+        // A promo code's discount depends on the subtotal, so it is worked
+        // out after a first pass and applied as a fixed amount.
+        $promo = null;
+        $promoCode = $input['promo_code'] ?? null;
+
+        if (is_string($promoCode) && trim($promoCode) !== '') {
+            ['promo' => $promo, 'amount' => $promoAmount] = $this->promoCodes->apply($promoCode, $quote['subtotal'], $input['customer_id'] ?? null, $orderId);
+            $discount = ['type' => DiscountType::Amount, 'value_bp' => $promoAmount];
+            $quote = $this->calculator->calculate(array_values($engineLines), $surchargePercent, $discount, $vatBasisPoints, $includesVat);
+        }
 
         $priced = [];
 
@@ -170,8 +181,13 @@ final class OrderPricer
             'surcharge_percent' => $surchargePercent,
             'subtotal' => $quote['subtotal'],
             'discount_type' => $discount['type'] ?? null,
-            'discount_value' => $discount === null ? '0' : (string) $input['discount']['value'],
+            'discount_value' => match (true) {
+                $discount === null => '0',
+                $promo !== null => (string) $quote['discount'],
+                default => (string) $input['discount']['value'],
+            },
             'discount_amount' => $quote['discount'],
+            'promo' => $promo,
             'tax_amount' => $quote['tax'],
             'total' => $quote['total'],
         ];

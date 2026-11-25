@@ -39,7 +39,7 @@ final class UpdateOrder
         }
 
         /** @var array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null} $data */
-        $priced = $this->pricer->price($data);
+        $priced = $this->pricer->price([...$data, 'customer_id' => $order->customer_id], $order->id);
         $this->writer->authorizeDiscount($actor, $priced);
 
         if ($priced['total'] < $order->paid_amount) {

@@ -41,6 +41,8 @@ trait ValidatesOrderPayload
             'lines.*.pieces.*.defect_type_ids.*' => ['integer', 'distinct', $this->inOrganization('defect_types')],
             // The default tier is used when left out.
             'turnaround_tier_id' => ['nullable', 'integer'],
+            // A manual discount or a promo code, not both.
+            'promo_code' => ['nullable', 'string', 'max:30', 'prohibits:discount'],
             'discount' => ['nullable', 'array'],
             'discount.type' => ['required_with:discount', Rule::enum(DiscountType::class)],
             // Rials for "amount", percent (up to two decimals) for "percent".

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Http\Resources;
 
+use App\Modules\Billing\Models\Payment;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderStatusChange;
@@ -57,6 +58,8 @@ class OrderResource extends JsonResource
                 'amount' => $this->discount_amount,
                 'reason' => $this->discount_reason,
             ],
+            /** @var array{id: int, code: string}|null The promo code the discount came from. */
+            'promo_code' => $this->whenLoaded('promoCode', fn (): ?array => $this->promoCode === null ? null : ['id' => $this->promoCode->id, 'code' => $this->promoCode->code]),
             'tax_amount' => $this->tax_amount,
             'total' => $this->total,
             'paid_amount' => $this->paid_amount,
@@ -71,6 +74,17 @@ class OrderResource extends JsonResource
             /** @var array{id: int, name: string}|null */
             'created_by' => $this->whenLoaded('creator', fn (): ?array => $this->creator === null ? null : ['id' => $this->creator->id, 'name' => $this->creator->name]),
             'lines' => OrderLineResource::collection($this->whenLoaded('lines')),
+            /** @var list<array{id: int, kind: 'payment'|'refund', method: 'cash'|'card'|'transfer', amount: int, reference: string|null, notes: string|null, user: array{id: int, name: string}|null, created_at: string}> */
+            'payments' => $this->whenLoaded('payments', fn (): array => $this->payments->map(fn (Payment $payment): array => [
+                'id' => $payment->id,
+                'kind' => $payment->kind->value,
+                'method' => $payment->method->value,
+                'amount' => $payment->amount,
+                'reference' => $payment->reference,
+                'notes' => $payment->notes,
+                'user' => $payment->user === null ? null : ['id' => $payment->user->id, 'name' => $payment->user->name],
+                'created_at' => $payment->created_at->toIso8601String(),
+            ])->all()),
             /** @var list<array{from_status: OrderStatus|null, to_status: OrderStatus, user: array{id: int, name: string}|null, reason: string|null, created_at: string}> */
             'history' => $this->whenLoaded('history', fn (): array => $this->history->map(fn (OrderStatusChange $change): array => [
                 'from_status' => $change->from_status,

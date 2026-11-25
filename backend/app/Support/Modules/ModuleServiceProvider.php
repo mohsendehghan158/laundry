@@ -15,7 +15,7 @@ use Illuminate\Support\ServiceProvider;
 final class ModuleServiceProvider extends ServiceProvider
 {
     /** @var list<string> */
-    public const array MODULES = ['Organization', 'Identity', 'Audit', 'Catalog', 'Customers', 'Orders'];
+    public const array MODULES = ['Organization', 'Identity', 'Audit', 'Catalog', 'Customers', 'Orders', 'Billing'];
 
     public const string API_PREFIX = 'api/v1';
 

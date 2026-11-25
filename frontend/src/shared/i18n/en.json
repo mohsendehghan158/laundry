@@ -60,7 +60,9 @@
     "catalog": "Catalog & prices",
     "customers": "Customers",
     "pos": "Counter",
-    "orders": "Orders"
+    "orders": "Orders",
+    "register": "Register",
+    "promotions": "Promo codes"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -152,7 +154,9 @@
       "activity": "Activity log",
       "catalog": "Catalog & prices",
       "customers": "Customers",
-      "orders": "Orders"
+      "orders": "Orders",
+      "billing": "Register & payments",
+      "promotions": "Promotions"
     },
     "permissions": {
       "organization": {
@@ -198,6 +202,17 @@
         "cancel": "Cancel orders",
         "discount": "Manual discount up to the cap",
         "discount_unlimited": "Unlimited manual discount"
+      },
+      "payments": {
+        "create": "Take payments",
+        "refund": "Refund payments"
+      },
+      "shifts": {
+        "operate": "Open and close the register",
+        "view": "Review shifts"
+      },
+      "promotions": {
+        "manage": "Manage promo codes"
       }
     }
   },
@@ -251,7 +266,9 @@
       "organization": "Organization",
       "catalog": "Catalog & prices",
       "customer": "Customers",
-      "order": "Orders"
+      "order": "Orders",
+      "cash": "Register",
+      "promo": "Promo codes"
     },
     "events": {
       "created": "Created",
@@ -263,7 +280,9 @@
       "prices_updated": "Prices changed",
       "discounted": "Discount",
       "edited": "Order edited",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "refunded": "Refund",
+      "shift_closed": "Register closed"
     }
   },
   "account": {
@@ -419,7 +438,8 @@
     "newOrder": "New order",
     "emptyCatalog": "The catalog is empty. Add items and prices under “Catalog & prices”.",
     "noPrice": "No price",
-    "serviceCount": "{count, number} services"
+    "serviceCount": "{count, number} services",
+    "promoCode": "Promo code"
   },
   "orders": {
     "title": "Orders",
@@ -512,6 +532,98 @@
       "received": "Received",
       "ready": "Ready",
       "handed_over": "Handed over"
+    }
+  },
+  "billing": {
+    "pay": "Take payment",
+    "refund": "Refund",
+    "confirmPay": "Record payment",
+    "confirmRefund": "Record refund",
+    "paid": "Payment recorded.",
+    "refunded": "Refund recorded.",
+    "balance": "Balance",
+    "paidSoFar": "Paid so far",
+    "method": "Method",
+    "methods": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Transfer"
+    },
+    "kind": "Kind",
+    "kinds": {
+      "payment": "Payment",
+      "refund": "Refund"
+    },
+    "amount": "Amount",
+    "tendered": "Cash given",
+    "change": "Change to give back",
+    "reference": "Reference",
+    "reason": "Reason",
+    "overLimit": "That is more than allowed.",
+    "registerClosed": "The branch's register is closed; open it to take cash.",
+    "openRegister": "Open the register",
+    "payments": "Payments",
+    "noPayments": "No payments yet.",
+    "registerTitle": "Register & shifts",
+    "currentShift": "Current shift",
+    "statuses": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "open": "Open the register",
+    "opened": "Register opened.",
+    "close": "Close the register",
+    "closed": "Register closed.",
+    "closedTitle": "The register is closed",
+    "closedText": "Enter the cash in the drawer and open the register.",
+    "openingFloat": "Opening float",
+    "expectedCash": "Expected cash",
+    "countedCash": "Counted cash",
+    "difference": "Difference",
+    "short": "Short",
+    "over": "Over",
+    "cashIn": "Cash in",
+    "cashOut": "Cash out",
+    "movementTypes": {
+      "in": "Cash in",
+      "out": "Cash out"
+    },
+    "movements": "Cash in and out",
+    "openedAt": "Opened",
+    "closedAt": "Closed",
+    "user": "User",
+    "time": "Time",
+    "history": "Recent shifts",
+    "shiftDetails": "Shift details",
+    "noDifference": "No difference"
+  },
+  "promotions": {
+    "title": "Promo codes",
+    "subtitle": "Codes customers give at the counter or online.",
+    "new": "New promo code",
+    "edit": "Edit promo code",
+    "deleteConfirm": "Delete code “{code}”? Orders that used it keep their discount.",
+    "codeInvalid": "Capital letters, digits, dash and underscore only.",
+    "rules": "Rules",
+    "usage": "Used",
+    "expired": "Expired",
+    "upTo": "up to",
+    "minOrder": "Min. {amount}",
+    "perCustomer": "{count, number} per customer",
+    "until": "Until {date}",
+    "fields": {
+      "code": "Code",
+      "type": "Type",
+      "value": "Value",
+      "percent": "Discount percent",
+      "amount": "Discount amount",
+      "maxDiscount": "Maximum discount",
+      "minOrder": "Minimum order",
+      "period": "Valid",
+      "usageLimit": "Total uses",
+      "perCustomerLimit": "Uses per customer",
+      "description": "Description",
+      "firstOrderOnly": "First order only"
     }
   }
 }

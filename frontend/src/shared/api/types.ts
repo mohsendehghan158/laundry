@@ -38,6 +38,12 @@ export type PaymentStatus = Schemas["PaymentStatus"];
 export type StoreOrderInput = Schemas["StoreOrderRequest"];
 export type OrderPayload = Schemas["PreviewOrderRequest"];
 
+export type CashShift = Schemas["CashShiftResource"];
+export type Payment = Schemas["PaymentResource"];
+export type PaymentMethod = Schemas["PaymentMethod"];
+export type PromoCode = Schemas["PromoCodeResource"];
+export type SavePromoCodeInput = Schemas["SavePromoCodeRequest"];
+
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
 export type UpdateBranchInput = Schemas["UpdateBranchRequest"];

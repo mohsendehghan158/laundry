@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckOutlined, CloseCircleOutlined, PlayCircleOutlined, RollbackOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseCircleOutlined, DollarOutlined, PlayCircleOutlined, RollbackOutlined, UndoOutlined } from "@ant-design/icons";
 import { Alert, App, Button, Card, Col, Descriptions, Flex, Input, Modal, Result, Row, Skeleton, Table, Tag, Timeline, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
@@ -16,6 +16,7 @@ import { dayjs, formatDateTime } from "@/shared/lib/date";
 import { formatNumber } from "@/shared/lib/digits";
 import { formatMoney } from "@/shared/lib/money";
 import { PageHeader } from "@/shared/ui/PageHeader";
+import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { useOrder, useTransitionOrder } from "../api";
 import { OPEN_STATUSES, ORDER_STATUS_COLOR, PAYMENT_STATUS_COLOR } from "../status";
 
@@ -31,6 +32,7 @@ export function OrderDetailPage() {
   const transition = useTransitionOrder();
   const [asking, setAsking] = useState<"ready" | "cancelled" | null>(null);
   const [answer, setAnswer] = useState("");
+  const [paying, setPaying] = useState<"pay" | "refund" | null>(null);
 
   if (order.isLoading) {
     return <Skeleton active />;
@@ -176,6 +178,45 @@ export function OrderDetailPage() {
                 </Descriptions.Item>
               </Descriptions>
             </Card>
+            <Card
+              title={t("billing.payments")}
+              extra={
+                <Flex gap={4}>
+                  {data.balance > 0 && data.status !== "cancelled" && can("payments.create") && (
+                    <Button type="primary" size="small" icon={<DollarOutlined />} onClick={() => setPaying("pay")}>
+                      {t("billing.pay")}
+                    </Button>
+                  )}
+                  {data.paid_amount > 0 && can("payments.refund") && (
+                    <Button size="small" danger icon={<UndoOutlined />} onClick={() => setPaying("refund")}>
+                      {t("billing.refund")}
+                    </Button>
+                  )}
+                </Flex>
+              }
+            >
+              {(data.payments ?? []).length === 0 ? (
+                <Typography.Text type="secondary">{t("billing.noPayments")}</Typography.Text>
+              ) : (
+                <Flex vertical gap={6}>
+                  {(data.payments ?? []).map((payment) => (
+                    <Flex key={payment.id} justify="space-between" gap={8}>
+                      <span>
+                        <Tag color={payment.kind === "refund" ? "red" : "green"}>{t(`billing.methods.${payment.method}`)}</Tag>
+                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                          {formatDateTime(payment.created_at)}
+                          {payment.reference ? ` · ${payment.reference}` : ""}
+                        </Typography.Text>
+                      </span>
+                      <Typography.Text type={payment.kind === "refund" ? "danger" : undefined}>
+                        {payment.kind === "refund" ? "−" : ""}
+                        {formatMoney(payment.amount, unit)}
+                      </Typography.Text>
+                    </Flex>
+                  ))}
+                </Flex>
+              )}
+            </Card>
             <Card>
               <Descriptions column={1} size="small">
                 <Descriptions.Item label={t("orders.detail.received")}>{formatDateTime(data.received_at)}</Descriptions.Item>
@@ -217,6 +258,7 @@ export function OrderDetailPage() {
           </Flex>
         </Col>
       </Row>
+      <PaymentModal order={data} mode={paying ?? "pay"} open={paying !== null} onClose={() => setPaying(null)} />
       <Modal
         open={asking !== null}
         title={asking === "ready" ? t("orders.actions.ready") : t("orders.actions.cancelled")}

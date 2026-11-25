@@ -2,6 +2,8 @@ import {
   ApartmentOutlined,
   ContactsOutlined,
   FileTextOutlined,
+  GiftOutlined,
+  WalletOutlined,
   ShopOutlined,
   DashboardOutlined,
   HistoryOutlined,
@@ -16,10 +18,10 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "pos" | "orders" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "pos" | "orders" | "register" | "promotions" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
-  /** Shown only to users holding this permission. */
-  permission?: Permission;
+  /** Shown only to users holding this permission (or any one of a list). */
+  permission?: Permission | Permission[];
 };
 
 export type NavGroup = { label?: "management"; items: NavItem[] };
@@ -30,6 +32,7 @@ export const NAV: NavGroup[] = [
       { href: "/dashboard", label: "dashboard", icon: <DashboardOutlined /> },
       { href: "/pos", label: "pos", icon: <ShopOutlined />, permission: "orders.create" },
       { href: "/orders", label: "orders", icon: <FileTextOutlined />, permission: "orders.view" },
+      { href: "/register", label: "register", icon: <WalletOutlined />, permission: ["shifts.operate", "shifts.view"] },
       { href: "/customers", label: "customers", icon: <ContactsOutlined />, permission: "customers.view" },
     ],
   },
@@ -37,6 +40,7 @@ export const NAV: NavGroup[] = [
     label: "management",
     items: [
       { href: "/catalog", label: "catalog", icon: <TagsOutlined />, permission: "catalog.view" },
+      { href: "/promotions", label: "promotions", icon: <GiftOutlined />, permission: "promotions.manage" },
       { href: "/branches", label: "branches", icon: <ApartmentOutlined />, permission: "branches.view" },
       { href: "/users", label: "users", icon: <TeamOutlined />, permission: "users.view" },
       { href: "/roles", label: "roles", icon: <SafetyCertificateOutlined />, permission: "roles.view" },
@@ -48,7 +52,8 @@ export const NAV: NavGroup[] = [
 
 /** The navigation entries the user may open, groups without entries dropped. */
 export function visibleNav(can: (permission?: Permission) => boolean): NavGroup[] {
-  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) })).filter(
+  const allowed = (permission: NavItem["permission"]) => (Array.isArray(permission) ? permission.some((p) => can(p)) : can(permission));
+  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => allowed(item.permission)) })).filter(
     (group) => group.items.length > 0,
   );
 }

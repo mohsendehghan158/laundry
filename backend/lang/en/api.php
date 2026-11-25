@@ -33,5 +33,12 @@ return [
         'order_total_below_paid' => 'The new total is below what has been paid; refund first.',
         'order_transition_not_allowed' => 'The order cannot go from “:from” to “:to”.',
         'order_has_payments' => 'This order has payments; refund them first.',
+
+        'shift_already_open' => 'This branch\'s register is already open.',
+        'shift_not_open' => 'The branch\'s register is closed; open it to take cash.',
+        'shift_cash_insufficient' => 'That is more cash than the drawer holds.',
+        'payment_order_cancelled' => 'A cancelled order cannot be paid.',
+        'payment_exceeds_balance' => 'The amount is more than the order\'s balance.',
+        'refund_exceeds_paid' => 'The refund is more than what was paid.',
     ],
 ];

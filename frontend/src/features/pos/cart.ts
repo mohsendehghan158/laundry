@@ -29,6 +29,8 @@ export type Cart = {
   lines: CartLine[];
   tierId: number | null;
   discount: CartDiscount | null;
+  /** A promo code replaces any manual discount. */
+  promoCode: string;
   notes: string;
 };
 
@@ -42,10 +44,11 @@ export type CartAction =
   | { type: "setPieces"; key: string; pieces: CartPiece[] }
   | { type: "setTier"; tierId: number | null }
   | { type: "setDiscount"; discount: CartDiscount | null }
+  | { type: "setPromoCode"; code: string }
   | { type: "setNotes"; notes: string }
   | { type: "reset" };
 
-export const emptyCart: Cart = { customerId: null, lines: [], tierId: null, discount: null, notes: "" };
+export const emptyCart: Cart = { customerId: null, lines: [], tierId: null, discount: null, promoCode: "", notes: "" };
 
 export const emptyPiece = (): CartPiece => ({ color_id: null, brand: "", notes: "", defect_type_ids: [] });
 
@@ -127,7 +130,10 @@ export function cartReducer(cart: Cart, action: CartAction): Cart {
       return { ...cart, tierId: action.tierId };
 
     case "setDiscount":
-      return { ...cart, discount: action.discount && action.discount.value > 0 ? action.discount : null };
+      return { ...cart, discount: action.discount && action.discount.value > 0 ? action.discount : null, promoCode: action.discount ? "" : cart.promoCode };
+
+    case "setPromoCode":
+      return { ...cart, promoCode: action.code.trim().toUpperCase(), discount: action.code.trim() ? null : cart.discount };
 
     case "setNotes":
       return { ...cart, notes: action.notes };
@@ -154,7 +160,10 @@ export function toPayload(cart: Cart): OrderPayload {
       })),
     })),
     turnaround_tier_id: cart.tierId,
-    discount: cart.discount ? { type: cart.discount.type, value: cart.discount.value, reason: cart.discount.reason || null } : null,
+    customer_id: cart.customerId,
+    ...(cart.promoCode
+      ? { promo_code: cart.promoCode }
+      : { discount: cart.discount ? { type: cart.discount.type, value: cart.discount.value, reason: cart.discount.reason || null } : null }),
   };
 }
 

@@ -30,7 +30,8 @@ final class OrderWriter
      */
     public function authorizeDiscount(User $actor, array $priced): void
     {
-        if ($priced['discount_amount'] === 0) {
+        // Promo codes carry their own rules and need no discount right.
+        if ($priced['discount_amount'] === 0 || $priced['promo'] !== null) {
             return;
         }
 
@@ -65,7 +66,12 @@ final class OrderWriter
             'discount_type' => $priced['discount_type'],
             'discount_value' => $priced['discount_type'] === null ? 0 : $priced['discount_value'],
             'discount_amount' => $priced['discount_amount'],
-            'discount_reason' => $priced['discount_type'] === null ? null : $discountReason,
+            'discount_reason' => match (true) {
+                $priced['promo'] !== null => __('orders.promo.reason', ['code' => $priced['promo']->code]),
+                $priced['discount_type'] === null => null,
+                default => $discountReason,
+            },
+            'promo_code_id' => $priced['promo']?->id,
             'tax_amount' => $priced['tax_amount'],
             'total' => $priced['total'],
         ];

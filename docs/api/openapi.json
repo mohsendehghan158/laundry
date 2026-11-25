@@ -709,6 +709,514 @@
                 }
             }
         },
+        "/cash-shifts/current": {
+            "get": {
+                "operationId": "cashShift.current",
+                "description": "`data` is null when the branch's register is closed.",
+                "summary": "Show the open shift of a branch",
+                "tags": [
+                    "CashShift"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "anyOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CashShiftResource"
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/cash-shifts": {
+            "get": {
+                "operationId": "cashShift.index",
+                "description": "Newest first, for the branches the user works in.",
+                "summary": "List cash shifts",
+                "tags": [
+                    "CashShift"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[branch_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "description": "open or closed.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `CashShiftResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CashShiftResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "cashShift.store",
+                "description": "Fails with 409 `shift_already_open` when it is open already.",
+                "summary": "Open a branch's register",
+                "tags": [
+                    "CashShift"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OpenShiftRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`CashShiftResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CashShiftResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "payments",
+                                                        "movements"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/cash-shifts/{cashShift}": {
+            "get": {
+                "operationId": "cashShift.show",
+                "description": "With its payments, cash movements and totals by method.",
+                "summary": "Show a cash shift",
+                "tags": [
+                    "CashShift"
+                ],
+                "parameters": [
+                    {
+                        "name": "cashShift",
+                        "in": "path",
+                        "required": true,
+                        "description": "The cash shift ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CashShiftResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CashShiftResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "payments",
+                                                        "movements"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/cash-shifts/{cashShift}/close": {
+            "post": {
+                "operationId": "cashShift.close",
+                "description": "Records the cash counted and the difference from what the shift's\npayments, refunds and movements say should be there.",
+                "summary": "Close a register",
+                "tags": [
+                    "CashShift"
+                ],
+                "parameters": [
+                    {
+                        "name": "cashShift",
+                        "in": "path",
+                        "required": true,
+                        "description": "The cash shift ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CloseShiftRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CashShiftResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CashShiftResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "payments",
+                                                        "movements"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/cash-shifts/{cashShift}/movements": {
+            "post": {
+                "operationId": "cashShift.movement",
+                "description": "For anything other than an order (change from the bank, buying\nsupplies). Taking out more than is in the drawer fails with 409.",
+                "summary": "Put cash into or take it out of the drawer",
+                "tags": [
+                    "CashShift"
+                ],
+                "parameters": [
+                    {
+                        "name": "cashShift",
+                        "in": "path",
+                        "required": true,
+                        "description": "The cash shift ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CashMovementRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CashShiftResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CashShiftResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "payments",
+                                                        "movements"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/catalog": {
             "get": {
                 "operationId": "catalog.catalog",
@@ -2302,8 +2810,10 @@
                                                 {
                                                     "type": "object",
                                                     "required": [
+                                                        "promo_code",
                                                         "created_by",
                                                         "lines",
+                                                        "payments",
                                                         "history"
                                                     ]
                                                 }
@@ -2372,9 +2882,157 @@
                                                 {
                                                     "type": "object",
                                                     "required": [
+                                                        "promo_code",
                                                         "created_by",
                                                         "lines",
+                                                        "payments",
                                                         "history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/payments": {
+            "post": {
+                "operationId": "orderPayment.store",
+                "description": "In advance, at handover or in parts with different methods. Fails\nwith 409 `payment_exceeds_balance` above what is still owed, and\n`shift_not_open` for cash while the branch's register is closed.",
+                "summary": "Record a payment",
+                "tags": [
+                    "OrderPayment"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`PaymentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/PaymentResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "user"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/refunds": {
+            "post": {
+                "operationId": "orderPayment.refund",
+                "description": "Up to what the customer has paid; the reason goes to the audit log.",
+                "summary": "Refund a payment",
+                "tags": [
+                    "OrderPayment"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RefundRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`PaymentResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/PaymentResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "user"
                                                     ]
                                                 }
                                             ]
@@ -2597,8 +3255,10 @@
                                                 {
                                                     "type": "object",
                                                     "required": [
+                                                        "promo_code",
                                                         "created_by",
                                                         "lines",
+                                                        "payments",
                                                         "history"
                                                     ]
                                                 }
@@ -2822,6 +3482,185 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/promo-codes": {
+            "get": {
+                "operationId": "promo-codes.index",
+                "description": "With how many orders used each.",
+                "summary": "List promo codes",
+                "tags": [
+                    "PromoCode"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `PromoCodeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PromoCodeResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "promo-codes.store",
+                "description": "Codes are stored in capitals; percent values may have two decimals.",
+                "summary": "Create a promo code",
+                "tags": [
+                    "PromoCode"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SavePromoCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`PromoCodeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PromoCodeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/promo-codes/{promoCode}": {
+            "put": {
+                "operationId": "promo-codes.update",
+                "summary": "Update a promo code",
+                "tags": [
+                    "PromoCode"
+                ],
+                "parameters": [
+                    {
+                        "name": "promoCode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The promo code ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SavePromoCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`PromoCodeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PromoCodeResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "promo-codes.destroy",
+                "description": "Orders that used it keep their discount.",
+                "summary": "Delete a promo code",
+                "tags": [
+                    "PromoCode"
+                ],
+                "parameters": [
+                    {
+                        "name": "promoCode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The promo code ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -4489,6 +5328,289 @@
                 ],
                 "title": "BranchType"
             },
+            "CashMovementRequest": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/CashMovementType"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100000000000
+                    },
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "type",
+                    "amount",
+                    "reason"
+                ],
+                "title": "CashMovementRequest"
+            },
+            "CashMovementType": {
+                "type": "string",
+                "description": "| |\n|---|\n| `in` <br/> Cash put into the drawer (e.g. change from the bank). |\n| `out` <br/> Cash taken out (e.g. buying supplies). |",
+                "enum": [
+                    "in",
+                    "out"
+                ],
+                "title": "CashMovementType"
+            },
+            "CashShiftResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ShiftStatus"
+                    },
+                    "branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "code": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "code"
+                        ]
+                    },
+                    "opened_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "opened_by": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "opening_float": {
+                        "type": "integer"
+                    },
+                    "closed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "closed_by": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "expected_cash": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Cash that should be in the drawer at closing."
+                    },
+                    "counted_cash": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "difference": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Counted minus expected; negative means cash is missing."
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "totals": {
+                        "type": "object",
+                        "description": "Live totals of the shift.",
+                        "properties": {
+                            "by_method": {
+                                "type": "object",
+                                "properties": {
+                                    "cash": {
+                                        "type": "integer"
+                                    },
+                                    "card": {
+                                        "type": "integer"
+                                    },
+                                    "transfer": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "cash",
+                                    "card",
+                                    "transfer"
+                                ]
+                            },
+                            "payments": {
+                                "type": "integer"
+                            },
+                            "refunds": {
+                                "type": "integer"
+                            },
+                            "cash_in": {
+                                "type": "integer"
+                            },
+                            "cash_out": {
+                                "type": "integer"
+                            },
+                            "expected_cash": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "by_method",
+                            "payments",
+                            "refunds",
+                            "cash_in",
+                            "cash_out",
+                            "expected_cash"
+                        ]
+                    },
+                    "payments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PaymentResource"
+                        }
+                    },
+                    "movements": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "in",
+                                        "out"
+                                    ]
+                                },
+                                "amount": {
+                                    "type": "integer"
+                                },
+                                "reason": {
+                                    "type": "string"
+                                },
+                                "user": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name"
+                                    ]
+                                },
+                                "created_at": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "type",
+                                "amount",
+                                "reason",
+                                "user",
+                                "created_at"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "status",
+                    "branch",
+                    "opened_at",
+                    "opened_by",
+                    "opening_float",
+                    "closed_at",
+                    "closed_by",
+                    "expected_cash",
+                    "counted_cash",
+                    "difference",
+                    "notes",
+                    "totals"
+                ],
+                "title": "CashShiftResource"
+            },
+            "CloseShiftRequest": {
+                "type": "object",
+                "properties": {
+                    "counted_cash": {
+                        "type": "integer",
+                        "description": "Cash counted in the drawer at closing, in rials.",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    }
+                },
+                "required": [
+                    "counted_cash"
+                ],
+                "title": "CloseShiftRequest"
+            },
             "ColorResource": {
                 "type": "object",
                 "properties": {
@@ -4772,6 +5894,32 @@
                     "password"
                 ],
                 "title": "LoginRequest"
+            },
+            "OpenShiftRequest": {
+                "type": "object",
+                "properties": {
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "opening_float": {
+                        "type": "integer",
+                        "description": "Cash already in the drawer, in rials.",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    }
+                },
+                "required": [
+                    "branch_id",
+                    "opening_float"
+                ],
+                "title": "OpenShiftRequest"
             },
             "OrderLineResource": {
                 "type": "object",
@@ -5064,6 +6212,25 @@
                             "reason"
                         ]
                     },
+                    "promo_code": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The promo code the discount came from.",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "code": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "code"
+                        ]
+                    },
                     "tax_amount": {
                         "type": "integer"
                     },
@@ -5120,6 +6287,78 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/OrderLineResource"
+                        }
+                    },
+                    "payments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "payment",
+                                        "refund"
+                                    ]
+                                },
+                                "method": {
+                                    "type": "string",
+                                    "enum": [
+                                        "cash",
+                                        "card",
+                                        "transfer"
+                                    ]
+                                },
+                                "amount": {
+                                    "type": "integer"
+                                },
+                                "reference": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "notes": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "user": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name"
+                                    ]
+                                },
+                                "created_at": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "kind",
+                                "method",
+                                "amount",
+                                "reference",
+                                "notes",
+                                "user",
+                                "created_at"
+                            ]
                         }
                     },
                     "history": {
@@ -5239,6 +6478,128 @@
                     "name"
                 ],
                 "title": "OrganizationResource"
+            },
+            "PaymentKind": {
+                "type": "string",
+                "description": "| |\n|---|\n| `payment` <br/> Money received. |\n| `refund` <br/> Money given back. |",
+                "enum": [
+                    "payment",
+                    "refund"
+                ],
+                "title": "PaymentKind"
+            },
+            "PaymentMethod": {
+                "type": "string",
+                "description": "| |\n|---|\n| `cash` <br/> Banknotes in the drawer. |\n| `card` <br/> Card terminal (POS device); the trace number is the reference. |\n| `transfer` <br/> Bank transfer or card-to-card; the reference identifies it. |",
+                "enum": [
+                    "cash",
+                    "card",
+                    "transfer"
+                ],
+                "title": "PaymentMethod"
+            },
+            "PaymentRequest": {
+                "type": "object",
+                "properties": {
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Whole rials; at most the order's balance.",
+                        "minimum": 1
+                    },
+                    "reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Card trace number or transfer reference.",
+                        "maxLength": 100
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "method",
+                    "amount"
+                ],
+                "title": "PaymentRequest"
+            },
+            "PaymentResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "order_id": {
+                        "type": "integer"
+                    },
+                    "ticket_number": {
+                        "type": "string",
+                        "description": "Present in a shift's payment list."
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/PaymentKind"
+                    },
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Whole rials, always positive; `kind` says which way it went."
+                    },
+                    "reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "user": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "order_id",
+                    "kind",
+                    "method",
+                    "amount",
+                    "reference",
+                    "notes",
+                    "created_at"
+                ],
+                "title": "PaymentResource"
             },
             "PaymentStatus": {
                 "type": "string",
@@ -5363,6 +6724,13 @@
             "PreviewOrderRequest": {
                 "type": "object",
                 "properties": {
+                    "customer_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Lets the preview check customer-specific promo code rules."
+                    },
                     "lines": {
                         "type": "array",
                         "items": {
@@ -5449,6 +6817,14 @@
                         ],
                         "description": "The default tier is used when left out."
                     },
+                    "promo_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A manual discount or a promo code, not both.",
+                        "maxLength": 30
+                    },
                     "discount": {
                         "type": [
                             "object",
@@ -5488,6 +6864,114 @@
                     "sqm"
                 ],
                 "title": "PriceUnit"
+            },
+            "PromoCodeResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/DiscountType"
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "Rials for \"amount\", percent for \"percent\"."
+                    },
+                    "max_discount": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "min_order": {
+                        "type": "integer"
+                    },
+                    "starts_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "usage_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "per_customer_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "first_order_only": {
+                        "type": "boolean"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "used_count": {
+                        "type": "integer",
+                        "description": "Orders (not cancelled) that used the code."
+                    }
+                },
+                "required": [
+                    "id",
+                    "code",
+                    "description",
+                    "type",
+                    "value",
+                    "max_discount",
+                    "min_order",
+                    "starts_at",
+                    "ends_at",
+                    "usage_limit",
+                    "per_customer_limit",
+                    "first_order_only",
+                    "is_active"
+                ],
+                "title": "PromoCodeResource"
+            },
+            "RefundRequest": {
+                "type": "object",
+                "properties": {
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Whole rials; at most what has been paid.",
+                        "minimum": 1
+                    },
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "method",
+                    "amount",
+                    "reason"
+                ],
+                "title": "RefundRequest"
             },
             "RoleResource": {
                 "type": "object",
@@ -5733,6 +7217,80 @@
                 },
                 "title": "SaveItemRequest"
             },
+            "SavePromoCodeRequest": {
+                "type": "object",
+                "description": "Creates (POST) or updates (PUT) a promo code.",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9_-]+$",
+                        "maxLength": 30
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/DiscountType"
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "Rials for \"amount\"; percent (up to two decimals) for \"percent\".",
+                        "maximum": 1000000000000
+                    },
+                    "max_discount": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Largest discount a percent code gives, in rials.",
+                        "minimum": 0
+                    },
+                    "min_order": {
+                        "type": "integer",
+                        "description": "Smallest order subtotal the code applies to, in rials.",
+                        "minimum": 0
+                    },
+                    "starts_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "usage_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1
+                    },
+                    "per_customer_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1
+                    },
+                    "first_order_only": {
+                        "type": "boolean"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SavePromoCodeRequest"
+            },
             "SaveServiceTypeRequest": {
                 "type": "object",
                 "properties": {
@@ -5868,6 +7426,14 @@
                     "is_active"
                 ],
                 "title": "ServiceTypeResource"
+            },
+            "ShiftStatus": {
+                "type": "string",
+                "enum": [
+                    "open",
+                    "closed"
+                ],
+                "title": "ShiftStatus"
             },
             "StoreBranchRequest": {
                 "type": "object",
@@ -6011,6 +7577,14 @@
                             "null"
                         ],
                         "description": "The default tier is used when left out."
+                    },
+                    "promo_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A manual discount or a promo code, not both.",
+                        "maxLength": 30
                     },
                     "discount": {
                         "type": [
@@ -6363,6 +7937,14 @@
                         ],
                         "description": "The default tier is used when left out."
                     },
+                    "promo_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A manual discount or a promo code, not both.",
+                        "maxLength": 30
+                    },
                     "discount": {
                         "type": [
                             "object",
@@ -6501,7 +8083,12 @@
                                 "orders.update",
                                 "orders.cancel",
                                 "orders.discount",
-                                "orders.discount_unlimited"
+                                "orders.discount_unlimited",
+                                "payments.create",
+                                "payments.refund",
+                                "shifts.operate",
+                                "shifts.view",
+                                "promotions.manage"
                             ]
                         },
                         "uniqueItems": true

@@ -63,8 +63,20 @@ describe("cart", () => {
     expect(toPayload(cart)).toEqual({
       lines: [{ item_id: 2, service_type_id: 10, quantity: 1, upcharge_ids: [], notes: null, pieces: [{ color_id: 4, brand: null, notes: null, defect_type_ids: [9] }] }],
       turnaround_tier_id: 7,
+      customer_id: null,
       discount: { type: "percent", value: 5, reason: null },
     });
+  });
+
+  it("uses either a promo code or a manual discount, never both", () => {
+    let cart = cartWith({ type: "setDiscount", discount: { type: "percent", value: 5, reason: "" } });
+    cart = cartReducer(cart, { type: "setPromoCode", code: " yalda " });
+    expect(cart.discount).toBeNull();
+    expect(toPayload(cart)).toMatchObject({ promo_code: "YALDA" });
+    expect(toPayload(cart)).not.toHaveProperty("discount");
+
+    cart = cartReducer(cart, { type: "setDiscount", discount: { type: "amount", value: 1000, reason: "" } });
+    expect(cart.promoCode).toBe("");
   });
 
   it("treats a zero discount as none", () => {

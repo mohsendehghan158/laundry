@@ -60,7 +60,9 @@
     "catalog": "کاتالوگ و قیمت",
     "customers": "مشتریان",
     "pos": "صندوق",
-    "orders": "سفارش‌ها"
+    "orders": "سفارش‌ها",
+    "register": "صندوق و شیفت",
+    "promotions": "کدهای تخفیف"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -152,7 +154,9 @@
       "activity": "لاگ فعالیت",
       "catalog": "کاتالوگ و قیمت",
       "customers": "مشتریان",
-      "orders": "سفارش‌ها"
+      "orders": "سفارش‌ها",
+      "billing": "صندوق و پرداخت",
+      "promotions": "تخفیف و بازاریابی"
     },
     "permissions": {
       "organization": {
@@ -198,6 +202,17 @@
         "cancel": "لغو سفارش",
         "discount": "تخفیف دستی تا سقف",
         "discount_unlimited": "تخفیف دستی بدون سقف"
+      },
+      "payments": {
+        "create": "دریافت وجه",
+        "refund": "بازپرداخت وجه"
+      },
+      "shifts": {
+        "operate": "باز و بسته کردن صندوق",
+        "view": "مشاهده گزارش شیفت‌ها"
+      },
+      "promotions": {
+        "manage": "مدیریت کدهای تخفیف"
       }
     }
   },
@@ -251,7 +266,9 @@
       "organization": "سازمان",
       "catalog": "کاتالوگ و قیمت",
       "customer": "مشتریان",
-      "order": "سفارش‌ها"
+      "order": "سفارش‌ها",
+      "cash": "صندوق",
+      "promo": "کدهای تخفیف"
     },
     "events": {
       "created": "ایجاد",
@@ -263,7 +280,9 @@
       "prices_updated": "تغییر قیمت",
       "discounted": "تخفیف",
       "edited": "ویرایش سفارش",
-      "cancelled": "لغو"
+      "cancelled": "لغو",
+      "refunded": "بازپرداخت",
+      "shift_closed": "بستن صندوق"
     }
   },
   "account": {
@@ -419,7 +438,8 @@
     "newOrder": "سفارش جدید",
     "emptyCatalog": "کاتالوگ خالی است. از «کاتالوگ و قیمت» اقلام و قیمت‌ها را تعریف کنید.",
     "noPrice": "بدون قیمت",
-    "serviceCount": "{count, number} خدمت"
+    "serviceCount": "{count, number} خدمت",
+    "promoCode": "کد تخفیف"
   },
   "orders": {
     "title": "سفارش‌ها",
@@ -512,6 +532,98 @@
       "received": "دریافت‌شده",
       "ready": "آماده",
       "handed_over": "تحویل‌شده"
+    }
+  },
+  "billing": {
+    "pay": "دریافت وجه",
+    "refund": "بازپرداخت",
+    "confirmPay": "ثبت دریافت",
+    "confirmRefund": "ثبت بازپرداخت",
+    "paid": "پرداخت ثبت شد.",
+    "refunded": "بازپرداخت ثبت شد.",
+    "balance": "مانده",
+    "paidSoFar": "پرداخت‌شده تاکنون",
+    "method": "روش",
+    "methods": {
+      "cash": "نقد",
+      "card": "کارت‌خوان",
+      "transfer": "کارت‌به‌کارت"
+    },
+    "kind": "نوع",
+    "kinds": {
+      "payment": "دریافت",
+      "refund": "بازپرداخت"
+    },
+    "amount": "مبلغ",
+    "tendered": "دریافتی از مشتری",
+    "change": "باقی‌مانده برای پس دادن",
+    "reference": "شماره پیگیری",
+    "reason": "دلیل",
+    "overLimit": "بیشتر از حد مجاز است.",
+    "registerClosed": "صندوق این شعبه بسته است؛ برای دریافت نقدی اول آن را باز کنید.",
+    "openRegister": "باز کردن صندوق",
+    "payments": "پرداخت‌ها",
+    "noPayments": "هنوز پرداختی ثبت نشده است.",
+    "registerTitle": "صندوق و شیفت",
+    "currentShift": "شیفت جاری",
+    "statuses": {
+      "open": "باز",
+      "closed": "بسته"
+    },
+    "open": "باز کردن صندوق",
+    "opened": "صندوق باز شد.",
+    "close": "بستن صندوق",
+    "closed": "صندوق بسته شد.",
+    "closedTitle": "صندوق بسته است",
+    "closedText": "موجودی نقد داخل صندوق را وارد کنید و صندوق را باز کنید.",
+    "openingFloat": "موجودی اول صندوق",
+    "expectedCash": "نقد مورد انتظار",
+    "countedCash": "نقد شمارش‌شده",
+    "difference": "مغایرت",
+    "short": "کسری",
+    "over": "اضافه",
+    "cashIn": "ورود وجه",
+    "cashOut": "خروج وجه",
+    "movementTypes": {
+      "in": "ورود وجه",
+      "out": "خروج وجه"
+    },
+    "movements": "ورود و خروج وجه",
+    "openedAt": "باز شده در",
+    "closedAt": "بسته شده در",
+    "user": "کاربر",
+    "time": "زمان",
+    "history": "شیفت‌های اخیر",
+    "shiftDetails": "جزئیات شیفت",
+    "noDifference": "بدون مغایرت"
+  },
+  "promotions": {
+    "title": "کدهای تخفیف",
+    "subtitle": "کدهایی که مشتری در صندوق یا سفارش آنلاین وارد می‌کند.",
+    "new": "کد تخفیف جدید",
+    "edit": "ویرایش کد تخفیف",
+    "deleteConfirm": "کد «{code}» حذف شود؟ تخفیف سفارش‌های ثبت‌شده می‌ماند.",
+    "codeInvalid": "فقط حروف بزرگ انگلیسی، عدد، خط تیره و زیرخط.",
+    "rules": "شرایط",
+    "usage": "استفاده",
+    "expired": "منقضی",
+    "upTo": "تا",
+    "minOrder": "حداقل {amount}",
+    "perCustomer": "هر مشتری {count, number} بار",
+    "until": "تا {date}",
+    "fields": {
+      "code": "کد",
+      "type": "نوع",
+      "value": "مقدار",
+      "percent": "درصد تخفیف",
+      "amount": "مبلغ تخفیف",
+      "maxDiscount": "سقف تخفیف",
+      "minOrder": "حداقل مبلغ سفارش",
+      "period": "بازه اعتبار",
+      "usageLimit": "سقف کل استفاده",
+      "perCustomerLimit": "سقف هر مشتری",
+      "description": "توضیح",
+      "firstOrderOnly": "فقط اولین سفارش"
     }
   }
 }

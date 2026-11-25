@@ -27,6 +27,10 @@ class PreviewOrderRequest extends ApiFormRequest
      */
     public function rules(): array
     {
-        return [...$this->payloadRules()];
+        return [
+            // Lets the preview check customer-specific promo code rules.
+            'customer_id' => ['nullable', 'integer'],
+            ...$this->payloadRules(),
+        ];
     }
 }

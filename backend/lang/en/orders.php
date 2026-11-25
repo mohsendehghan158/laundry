@@ -9,6 +9,15 @@ return [
     'tier_unavailable' => 'This turnaround tier is not active.',
     'discount_not_allowed' => 'You are not allowed to give discounts.',
     'discount_over_limit' => 'The discount exceeds the limit of :max percent.',
+    'promo' => [
+        'not_found' => 'This promo code is not valid.',
+        'expired' => 'This promo code is not active now.',
+        'min_order' => 'This code needs an order of at least :min rials.',
+        'used_up' => 'This code has been used up.',
+        'customer_limit' => 'This customer has already used this code.',
+        'first_order_only' => "This code is only for a customer\'s first order.",
+        'reason' => 'Promo code :code',
+    ],
     'statuses' => [
         'draft' => 'Draft',
         'pending_pickup' => 'Awaiting pickup',

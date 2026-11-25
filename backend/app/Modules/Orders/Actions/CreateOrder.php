@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Actions;
 
+use App\Modules\Billing\Models\PromoCode;
+use App\Modules\Billing\Support\PromoCodes;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PaymentStatus;
@@ -24,6 +26,7 @@ final class CreateOrder
         private readonly OrderPricer $pricer,
         private readonly OrderWriter $writer,
         private readonly Sequences $sequences,
+        private readonly PromoCodes $promoCodes,
     ) {}
 
     /**
@@ -57,6 +60,12 @@ final class CreateOrder
 
         try {
             $order = DB::transaction(function () use ($actor, $data, $branch, $priced, $idempotencyKey): Order {
+                // Serialize orders using the same promo code, so usage limits hold.
+                if ($priced['promo'] !== null) {
+                    PromoCode::query()->lockForUpdate()->findOrFail($priced['promo']->id);
+                    $this->promoCodes->apply($priced['promo']->code, $priced['subtotal'], (int) $data['customer_id']);
+                }
+
                 $receivedAt = now();
                 $number = $this->sequences->next($branch->organization_id, "ticket:{$branch->id}");
 

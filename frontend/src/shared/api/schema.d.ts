@@ -107,6 +107,112 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cash-shifts/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show the open shift of a branch
+         * @description `data` is null when the branch's register is closed.
+         */
+        get: operations["cashShift.current"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cash-shifts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List cash shifts
+         * @description Newest first, for the branches the user works in.
+         */
+        get: operations["cashShift.index"];
+        put?: never;
+        /**
+         * Open a branch's register
+         * @description Fails with 409 `shift_already_open` when it is open already.
+         */
+        post: operations["cashShift.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cash-shifts/{cashShift}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show a cash shift
+         * @description With its payments, cash movements and totals by method.
+         */
+        get: operations["cashShift.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cash-shifts/{cashShift}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close a register
+         * @description Records the cash counted and the difference from what the shift's
+         *     payments, refunds and movements say should be there.
+         */
+        post: operations["cashShift.close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cash-shifts/{cashShift}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Put cash into or take it out of the drawer
+         * @description For anything other than an order (change from the bank, buying
+         *     supplies). Taking out more than is in the drawer fails with 409.
+         */
+        post: operations["cashShift.movement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/catalog": {
         parameters: {
             query?: never;
@@ -436,6 +542,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders/{order}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a payment
+         * @description In advance, at handover or in parts with different methods. Fails
+         *     with 409 `payment_exceeds_balance` above what is still owed, and
+         *     `shift_not_open` for cash while the branch's register is closed.
+         */
+        post: operations["orderPayment.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{order}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refund a payment
+         * @description Up to what the customer has paid; the reason goes to the audit log.
+         */
+        post: operations["orderPayment.refund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orders/price-preview": {
         parameters: {
             query?: never;
@@ -521,6 +669,51 @@ export interface paths {
         put: operations["price.update"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/promo-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List promo codes
+         * @description With how many orders used each.
+         */
+        get: operations["promo-codes.index"];
+        put?: never;
+        /**
+         * Create a promo code
+         * @description Codes are stored in capitals; percent values may have two decimals.
+         */
+        post: operations["promo-codes.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/promo-codes/{promoCode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a promo code */
+        put: operations["promo-codes.update"];
+        post?: never;
+        /**
+         * Delete a promo code
+         * @description Orders that used it keep their discount.
+         */
+        delete: operations["promo-codes.destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -871,6 +1064,82 @@ export interface components {
          * @enum {string}
          */
         BranchType: "store" | "plant" | "hybrid";
+        /** CashMovementRequest */
+        CashMovementRequest: {
+            type: components["schemas"]["CashMovementType"];
+            amount: number;
+            reason: string;
+        };
+        /**
+         * CashMovementType
+         * @description | |
+         *     |---|
+         *     | `in` <br/> Cash put into the drawer (e.g. change from the bank). |
+         *     | `out` <br/> Cash taken out (e.g. buying supplies). |
+         * @enum {string}
+         */
+        CashMovementType: "in" | "out";
+        /** CashShiftResource */
+        CashShiftResource: {
+            id: number;
+            status: components["schemas"]["ShiftStatus"];
+            branch: {
+                id: number;
+                name: string;
+                code: string;
+            };
+            /** Format: date-time */
+            opened_at: string;
+            opened_by: {
+                id: number;
+                name: string;
+            } | null;
+            opening_float: number;
+            /** Format: date-time */
+            closed_at: string | null;
+            closed_by: {
+                id: number;
+                name: string;
+            } | null;
+            /** @description Cash that should be in the drawer at closing. */
+            expected_cash: number | null;
+            counted_cash: number | null;
+            /** @description Counted minus expected; negative means cash is missing. */
+            difference: number | null;
+            notes: string | null;
+            /** @description Live totals of the shift. */
+            totals: {
+                by_method: {
+                    cash: number;
+                    card: number;
+                    transfer: number;
+                };
+                payments: number;
+                refunds: number;
+                cash_in: number;
+                cash_out: number;
+                expected_cash: number;
+            };
+            payments?: components["schemas"]["PaymentResource"][];
+            movements?: {
+                id: number;
+                /** @enum {string} */
+                type: "in" | "out";
+                amount: number;
+                reason: string;
+                user: {
+                    id: number;
+                    name: string;
+                } | null;
+                created_at: string;
+            }[];
+        };
+        /** CloseShiftRequest */
+        CloseShiftRequest: {
+            /** @description Cash counted in the drawer at closing, in rials. */
+            counted_cash: number;
+            notes?: string | null;
+        };
         /** ColorResource */
         ColorResource: {
             id: number;
@@ -958,6 +1227,13 @@ export interface components {
             /** @description Keep the session alive after the browser closes. */
             remember?: boolean;
         };
+        /** OpenShiftRequest */
+        OpenShiftRequest: {
+            branch_id: number;
+            /** @description Cash already in the drawer, in rials. */
+            opening_float: number;
+            notes?: string | null;
+        };
         /** OrderLineResource */
         OrderLineResource: {
             id: number;
@@ -1031,6 +1307,11 @@ export interface components {
                 amount: number;
                 reason: string | null;
             } | null;
+            /** @description The promo code the discount came from. */
+            promo_code?: {
+                id: number;
+                code: string;
+            } | null;
             tax_amount: number;
             total: number;
             paid_amount: number;
@@ -1048,6 +1329,21 @@ export interface components {
                 name: string;
             } | null;
             lines?: components["schemas"]["OrderLineResource"][];
+            payments?: {
+                id: number;
+                /** @enum {string} */
+                kind: "payment" | "refund";
+                /** @enum {string} */
+                method: "cash" | "card" | "transfer";
+                amount: number;
+                reference: string | null;
+                notes: string | null;
+                user: {
+                    id: number;
+                    name: string;
+                } | null;
+                created_at: string;
+            }[];
             history?: {
                 from_status: components["schemas"]["OrderStatus"] | null;
                 to_status: components["schemas"]["OrderStatus"];
@@ -1069,6 +1365,53 @@ export interface components {
         OrganizationResource: {
             id: number;
             name: string;
+        };
+        /**
+         * PaymentKind
+         * @description | |
+         *     |---|
+         *     | `payment` <br/> Money received. |
+         *     | `refund` <br/> Money given back. |
+         * @enum {string}
+         */
+        PaymentKind: "payment" | "refund";
+        /**
+         * PaymentMethod
+         * @description | |
+         *     |---|
+         *     | `cash` <br/> Banknotes in the drawer. |
+         *     | `card` <br/> Card terminal (POS device); the trace number is the reference. |
+         *     | `transfer` <br/> Bank transfer or card-to-card; the reference identifies it. |
+         * @enum {string}
+         */
+        PaymentMethod: "cash" | "card" | "transfer";
+        /** PaymentRequest */
+        PaymentRequest: {
+            method: components["schemas"]["PaymentMethod"];
+            /** @description Whole rials; at most the order's balance. */
+            amount: number;
+            /** @description Card trace number or transfer reference. */
+            reference?: string | null;
+            notes?: string | null;
+        };
+        /** PaymentResource */
+        PaymentResource: {
+            id: number;
+            order_id: number;
+            /** @description Present in a shift's payment list. */
+            ticket_number?: string;
+            kind: components["schemas"]["PaymentKind"];
+            method: components["schemas"]["PaymentMethod"];
+            /** @description Whole rials, always positive; `kind` says which way it went. */
+            amount: number;
+            reference: string | null;
+            notes: string | null;
+            user?: {
+                id: number;
+                name: string;
+            } | null;
+            /** Format: date-time */
+            created_at: string;
         };
         /**
          * PaymentStatus
@@ -1106,6 +1449,8 @@ export interface components {
         PieceStatus: "received" | "ready" | "handed_over";
         /** PreviewOrderRequest */
         PreviewOrderRequest: {
+            /** @description Lets the preview check customer-specific promo code rules. */
+            customer_id?: number | null;
             lines: {
                 item_id: number;
                 service_type_id: number;
@@ -1123,6 +1468,8 @@ export interface components {
             }[];
             /** @description The default tier is used when left out. */
             turnaround_tier_id?: number | null;
+            /** @description A manual discount or a promo code, not both. */
+            promo_code?: string | null;
             discount?: {
                 type?: components["schemas"]["DiscountType"];
                 /** @description Rials for "amount", percent (up to two decimals) for "percent". */
@@ -1141,6 +1488,34 @@ export interface components {
          * @enum {string}
          */
         PriceUnit: "piece" | "kg" | "sqm";
+        /** PromoCodeResource */
+        PromoCodeResource: {
+            id: number;
+            code: string;
+            description: string | null;
+            type: components["schemas"]["DiscountType"];
+            /** @description Rials for "amount", percent for "percent". */
+            value: number;
+            max_discount: number | null;
+            min_order: number;
+            /** Format: date-time */
+            starts_at: string | null;
+            /** Format: date-time */
+            ends_at: string | null;
+            usage_limit: number | null;
+            per_customer_limit: number | null;
+            first_order_only: boolean;
+            is_active: boolean;
+            /** @description Orders (not cancelled) that used the code. */
+            used_count?: number;
+        };
+        /** RefundRequest */
+        RefundRequest: {
+            method: components["schemas"]["PaymentMethod"];
+            /** @description Whole rials; at most what has been paid. */
+            amount: number;
+            reason: string;
+        };
         /** RoleResource */
         RoleResource: {
             id: number;
@@ -1209,6 +1584,29 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /**
+         * SavePromoCodeRequest
+         * @description Creates (POST) or updates (PUT) a promo code.
+         */
+        SavePromoCodeRequest: {
+            code?: string;
+            description?: string | null;
+            type?: components["schemas"]["DiscountType"];
+            /** @description Rials for "amount"; percent (up to two decimals) for "percent". */
+            value?: number;
+            /** @description Largest discount a percent code gives, in rials. */
+            max_discount?: number | null;
+            /** @description Smallest order subtotal the code applies to, in rials. */
+            min_order?: number;
+            /** Format: date-time */
+            starts_at?: string | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            usage_limit?: number | null;
+            per_customer_limit?: number | null;
+            first_order_only?: boolean;
+            is_active?: boolean;
+        };
         /** SaveServiceTypeRequest */
         SaveServiceTypeRequest: {
             name?: string;
@@ -1248,6 +1646,11 @@ export interface components {
             sort_order: number;
             is_active: boolean;
         };
+        /**
+         * ShiftStatus
+         * @enum {string}
+         */
+        ShiftStatus: "open" | "closed";
         /** StoreBranchRequest */
         StoreBranchRequest: {
             name: string;
@@ -1280,6 +1683,8 @@ export interface components {
             }[];
             /** @description The default tier is used when left out. */
             turnaround_tier_id?: number | null;
+            /** @description A manual discount or a promo code, not both. */
+            promo_code?: string | null;
             discount?: {
                 type?: components["schemas"]["DiscountType"];
                 /** @description Rials for "amount", percent (up to two decimals) for "percent". */
@@ -1379,6 +1784,8 @@ export interface components {
             }[];
             /** @description The default tier is used when left out. */
             turnaround_tier_id?: number | null;
+            /** @description A manual discount or a promo code, not both. */
+            promo_code?: string | null;
             discount?: {
                 type?: components["schemas"]["DiscountType"];
                 /** @description Rials for "amount", percent (up to two decimals) for "percent". */
@@ -1408,7 +1815,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -1826,6 +2233,209 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "cashShift.current": {
+        parameters: {
+            query: {
+                branch_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CashShiftResource"] | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "cashShift.index": {
+        parameters: {
+            query?: {
+                "filter[branch_id]"?: number;
+                /** @description open or closed. */
+                "filter[status]"?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `CashShiftResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CashShiftResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "cashShift.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenShiftRequest"];
+            };
+        };
+        responses: {
+            /** @description `CashShiftResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CashShiftResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "cashShift.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The cash shift ID */
+                cashShift: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `CashShiftResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CashShiftResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "cashShift.close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The cash shift ID */
+                cashShift: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseShiftRequest"];
+            };
+        };
+        responses: {
+            /** @description `CashShiftResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CashShiftResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "cashShift.movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The cash shift ID */
+                cashShift: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CashMovementRequest"];
+            };
+        };
+        responses: {
+            /** @description `CashShiftResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CashShiftResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "catalog.catalog": {
@@ -2671,6 +3281,72 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "orderPayment.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentRequest"];
+            };
+        };
+        responses: {
+            /** @description `PaymentResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PaymentResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "orderPayment.refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefundRequest"];
+            };
+        };
+        responses: {
+            /** @description `PaymentResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PaymentResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "orders.orderPreview": {
         parameters: {
             query?: never;
@@ -2864,6 +3540,116 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "promo-codes.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `PromoCodeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PromoCodeResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "promo-codes.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SavePromoCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description `PromoCodeResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PromoCodeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "promo-codes.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The promo code ID */
+                promoCode: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SavePromoCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description `PromoCodeResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PromoCodeResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "promo-codes.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The promo code ID */
+                promoCode: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
         };
     };
     "role.permissions": {
