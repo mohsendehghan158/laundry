@@ -1,5 +1,6 @@
 import {
   ApartmentOutlined,
+  BarChartOutlined,
   ClusterOutlined,
   InboxOutlined,
   AppstoreOutlined,
@@ -30,7 +31,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "reports" | "board" | "station" | "assembly" | "racks" | "pieces" | "transfers" | "outsourcing" | "claims" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "reports" | "productionReport" | "board" | "station" | "assembly" | "racks" | "pieces" | "transfers" | "outsourcing" | "claims" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
@@ -66,6 +67,7 @@ export const NAV: NavGroup[] = [
     label: "management",
     items: [
       { href: "/reports", label: "reports", icon: <LineChartOutlined />, permission: "reports.view" },
+      { href: "/reports/production", label: "productionReport", icon: <BarChartOutlined />, permission: "reports.production" },
       { href: "/stations", label: "stations", icon: <ClusterOutlined />, permission: "production.manage" },
       { href: "/catalog", label: "catalog", icon: <TagsOutlined />, permission: "catalog.view" },
       { href: "/promotions", label: "promotions", icon: <GiftOutlined />, permission: "promotions.manage" },
@@ -89,7 +91,8 @@ export function visibleNav(can: (permission?: Permission) => boolean): NavGroup[
 
 /** The nav entry that owns a pathname, e.g. "/users/5" → users. */
 export function activeNavItem(pathname: string): NavItem | undefined {
-  return NAV.flatMap((group) => group.items).find(
-    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
-  );
+  // The most specific entry wins: /reports/production over /reports.
+  return NAV.flatMap((group) => group.items)
+    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+    .sort((a, b) => b.href.length - a.href.length)[0];
 }

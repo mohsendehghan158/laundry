@@ -6964,6 +6964,300 @@
                 }
             }
         },
+        "/reports/production": {
+            "get": {
+                "operationId": "report.production",
+                "description": "Orders that became ready between two dates: cycle time (intake to\nready, in hours), how many were ready by their due time, how long\nfinished orders waited for pickup, the latest ones, and the work at\neach station and by each person in the period.",
+                "summary": "Production report",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "description": "Local dates (the organization's time zone), both included; at most a year.",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "summary": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "ready": {
+                                                            "type": "integer"
+                                                        },
+                                                        "on_time": {
+                                                            "type": "integer"
+                                                        },
+                                                        "late": {
+                                                            "type": "integer"
+                                                        },
+                                                        "on_time_percent": {
+                                                            "type": [
+                                                                "number",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "avg_cycle_hours": {
+                                                            "type": [
+                                                                "number",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "median_cycle_hours": {
+                                                            "type": [
+                                                                "number",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "avg_late_hours": {
+                                                            "type": [
+                                                                "number",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "picked_up": {
+                                                            "type": "integer"
+                                                        },
+                                                        "avg_pickup_wait_hours": {
+                                                            "type": [
+                                                                "number",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "ready",
+                                                        "on_time",
+                                                        "late",
+                                                        "on_time_percent",
+                                                        "avg_cycle_hours",
+                                                        "median_cycle_hours",
+                                                        "avg_late_hours",
+                                                        "picked_up",
+                                                        "avg_pickup_wait_hours"
+                                                    ]
+                                                },
+                                                "by_day": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "date": {
+                                                                "type": "string"
+                                                            },
+                                                            "ready": {
+                                                                "type": "integer"
+                                                            },
+                                                            "on_time": {
+                                                                "type": "integer"
+                                                            },
+                                                            "avg_cycle_hours": {
+                                                                "type": [
+                                                                    "number",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "date",
+                                                            "ready",
+                                                            "on_time",
+                                                            "avg_cycle_hours"
+                                                        ]
+                                                    }
+                                                },
+                                                "by_service": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "service": {
+                                                                "type": "string"
+                                                            },
+                                                            "orders": {
+                                                                "type": "integer"
+                                                            },
+                                                            "on_time": {
+                                                                "type": "integer"
+                                                            },
+                                                            "avg_cycle_hours": {
+                                                                "type": [
+                                                                    "number",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "service",
+                                                            "orders",
+                                                            "on_time",
+                                                            "avg_cycle_hours"
+                                                        ]
+                                                    }
+                                                },
+                                                "stations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "station": {
+                                                                "type": "string"
+                                                            },
+                                                            "branch": {
+                                                                "type": "string"
+                                                            },
+                                                            "scans": {
+                                                                "type": "integer"
+                                                            },
+                                                            "pieces": {
+                                                                "type": "integer"
+                                                            },
+                                                            "qc_passed": {
+                                                                "type": "integer"
+                                                            },
+                                                            "qc_failed": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "station",
+                                                            "branch",
+                                                            "scans",
+                                                            "pieces",
+                                                            "qc_passed",
+                                                            "qc_failed"
+                                                        ]
+                                                    }
+                                                },
+                                                "operators": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "scans": {
+                                                                "type": "integer"
+                                                            },
+                                                            "pieces": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "scans",
+                                                            "pieces"
+                                                        ]
+                                                    }
+                                                },
+                                                "late_orders": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "ticket_number": {
+                                                                "type": "string"
+                                                            },
+                                                            "customer_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "due_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "ready_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "hours_late": {
+                                                                "type": "number"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "ticket_number",
+                                                            "customer_name",
+                                                            "due_at",
+                                                            "ready_at",
+                                                            "hours_late"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "summary",
+                                                "by_day",
+                                                "by_service",
+                                                "stations",
+                                                "operators",
+                                                "late_orders"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/permissions": {
             "get": {
                 "operationId": "role.permissions",

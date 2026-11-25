@@ -673,11 +673,11 @@ erDiagram
 | کاتالوگ | `GET /catalog` (یک‌جا برای صندوق)، CRUD روی `items`، `service-types`، `price-lists`، `upcharges`؛ `GET`/`PUT /prices` (ماتریس قیمت)، `GET /prices/export` و `POST /prices/import` (اکسل، با پیش‌نمایش) |
 | مشتریان | `GET /customers?filter[q]=0912`، CRUD، `GET /customers/{id}/orders`، `POST /customers/{id}/wallet/adjust` |
 | سفارش | `POST /orders`، `GET /orders`، `GET /orders/{id}`، `PATCH /orders/{id}`، `POST /orders/{id}/transitions`، `POST /orders/{id}/handover`، `POST /orders/price-preview` |
-| قطعه و کارگاه | `POST /scans` (تکی و دسته‌ای)، `GET /pieces/{tag}`، `GET /production/board`، `POST /assembly/{order}/complete`، `POST /racks/assign`، `POST /transfers` |
+| قطعه و کارگاه | `POST /scans` (تکی و دسته‌ای)، `GET /pieces/{tag}`، `GET /production/board`، `POST /assembly/scan`، `POST /assembly/{order}/complete`، CRUD روی `stations` و `racks`، `POST /transfers` و `/transfers/{id}/pieces`، `/send`، `/receive`، `/close`، `POST /shipments` و `/shipments/{id}/receive`، CRUD روی `vendors`، `POST /claims` و `/claims/{id}/resolve`، `/reject`، `POST /pieces/{id}/photos` |
 | لجستیک | `GET /slots/available`، `POST /logistics/tasks`، `POST /routes`، `POST /routes/{id}/optimize`، `GET /driver/route/today`، `POST /driver/tasks/{id}/complete` |
 | مالی | `POST /orders/{id}/payments`، `POST /payments/{id}/refund`، `POST /cash-shifts/open`، `POST /cash-shifts/{id}/close`، `GET /invoices/{id}/pdf`، `POST /payments/gateway/callback` |
 | اعلان | CRUD روی `notification-templates`، `GET /notification-logs`، `POST /push/subscribe` |
-| گزارش | `GET /reports/dashboard`، `GET /reports/sales`، `GET /reports/sales/export` (اکسل)، `GET /reports/production` |
+| گزارش | `GET /reports/dashboard`، `GET /reports/sales`، `GET /reports/sales/export` (اکسل)، `GET /reports/production` (زمان چرخه و تحویل به‌موقع) |
 | عمومی | `GET /public/track/{code}`، `GET /public/price-list`، `GET /public/zones/check` |
 
 ---

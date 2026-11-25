@@ -1366,6 +1366,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/production": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Production report
+         * @description Orders that became ready between two dates: cycle time (intake to
+         *     ready, in hours), how many were ready by their due time, how long
+         *     finished orders waited for pickup, the latest ones, and the work at
+         *     each station and by each person in the period.
+         */
+        get: operations["report.production"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/permissions": {
         parameters: {
             query?: never;
@@ -6419,6 +6442,82 @@ export interface operations {
                 };
                 content: {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "report.production": {
+        parameters: {
+            query: {
+                /** @description Local dates (the organization's time zone), both included; at most a year. */
+                from: string;
+                to: string;
+                branch_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            summary: {
+                                ready: number;
+                                on_time: number;
+                                late: number;
+                                on_time_percent: number | null;
+                                avg_cycle_hours: number | null;
+                                median_cycle_hours: number | null;
+                                avg_late_hours: number | null;
+                                picked_up: number;
+                                avg_pickup_wait_hours: number | null;
+                            };
+                            by_day: {
+                                date: string;
+                                ready: number;
+                                on_time: number;
+                                avg_cycle_hours: number | null;
+                            }[];
+                            by_service: {
+                                service: string;
+                                orders: number;
+                                on_time: number;
+                                avg_cycle_hours: number | null;
+                            }[];
+                            stations: {
+                                id: number;
+                                station: string;
+                                branch: string;
+                                scans: number;
+                                pieces: number;
+                                qc_passed: number;
+                                qc_failed: number;
+                            }[];
+                            operators: {
+                                id: number;
+                                name: string;
+                                scans: number;
+                                pieces: number;
+                            }[];
+                            late_orders: {
+                                id: number;
+                                ticket_number: string;
+                                customer_name: string;
+                                due_at: string;
+                                ready_at: string;
+                                hours_late: number;
+                            }[];
+                        };
+                    };
                 };
             };
             401: components["responses"]["AuthenticationException"];

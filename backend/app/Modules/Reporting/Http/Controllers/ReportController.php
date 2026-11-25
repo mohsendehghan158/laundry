@@ -6,7 +6,9 @@ namespace App\Modules\Reporting\Http\Controllers;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Support\Settings;
+use App\Modules\Reporting\Http\Requests\ProductionReportRequest;
 use App\Modules\Reporting\Http\Requests\SalesReportRequest;
+use App\Modules\Reporting\Support\ProductionReport;
 use App\Modules\Reporting\Support\Reports;
 use App\Support\Export\XlsxWriter;
 use App\Support\Text\Jalali;
@@ -111,6 +113,27 @@ class ReportController
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'Content-Disposition' => 'attachment; filename="sales-'.$group.'-'.$from.'-'.$to.'.xlsx"',
         ]);
+    }
+
+    /**
+     * Production report
+     *
+     * Orders that became ready between two dates: cycle time (intake to
+     * ready, in hours), how many were ready by their due time, how long
+     * finished orders waited for pickup, the latest ones, and the work at
+     * each station and by each person in the period.
+     *
+     * @response array{data: array{summary: array{ready: int, on_time: int, late: int, on_time_percent: float|null, avg_cycle_hours: float|null, median_cycle_hours: float|null, avg_late_hours: float|null, picked_up: int, avg_pickup_wait_hours: float|null}, by_day: list<array{date: string, ready: int, on_time: int, avg_cycle_hours: float|null}>, by_service: list<array{service: string, orders: int, on_time: int, avg_cycle_hours: float|null}>, stations: list<array{id: int, station: string, branch: string, scans: int, pieces: int, qc_passed: int, qc_failed: int}>, operators: list<array{id: int, name: string, scans: int, pieces: int}>, late_orders: list<array{id: int, ticket_number: string, customer_name: string, due_at: string, ready_at: string, hours_late: float}>}}
+     */
+    public function production(ProductionReportRequest $request, Reports $reports, ProductionReport $report): JsonResponse
+    {
+        $branchId = $request->validated('branch_id');
+
+        return response()->json(['data' => $report->build(
+            $reports->branches($request->actor(), $branchId === null ? null : (int) $branchId),
+            (string) $request->validated('from'),
+            (string) $request->validated('to'),
+        )]);
     }
 
     /**

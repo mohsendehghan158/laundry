@@ -75,7 +75,8 @@
     "board": "تابلوی تولید",
     "transfers": "بارنامه‌ها",
     "outsourcing": "برون‌سپاری",
-    "claims": "خسارت و مفقودی"
+    "claims": "خسارت و مفقودی",
+    "productionReport": "گزارش تولید"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -1179,5 +1180,42 @@
       "compensation": "مبلغ جبران",
       "created": "ثبت"
     }
+  },
+  "productionReport": {
+    "title": "گزارش تولید",
+    "subtitle": "زمان چرخه، تحویل به‌موقع و کار هر ایستگاه و هر نفر",
+    "empty": "در این بازه سفارشی آماده نشده است.",
+    "noLate": "در این بازه سفارشی با تأخیر آماده نشده است.",
+    "hours": "{value} ساعت",
+    "days": "{value} روز",
+    "daily": "تحویل به‌موقع روزانه",
+    "dailyAria": "نمودار ستونی درصد تحویل به‌موقع در هر روز",
+    "dayTooltip": "{date}: {onTime, number} از {ready, number} سفارش به‌موقع، میانگین چرخه {cycle}",
+    "byService": "به تفکیک خدمت",
+    "stations": "ایستگاه‌ها",
+    "operators": "کارکنان",
+    "lateOrders": "سفارش‌های دیرآماده",
+    "summary": {
+      "ready": "سفارش آماده‌شده",
+      "onTime": "آماده به‌موقع",
+      "late": "دیرآماده",
+      "avgCycle": "میانگین زمان چرخه",
+      "medianCycle": "میانه زمان چرخه",
+      "pickupWait": "میانگین انتظار تا تحویل"
+    },
+    "columns": {
+      "service": "خدمت",
+      "orders": "سفارش",
+      "station": "ایستگاه",
+      "scans": "اسکن",
+      "pieces": "قطعه",
+      "qcFail": "رد در کنترل کیفیت",
+      "person": "نام",
+      "due": "موعد",
+      "readyAt": "آماده شد",
+      "lateBy": "تأخیر"
+    },
+    "noData": "در این بازه کاری ثبت نشده است.",
+    "dayEmpty": "{date}: سفارشی آماده نشد"
   }
 }

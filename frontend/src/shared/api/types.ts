@@ -91,6 +91,7 @@ export type ClaimStatus = Schemas["ClaimStatus"];
 export type TagResult = Json<operations["transfer.addPieces"]>["results"][number];
 export type PiecePhoto = PieceDetail["photos"][number];
 export type StationActivity = Json<operations["station.activity"]>["data"];
+export type ProductionReport = Json<operations["report.production"]>["data"];
 export type DashboardReport = Json<operations["report.dashboard"]>["data"];
 export type SalesReport = Json<operations["report.sales"]>["data"];
 export type SalesRow = SalesReport["rows"][number];

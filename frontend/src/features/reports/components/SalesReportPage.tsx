@@ -9,13 +9,14 @@ import { errorMessage } from "@/shared/api/formErrors";
 import type { SalesGroup, SalesRow } from "@/shared/api/types";
 import { useCurrencyUnit } from "@/shared/hooks/useCurrencyUnit";
 import { usePermission } from "@/shared/hooks/usePermission";
-import { dayjs, formatJalali, jalaliMonthRange, type Dayjs } from "@/shared/lib/date";
+import { dayjs, formatJalali, jalaliMonthRange } from "@/shared/lib/date";
 import { formatNumber, toPersianDigits } from "@/shared/lib/digits";
 import { formatMoney } from "@/shared/lib/money";
 import { JalaliRangePicker } from "@/shared/ui/JalaliDatePicker";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { StatTile } from "@/shared/ui/StatTile";
 import { useExportSales, useSalesReport, type SalesFilters } from "../api";
+import { useRangePresets } from "../presets";
 
 const GROUPS: SalesGroup[] = ["day", "service", "item", "branch", "user"];
 const DATE = "YYYY-MM-DD";
@@ -42,15 +43,7 @@ export function SalesReportPage() {
   const money = t(`money.${unit}`);
   const totals = report.data?.totals;
 
-  const today = dayjs().startOf("day");
-  const presets: { label: string; value: [Dayjs, Dayjs] }[] = [
-    { label: t("reports.presets.today"), value: [today, today] },
-    { label: t("reports.presets.yesterday"), value: [today.subtract(1, "day"), today.subtract(1, "day")] },
-    { label: t("reports.presets.week"), value: [today.subtract(6, "day"), today] },
-    { label: t("reports.presets.days30"), value: [today.subtract(29, "day"), today] },
-    { label: t("reports.presets.month"), value: [jalaliMonthRange(0)[0], today] },
-    { label: t("reports.presets.lastMonth"), value: jalaliMonthRange(-1) },
-  ];
+  const presets = useRangePresets();
 
   const amount = (v: number | null) => (v === null ? "" : formatMoney(v, unit));
   const columns: ColumnsType<SalesRow> = [

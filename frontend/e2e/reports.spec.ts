@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAndWait, sidebar } from "./helpers";
+import { API_HEADERS, loginAndWait, markReady, shirtAtCounter, sidebar } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -62,4 +62,26 @@ test("a cashier sees no sales figures and cannot open the report", async ({ page
   await expect(sidebar(page).getByRole("link", { name: "گزارش فروش" })).toBeHidden();
   await page.goto("/reports");
   await expect(page.getByText("دسترسی ندارید")).toBeVisible();
+});
+
+test("the manager reads how the workshop did: cycle time and on-time delivery", async ({ page }) => {
+  const tag = await shirtAtCounter(page);
+  const ticket = tag.slice(0, tag.lastIndexOf("-"));
+
+  // The manager marks the shirt ready at the counter.
+  await loginAndWait(page, "manager");
+  const order = (await (await page.request.get(`/api/v1/orders/lookup?code=${ticket}`, { headers: API_HEADERS })).json()).data;
+  await page.goto(`/orders/${order.id}`);
+  await markReady(page);
+
+  await sidebar(page).getByRole("link", { name: "گزارش تولید" }).click();
+  await expect(page.getByRole("heading", { name: "گزارش تولید" })).toBeVisible();
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Tehran" });
+  const report = (await (await page.request.get(`/api/v1/reports/production?from=${today}&to=${today}`, { headers: API_HEADERS })).json()).data;
+  await page.locator(".ant-picker-range").click();
+  await page.locator(".ant-picker-presets").getByText("امروز", { exact: true }).click();
+  const tile = (title: string) => page.locator(".ant-statistic:visible").filter({ has: page.getByText(title, { exact: true }) });
+  await expect(tile("سفارش آماده‌شده")).toContainText(new Intl.NumberFormat("fa-IR").format(report.summary.ready));
+  await expect(tile("آماده به‌موقع")).toContainText("٪");
+  await expect(page.getByRole("figure", { name: /درصد تحویل به‌موقع/ }).getByRole("listitem")).toHaveCount(1); // today only
 });

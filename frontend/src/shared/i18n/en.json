@@ -75,7 +75,8 @@
     "board": "Production board",
     "transfers": "Transfers",
     "outsourcing": "Outsourcing",
-    "claims": "Damage and loss"
+    "claims": "Damage and loss",
+    "productionReport": "Production report"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -1179,5 +1180,42 @@
       "compensation": "Compensation",
       "created": "Opened"
     }
+  },
+  "productionReport": {
+    "title": "Production report",
+    "subtitle": "Cycle time, on-time delivery and the work at each station and by each person",
+    "empty": "No order became ready in this period.",
+    "noLate": "No order was ready late in this period.",
+    "hours": "{value} h",
+    "days": "{value} days",
+    "daily": "On time by day",
+    "dailyAria": "Bar chart of the share of orders ready on time each day",
+    "dayTooltip": "{date}: {onTime, number} of {ready, number} orders on time, average cycle {cycle}",
+    "byService": "By service",
+    "stations": "Stations",
+    "operators": "Staff",
+    "lateOrders": "Orders ready late",
+    "summary": {
+      "ready": "Orders ready",
+      "onTime": "Ready on time",
+      "late": "Ready late",
+      "avgCycle": "Average cycle time",
+      "medianCycle": "Median cycle time",
+      "pickupWait": "Average wait for pickup"
+    },
+    "columns": {
+      "service": "Service",
+      "orders": "Orders",
+      "station": "Station",
+      "scans": "Scans",
+      "pieces": "Pieces",
+      "qcFail": "Failed QC",
+      "person": "Name",
+      "due": "Due",
+      "readyAt": "Ready",
+      "lateBy": "Late by"
+    },
+    "noData": "Nothing recorded in this period.",
+    "dayEmpty": "{date}: no order became ready"
   }
 }

@@ -2,7 +2,7 @@
 
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { api, apiDownload } from "@/shared/api/client";
-import type { DashboardReport, SalesGroup, SalesReport } from "@/shared/api/types";
+import type { DashboardReport, ProductionReport, SalesGroup, SalesReport } from "@/shared/api/types";
 
 export function useDashboardReport(branchId: number | null, enabled = true) {
   return useQuery({
@@ -27,4 +27,14 @@ export function useSalesReport(filters: SalesFilters) {
 
 export function useExportSales() {
   return useMutation({ mutationFn: (filters: SalesFilters) => apiDownload("/reports/sales/export", filters) });
+}
+
+export type ProductionFilters = { from: string; to: string; branch_id: number | null };
+
+export function useProductionReport(filters: ProductionFilters) {
+  return useQuery({
+    queryKey: ["reports", "production", filters],
+    queryFn: async () => (await api.get<{ data: ProductionReport }>("/reports/production", filters)).data,
+    placeholderData: keepPreviousData,
+  });
 }

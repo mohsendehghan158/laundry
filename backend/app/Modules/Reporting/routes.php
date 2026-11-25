@@ -9,4 +9,5 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
     Route::get('reports/sales', [ReportController::class, 'sales']);
     Route::get('reports/sales/export', [ReportController::class, 'export']);
+    Route::get('reports/production', [ReportController::class, 'production']);
 });
