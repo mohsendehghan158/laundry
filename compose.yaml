@@ -1,0 +1,105 @@
+# Local development environment.
+#
+#   cp backend/.env.example backend/.env
+#   docker compose up -d
+#   docker compose exec backend composer install
+#   docker compose exec backend php artisan key:generate
+#   docker compose exec backend php artisan migrate --seed
+#
+# Panel: http://localhost:3000 (sign in as admin / password)
+# API docs: http://localhost:3000/docs/api · Mail: http://localhost:8025
+#
+# Search (Meilisearch), file storage (MinIO) and websockets (Reverb) join
+# this file in the phases that start using them (see ROADMAP.md, section 14).
+
+name: laundry
+
+x-backend-env: &backend-env
+  DB_HOST: pgsql
+  DB_PORT: 5432
+  REDIS_HOST: redis
+  MAIL_MAILER: smtp
+  MAIL_HOST: mailpit
+  MAIL_PORT: 1025
+
+services:
+  pgsql:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: laundry
+      POSTGRES_USER: laundry
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432"
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "laundry", "-d", "laundry"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "${FORWARD_MAILPIT_PORT:-8025}:8025"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../infra/docker/backend.Dockerfile
+      target: dev
+    environment: *backend-env
+    ports:
+      - "${FORWARD_API_PORT:-8000}:8000"
+    volumes:
+      # docs/ sits next to backend/ so `php artisan scramble:export` can write ../docs/api.
+      - ./backend:/app
+      - ./docs:/docs
+    depends_on:
+      pgsql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  queue:
+    build:
+      context: ./backend
+      dockerfile: ../infra/docker/backend.Dockerfile
+      target: dev
+    command: ["php", "artisan", "queue:listen", "--tries=3"]
+    environment: *backend-env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci --no-audit --no-fund && npm run dev -- --hostname 0.0.0.0"
+    environment:
+      BACKEND_URL: http://backend:8000
+      NEXT_TELEMETRY_DISABLED: 1
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "${FORWARD_APP_PORT:-3000}:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgsql-data:
+  redis-data:
+  frontend-node-modules:

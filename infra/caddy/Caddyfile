@@ -1,0 +1,26 @@
+# Public entry point. One origin for the browser: the API and Sanctum go to
+# Laravel, everything else to the Next.js panel. Set SITE_ADDRESS to the
+# domain name for automatic HTTPS (e.g. laundry.example.ir), or :80 behind
+# another TLS terminator.
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	@backend path /api/* /sanctum/* /up /docs/api /docs/api.json
+	handle @backend {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

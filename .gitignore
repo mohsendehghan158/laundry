@@ -1,0 +1,3 @@
+# Secrets for the production stack
+/infra/.env.prod
+.DS_Store

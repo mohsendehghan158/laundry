@@ -1,0 +1,103 @@
+# Production stack: one server, Docker, a reverse proxy with automatic TLS.
+#
+#   cp infra/.env.prod.example infra/.env.prod   # fill in the secrets
+#   docker compose -f infra/compose.prod.yaml --env-file infra/.env.prod up -d --build
+#
+# The backend container migrates the database on start (RUN_MIGRATIONS=true);
+# the queue worker and the scheduler run from the same image.
+
+name: laundry-prod
+
+x-backend: &backend
+  build:
+    context: ../backend
+    dockerfile: ../infra/docker/backend.Dockerfile
+    target: prod
+  image: laundry-backend:${APP_VERSION:-latest}
+  restart: unless-stopped
+  env_file: .env.prod
+  environment:
+    DB_HOST: pgsql
+    REDIS_HOST: redis
+  volumes:
+    - storage:/app/storage/app
+  depends_on:
+    pgsql: { condition: service_healthy }
+    redis: { condition: service_healthy }
+
+services:
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - backend
+      - frontend
+
+  backend:
+    <<: *backend
+    environment:
+      DB_HOST: pgsql
+      REDIS_HOST: redis
+      RUN_MIGRATIONS: "true"
+
+  queue:
+    <<: *backend
+    command: ["php", "artisan", "queue:work", "--tries=3", "--max-time=3600"]
+    healthcheck:
+      disable: true
+
+  scheduler:
+    <<: *backend
+    command: ["php", "artisan", "schedule:work"]
+    healthcheck:
+      disable: true
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../infra/docker/frontend.Dockerfile
+      target: prod
+    image: laundry-frontend:${APP_VERSION:-latest}
+    restart: unless-stopped
+
+  pgsql:
+    image: postgis/postgis:17-3.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-laundry}
+      POSTGRES_USER: ${DB_USERNAME:-laundry}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in infra/.env.prod}
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  storage:
+  pgsql-data:
+  redis-data:
+  caddy-data:
+  caddy-config:
