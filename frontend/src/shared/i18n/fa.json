@@ -1,0 +1,77 @@
+{
+  "app": { "name": "سامانه خشکشویی", "loading": "در حال بارگذاری…" },
+  "common": {
+    "save": "ذخیره", "cancel": "انصراف", "create": "افزودن", "edit": "ویرایش", "delete": "حذف",
+    "search": "جست‌وجو", "actions": "عملیات", "yes": "بله", "no": "خیر", "active": "فعال", "inactive": "غیرفعال",
+    "status": "وضعیت", "all": "همه", "saved": "تغییرات ذخیره شد.", "deleted": "حذف شد.", "created": "ایجاد شد.",
+    "confirmDelete": "از حذف «{name}» مطمئن هستید؟", "retry": "تلاش دوباره", "createdAt": "تاریخ ایجاد",
+    "total": "{count} مورد", "back": "بازگشت", "noAccess": "به این بخش دسترسی ندارید.", "notFound": "صفحه پیدا نشد.",
+    "home": "صفحه اصلی", "error": "خطایی رخ داد.", "filters": "فیلترها", "clear": "پاک‌کردن"
+  },
+  "nav": {
+    "dashboard": "پیشخوان", "branches": "شعبه‌ها", "users": "کاربران", "roles": "نقش‌ها و مجوزها",
+    "settings": "تنظیمات", "activity": "گزارش فعالیت", "profile": "حساب من", "logout": "خروج",
+    "management": "مدیریت", "theme": "تغییر پوسته", "branch": "شعبه فعال"
+  },
+  "auth": {
+    "title": "ورود کارکنان", "subtitle": "برای ادامه وارد حساب خود شوید.", "username": "نام کاربری", "password": "رمز عبور",
+    "remember": "مرا به خاطر بسپار", "submit": "ورود", "required": "این فیلد الزامی است."
+  },
+  "dashboard": {
+    "welcome": "{name} عزیز، خوش آمدید", "today": "امروز {date}", "branches": "شعبه‌های فعال", "users": "کاربران",
+    "roles": "نقش‌ها", "comingSoon": "صندوق، سفارش‌ها و گزارش‌ها در فاز بعد به این پیشخوان اضافه می‌شوند.",
+    "recentActivity": "آخرین فعالیت‌ها", "yourBranches": "شعبه‌های شما", "noBranches": "به هیچ شعبه‌ای دسترسی ندارید."
+  },
+  "branches": {
+    "title": "شعبه‌ها", "new": "شعبه جدید", "editTitle": "ویرایش شعبه", "name": "نام", "code": "کد",
+    "codeHelp": "پیشوند شماره قبض‌ها؛ حروف لاتین بزرگ و عدد، مثل T1", "type": "نوع", "phone": "تلفن",
+    "address": "نشانی", "users": "کارکنان",
+    "types": { "store": "پذیرش", "plant": "کارگاه", "hybrid": "پذیرش و کارگاه" }
+  },
+  "users": {
+    "title": "کاربران", "new": "کاربر جدید", "editTitle": "ویرایش کاربر", "name": "نام و نام خانوادگی",
+    "username": "نام کاربری", "usernameHelp": "حروف کوچک لاتین، عدد، نقطه، خط تیره و زیرخط؛ ۳ تا ۳۰ نویسه",
+    "email": "ایمیل", "mobile": "موبایل", "password": "رمز عبور", "passwordKeep": "برای حفظ رمز فعلی خالی بگذارید.",
+    "roles": "نقش‌ها", "branches": "شعبه‌ها", "branchesHelp": "بدون شعبه یعنی فقط نقش‌هایی که به همه شعبه‌ها دسترسی دارند کار می‌کنند.",
+    "lastLogin": "آخرین ورود", "language": "زبان", "searchPlaceholder": "نام، نام کاربری یا موبایل"
+  },
+  "roles": {
+    "title": "نقش‌ها و مجوزها", "permissions": "مجوزها", "usersCount": "{count} کاربر",
+    "ownerNote": "نقش مالک همه مجوزها را دارد و قابل تغییر نیست.", "edit": "ویرایش مجوزها",
+    "names": {
+      "owner": "مالک", "branch_manager": "مدیر شعبه", "cashier": "پذیرش و صندوق", "plant_operator": "اپراتور کارگاه",
+      "driver": "راننده", "accountant": "حسابدار", "support": "پشتیبانی"
+    },
+    "groups": {
+      "organization": "سازمان", "branches": "شعبه‌ها", "users": "کاربران", "roles": "نقش‌ها", "settings": "تنظیمات", "activity": "گزارش فعالیت"
+    },
+    "perms": {
+      "organization.update": "ویرایش مشخصات سازمان",
+      "branches.view": "مشاهده شعبه‌ها", "branches.create": "افزودن شعبه", "branches.update": "ویرایش شعبه",
+      "branches.delete": "حذف شعبه", "branches.access_all": "دسترسی به همه شعبه‌ها",
+      "users.view": "مشاهده کاربران", "users.create": "افزودن کاربر", "users.update": "ویرایش کاربر", "users.delete": "حذف کاربر",
+      "roles.view": "مشاهده نقش‌ها", "roles.update": "تغییر مجوز نقش‌ها",
+      "settings.view": "مشاهده تنظیمات", "settings.update": "تغییر تنظیمات",
+      "activity.view": "مشاهده گزارش فعالیت"
+    }
+  },
+  "settings": {
+    "title": "تنظیمات", "organization": "سازمان", "orgName": "نام مجموعه", "general": "عمومی",
+    "currencyUnit": "واحد نمایش مبالغ", "currencyHelp": "مبالغ همیشه به ریال ذخیره می‌شوند؛ این فقط نمایش را تغییر می‌دهد.",
+    "toman": "تومان", "rial": "ریال", "timezone": "منطقه زمانی", "tax": "مالیات", "vat": "درصد مالیات بر ارزش افزوده",
+    "pricesIncludeVat": "قیمت‌ها شامل مالیات هستند", "receipt": "رسید", "header": "متن بالای رسید", "footer": "متن پایین رسید"
+  },
+  "activity": {
+    "title": "گزارش فعالیت", "when": "زمان", "who": "کاربر", "area": "بخش", "event": "رویداد", "subject": "مورد",
+    "changes": "تغییرات", "system": "سامانه", "from": "از تاریخ", "to": "تا تاریخ", "field": "فیلد", "old": "قبلی", "new": "جدید",
+    "areas": { "auth": "ورود و خروج", "user": "کاربر", "branch": "شعبه", "role": "نقش", "settings": "تنظیمات", "organization": "سازمان" },
+    "events": {
+      "created": "ایجاد", "updated": "ویرایش", "deleted": "حذف", "login": "ورود", "logout": "خروج", "roles_updated": "تغییر نقش"
+    }
+  },
+  "profile": {
+    "title": "حساب من", "info": "مشخصات", "changePassword": "تغییر رمز عبور", "currentPassword": "رمز فعلی",
+    "newPassword": "رمز جدید", "confirmPassword": "تکرار رمز جدید", "mismatch": "تکرار رمز با رمز جدید یکسان نیست.",
+    "changed": "رمز عبور تغییر کرد.", "minLength": "رمز عبور باید دست‌کم ۸ نویسه باشد."
+  }
+}

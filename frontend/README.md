@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# پنل خشکشویی (Next.js)
 
-## Getting Started
-
-First, run the development server:
+پنل کارکنان: Next.js 16 (App Router)، React 19، Ant Design 6 راست‌به‌چپ، TanStack Query، next-intl، nuqs و dayjs با تقویم جلالی.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+npm run dev          # http://localhost:3000 — /api و /sanctum به BACKEND_URL (پیش‌فرض http://localhost:8000) می‌روند
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ساختار
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+src/
+├── app/
+│   ├── (auth)/login/        # ورود کارکنان
+│   ├── (panel)/             # پیشخوان، شعبه‌ها، کاربران، نقش‌ها، تنظیمات، گزارش فعالیت، حساب من
+│   ├── layout.tsx           # فونت، AntdRegistry
+│   └── providers.tsx        # ConfigProvider (rtl، fa_IR، تم)، QueryClient، next-intl، nuqs
+├── features/<domain>/       # api.ts (هوک‌های Query) + صفحه‌ها و اجزای همان دامنه
+├── shared/
+│   ├── api/                 # client.ts، errors.ts، form-errors.ts، schema.d.ts (تولیدی)، types.ts
+│   ├── hooks/               # usePermission، useTableState
+│   ├── lib/                 # digits، money، date، jalali-generate-config
+│   ├── ui/                  # DataTable، PageHeader، FormDrawer، QueryState، MoneyInput، JalaliDatePicker
+│   └── i18n/                # fa.json، en.json
+├── theme/                   # توکن‌ها، حالت روشن و تیره
+└── proxy.ts                 # هدایت به /login در نبود کوکی نشست
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## قواعد
 
-## Learn More
+- داده سرور فقط با TanStack Query و از راه `shared/api/client.ts`؛ نوع‌ها از `shared/api/types.ts` که از OpenAPI بک‌اند تولید می‌شود (`npm run api:types`).
+- فیلتر و صفحه جدول‌ها در نشانی صفحه (`useTableState`).
+- منو و دکمه‌ها با `usePermission`؛ فهرست منو در `features/shell/navigation.tsx`.
+- همه متن‌ها در `shared/i18n/fa.json` (و همتای انگلیسی در `en.json`).
+- مبالغ همیشه ریال؛ `MoneyInput` و `formatMoney` تبدیل به واحد نمایش را انجام می‌دهند.
 
-To learn more about Next.js, take a look at the following resources:
+## تست
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test             # Vitest: ابزارهای پول، تاریخ جلالی، کلاینت API، MoneyInput
+npm run build && npm run e2e   # Playwright با API شبیه‌سازی‌شده
+```
