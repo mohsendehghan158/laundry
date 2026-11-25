@@ -7,12 +7,16 @@ import type { ReactNode } from "react";
 import type { Permission } from "@/shared/api/types";
 import { usePermission } from "@/shared/hooks/usePermission";
 
-/** Page-level guard: a 403 screen instead of a page the server would refuse anyway. */
-export function RequirePermission({ permission, children }: { permission: Permission; children: ReactNode }) {
+/**
+ * Page-level guard: a 403 screen instead of a page the server would refuse
+ * anyway. With a list, any one of the permissions is enough.
+ */
+export function RequirePermission({ permission, children }: { permission: Permission | Permission[]; children: ReactNode }) {
   const t = useTranslations("common");
   const { can } = usePermission();
+  const allowed = Array.isArray(permission) ? permission.some((p) => can(p)) : can(permission);
 
-  if (!can(permission)) {
+  if (!allowed) {
     return (
       <Result
         status="403"

@@ -1,5 +1,8 @@
 import {
   ApartmentOutlined,
+  ClusterOutlined,
+  ScanOutlined,
+  SearchOutlined,
   ContactsOutlined,
   FileTextOutlined,
   GiftOutlined,
@@ -21,13 +24,13 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "reports" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "reports" | "station" | "pieces" | "stations" | "pos" | "handover" | "orders" | "register" | "promotions" | "notifications" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
 };
 
-export type NavGroup = { label?: "management"; items: NavItem[] };
+export type NavGroup = { label?: "management" | "workshop"; items: NavItem[] };
 
 export const NAV: NavGroup[] = [
   {
@@ -41,9 +44,17 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
+    label: "workshop",
+    items: [
+      { href: "/station", label: "station", icon: <ScanOutlined />, permission: "production.scan" },
+      { href: "/pieces", label: "pieces", icon: <SearchOutlined />, permission: ["production.view", "orders.view"] },
+    ],
+  },
+  {
     label: "management",
     items: [
       { href: "/reports", label: "reports", icon: <LineChartOutlined />, permission: "reports.view" },
+      { href: "/stations", label: "stations", icon: <ClusterOutlined />, permission: "production.manage" },
       { href: "/catalog", label: "catalog", icon: <TagsOutlined />, permission: "catalog.view" },
       { href: "/promotions", label: "promotions", icon: <GiftOutlined />, permission: "promotions.manage" },
       { href: "/notifications", label: "notifications", icon: <MessageOutlined />, permission: ["notifications.view", "notifications.manage"] },

@@ -4057,6 +4057,186 @@
                 }
             }
         },
+        "/pieces/{tag}": {
+            "get": {
+                "operationId": "piece.show",
+                "description": "Where the piece is (branch, station, rack), its state and side flag,\nits order and its full history. Tags may be typed with any digits\nand in any case.",
+                "summary": "Find a piece by its tag",
+                "tags": [
+                    "Piece"
+                ],
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`PieceDetailResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PieceDetailResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/pieces/{piece}/hold": {
+            "post": {
+                "operationId": "piece.hold",
+                "description": "A held piece cannot be scanned or gathered until released.",
+                "summary": "Put a piece on hold",
+                "tags": [
+                    "Piece"
+                ],
+                "parameters": [
+                    {
+                        "name": "piece",
+                        "in": "path",
+                        "required": true,
+                        "description": "The piece ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HoldPieceRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`PieceDetailResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PieceDetailResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/pieces/{piece}/release": {
+            "post": {
+                "operationId": "piece.release",
+                "summary": "Release a held piece",
+                "tags": [
+                    "Piece"
+                ],
+                "parameters": [
+                    {
+                        "name": "piece",
+                        "in": "path",
+                        "required": true,
+                        "description": "The piece ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`PieceDetailResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PieceDetailResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/prices": {
             "get": {
                 "operationId": "price.index",
@@ -5254,6 +5434,203 @@
                 }
             }
         },
+        "/scans": {
+            "post": {
+                "operationId": "production.scan",
+                "description": "One tag or a batch. Each tag gets its own result: `ok` with the\npiece and any warnings, or an error code and message; one bad tag\ndoes not stop the rest. At a quality-control station send `passed`\n(and, when failing, a `reason` or defects): failed pieces are\nflagged for rework. A repeated scan within 30 seconds is reported\nas `duplicate` and not counted twice.",
+                "summary": "Scan pieces at a station",
+                "tags": [
+                    "Scan"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ScanRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "tag": {
+                                                        "type": "string"
+                                                    },
+                                                    "ok": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "duplicate": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "code": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "message": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "warnings": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "piece": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tag_code": {
+                                                                "type": "string"
+                                                            },
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "service_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "color_name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "notes": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "defects": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "flag": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "flag_note": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "order": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "ticket_number": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "due_at": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "is_express": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "is_overdue": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "piece_count": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "notes": {
+                                                                        "type": [
+                                                                            "string",
+                                                                            "null"
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "ticket_number",
+                                                                    "due_at",
+                                                                    "is_express",
+                                                                    "is_overdue",
+                                                                    "piece_count",
+                                                                    "notes"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "tag_code",
+                                                            "item_name",
+                                                            "service_name",
+                                                            "color_name",
+                                                            "notes",
+                                                            "defects",
+                                                            "status",
+                                                            "flag",
+                                                            "flag_note",
+                                                            "order"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "tag",
+                                                    "ok",
+                                                    "duplicate",
+                                                    "code",
+                                                    "message",
+                                                    "warnings",
+                                                    "piece"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/service-types": {
             "get": {
                 "operationId": "service-types.index",
@@ -5704,6 +6081,305 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/stations": {
+            "get": {
+                "operationId": "stations.index",
+                "description": "Stations of the branches the user works in, in workflow order,\ninactive ones included.",
+                "summary": "List stations",
+                "tags": [
+                    "Station"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "Only this branch's stations.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `StationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/StationResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "stations.store",
+                "summary": "Create a station",
+                "tags": [
+                    "Station"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveStationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`StationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/stations/{station}": {
+            "put": {
+                "operationId": "stations.update",
+                "summary": "Update a station",
+                "tags": [
+                    "Station"
+                ],
+                "parameters": [
+                    {
+                        "name": "station",
+                        "in": "path",
+                        "required": true,
+                        "description": "The station ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveStationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`StationResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/StationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "stations.destroy",
+                "description": "Its scans stay in the pieces' history.",
+                "summary": "Delete a station",
+                "tags": [
+                    "Station"
+                ],
+                "parameters": [
+                    {
+                        "name": "station",
+                        "in": "path",
+                        "required": true,
+                        "description": "The station ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/stations/{station}/activity": {
+            "get": {
+                "operationId": "station.activity",
+                "description": "Today's scan counts (the user's and everyone's) and the latest scans,\nfor the counter on the station screen.",
+                "summary": "Station activity",
+                "tags": [
+                    "Station"
+                ],
+                "parameters": [
+                    {
+                        "name": "station",
+                        "in": "path",
+                        "required": true,
+                        "description": "The station ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "today": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "mine": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "mine",
+                                                        "total"
+                                                    ]
+                                                },
+                                                "recent": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tag_code": {
+                                                                "type": "string"
+                                                            },
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "event": {
+                                                                "type": "string"
+                                                            },
+                                                            "user_name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "tag_code",
+                                                            "item_name",
+                                                            "event",
+                                                            "user_name",
+                                                            "created_at"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "today",
+                                                "recent"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -7239,6 +7915,19 @@
                 ],
                 "title": "HandOverOrderRequest"
             },
+            "HoldPieceRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "reason"
+                ],
+                "title": "HoldPieceRequest"
+            },
             "ImportPricesRequest": {
                 "type": "object",
                 "properties": {
@@ -8184,6 +8873,339 @@
                 ],
                 "title": "PaymentStatus"
             },
+            "PieceDetailResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "tag_code": {
+                        "type": "string"
+                    },
+                    "number": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/PieceStatus"
+                    },
+                    "flag": {
+                        "anyOf": [
+                            {
+                                "description": "Side state: rework, on_hold, outsourced, in_transit, damaged or lost.\n| |\n|---|\n| `rework` <br/> Failed quality control; goes back through the stations. |\n| `on_hold` <br/> Held on purpose (waiting for the customer's approval, say). |\n| `outsourced` <br/> At an outside vendor (rugs, leather, tailoring). |\n| `in_transit` <br/> On its way between branches. |\n| `damaged` <br/> Damaged in the shop; a claim is open. Still handed back. |\n| `lost` <br/> Cannot be found; a claim is open. |",
+                                "$ref": "#/components/schemas/PieceFlag"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "flag_note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "item_name": {
+                        "type": "string"
+                    },
+                    "service_name": {
+                        "type": "string"
+                    },
+                    "color_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "brand": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "defects": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "branch": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "station": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "rack_location": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Where it waits on the rack, once ready."
+                    },
+                    "last_scanned_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "assembled_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "ready_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "handed_over_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "order": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "ticket_number": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "due_at": {
+                                "type": "string"
+                            },
+                            "is_express": {
+                                "type": "boolean"
+                            },
+                            "is_overdue": {
+                                "type": "boolean"
+                            },
+                            "piece_count": {
+                                "type": "integer"
+                            },
+                            "customer_name": {
+                                "type": "string"
+                            },
+                            "customer_mobile": {
+                                "type": "string"
+                            },
+                            "branch": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "ticket_number",
+                            "status",
+                            "due_at",
+                            "is_express",
+                            "is_overdue",
+                            "piece_count",
+                            "customer_name",
+                            "customer_mobile",
+                            "branch"
+                        ]
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PieceEventResource"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "tag_code",
+                    "number",
+                    "status",
+                    "flag",
+                    "flag_note",
+                    "item_name",
+                    "service_name",
+                    "color_name",
+                    "brand",
+                    "notes",
+                    "defects",
+                    "branch",
+                    "station",
+                    "rack_location",
+                    "last_scanned_at",
+                    "assembled_at",
+                    "ready_at",
+                    "handed_over_at",
+                    "order",
+                    "events"
+                ],
+                "title": "PieceDetailResource"
+            },
+            "PieceEvent": {
+                "type": "string",
+                "description": "What happened to a piece, one row each in its history.\n",
+                "enum": [
+                    "scanned",
+                    "qc_passed",
+                    "qc_failed",
+                    "held",
+                    "released",
+                    "assembled",
+                    "racked",
+                    "sent_back",
+                    "transferred_out",
+                    "transferred_in",
+                    "outsourced",
+                    "returned",
+                    "damaged",
+                    "lost",
+                    "found",
+                    "handed_over"
+                ],
+                "title": "PieceEvent"
+            },
+            "PieceEventResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "event": {
+                        "$ref": "#/components/schemas/PieceEvent"
+                    },
+                    "station": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "branch": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "user_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "event",
+                    "station",
+                    "branch",
+                    "user_name",
+                    "note",
+                    "created_at"
+                ],
+                "title": "PieceEventResource"
+            },
+            "PieceFlag": {
+                "type": "string",
+                "description": "A side state on top of a piece's status.\n| |\n|---|\n| `rework` <br/> Failed quality control; goes back through the stations. |\n| `on_hold` <br/> Held on purpose (waiting for the customer's approval, say). |\n| `outsourced` <br/> At an outside vendor (rugs, leather, tailoring). |\n| `in_transit` <br/> On its way between branches. |\n| `damaged` <br/> Damaged in the shop; a claim is open. Still handed back. |\n| `lost` <br/> Cannot be found; a claim is open. |",
+                "enum": [
+                    "rework",
+                    "on_hold",
+                    "outsourced",
+                    "in_transit",
+                    "damaged",
+                    "lost"
+                ],
+                "title": "PieceFlag"
+            },
             "PieceResource": {
                 "type": "object",
                 "properties": {
@@ -8286,9 +9308,11 @@
             },
             "PieceStatus": {
                 "type": "string",
-                "description": "Where a piece is in the simple counter flow. Workshop stations (phase 3) add their own scan history on top of this.\n",
+                "description": "Where a piece is in its life: tagged at intake, worked on at stations, gathered with the rest of its order (assembly), on the rack, and back with the customer. Side states (rework, outsourced\u2026) are its flag.\n",
                 "enum": [
                     "received",
+                    "in_process",
+                    "assembled",
                     "ready",
                     "handed_over"
                 ],
@@ -8895,6 +9919,35 @@
                 },
                 "title": "SaveServiceTypeRequest"
             },
+            "SaveStationRequest": {
+                "type": "object",
+                "properties": {
+                    "branch_id": {
+                        "type": "string",
+                        "description": "A station stays in the branch it was made for."
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "code": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9-]{1,10}$"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/StationKind"
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveStationRequest"
+            },
             "SaveTurnaroundTierRequest": {
                 "type": "object",
                 "properties": {
@@ -8965,6 +10018,53 @@
                 ],
                 "title": "SaveUpchargeRequest"
             },
+            "ScanRequest": {
+                "type": "object",
+                "properties": {
+                    "station_id": {
+                        "type": "integer"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "description": "One tag, or a batch (a bag or a cart scanned together).",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 40
+                        },
+                        "minItems": 1,
+                        "maxItems": 200
+                    },
+                    "passed": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ],
+                        "description": "Quality-control stations only: whether the pieces passed."
+                    },
+                    "reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    },
+                    "defect_type_ids": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 20
+                    }
+                },
+                "required": [
+                    "station_id",
+                    "tags"
+                ],
+                "title": "ScanRequest"
+            },
             "ServiceTypeResource": {
                 "type": "object",
                 "properties": {
@@ -9007,6 +10107,51 @@
                     "closed"
                 ],
                 "title": "ShiftStatus"
+            },
+            "StationKind": {
+                "type": "string",
+                "description": "| |\n|---|\n| `process` <br/> Scanning records that the piece reached this step. |\n| `qc` <br/> Quality control: every scan passes the piece or sends it back for rework. |",
+                "enum": [
+                    "process",
+                    "qc"
+                ],
+                "title": "StationKind"
+            },
+            "StationResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/StationKind"
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "branch_id",
+                    "name",
+                    "code",
+                    "kind",
+                    "sort_order",
+                    "is_active"
+                ],
+                "title": "StationResource"
             },
             "StoreBranchRequest": {
                 "type": "object",
@@ -9683,7 +10828,15 @@
                                 "promotions.manage",
                                 "notifications.manage",
                                 "notifications.view",
-                                "reports.view"
+                                "production.view",
+                                "production.scan",
+                                "production.manage",
+                                "production.transfer",
+                                "production.outsource",
+                                "claims.view",
+                                "claims.manage",
+                                "reports.view",
+                                "reports.production"
                             ]
                         },
                         "uniqueItems": true

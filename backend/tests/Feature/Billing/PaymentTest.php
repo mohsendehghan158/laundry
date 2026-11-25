@@ -13,13 +13,7 @@ beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-11-24 10:00', 'Asia/Tehran'));
 });
 
-/** An order of one shirt (900,000 + 10% VAT = 990,000 rials). */
-function shirtOrder(object $shop): array
-{
-    return test()->postJson('/api/v1/orders', orderPayload($shop, ['lines' => [
-        ['item_id' => $shop->shirt->id, 'service_type_id' => $shop->dc->id, 'quantity' => 1],
-    ]]))->assertCreated()->json('data');
-}
+// shirtOrder(): one shirt, 900,000 + 10% VAT = 990,000 rials (tests/Support/production.php).
 
 function openRegister(object $shop, int $float = 500_000): array
 {

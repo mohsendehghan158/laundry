@@ -45,6 +45,9 @@ return [
         'handover_unpaid' => 'The order has an unpaid balance; take the payment first.',
         'handover_piece_unavailable' => 'Some chosen pieces are not ready or not part of this order.',
 
+        'piece_cannot_hold' => 'This piece cannot be put on hold (it is ready, handed over or in another state).',
+        'piece_not_held' => 'This piece is not on hold.',
+
         'notification_not_failed' => 'Only failed messages can be sent again.',
     ],
 ];

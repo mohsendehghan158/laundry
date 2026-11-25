@@ -806,6 +806,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/pieces/{tag}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find a piece by its tag
+         * @description Where the piece is (branch, station, rack), its state and side flag,
+         *     its order and its full history. Tags may be typed with any digits
+         *     and in any case.
+         */
+        get: operations["piece.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pieces/{piece}/hold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Put a piece on hold
+         * @description A held piece cannot be scanned or gathered until released.
+         */
+        post: operations["piece.hold"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pieces/{piece}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Release a held piece */
+        post: operations["piece.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/prices": {
         parameters: {
             query?: never;
@@ -1069,6 +1128,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/scans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scan pieces at a station
+         * @description One tag or a batch. Each tag gets its own result: `ok` with the
+         *     piece and any warnings, or an error code and message; one bad tag
+         *     does not stop the rest. At a quality-control station send `passed`
+         *     (and, when failing, a `reason` or defects): failed pieces are
+         *     flagged for rework. A repeated scan within 30 seconds is reported
+         *     as `duplicate` and not counted twice.
+         */
+        post: operations["production.scan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/service-types": {
         parameters: {
             query?: never;
@@ -1128,6 +1212,70 @@ export interface paths {
          * @description Send only the settings that change.
          */
         put: operations["setting.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List stations
+         * @description Stations of the branches the user works in, in workflow order,
+         *     inactive ones included.
+         */
+        get: operations["stations.index"];
+        put?: never;
+        /** Create a station */
+        post: operations["stations.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stations/{station}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a station */
+        put: operations["stations.update"];
+        post?: never;
+        /**
+         * Delete a station
+         * @description Its scans stay in the pieces' history.
+         */
+        delete: operations["stations.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stations/{station}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Station activity
+         * @description Today's scan counts (the user's and everyone's) and the latest scans,
+         *     for the counter on the station screen.
+         */
+        get: operations["station.activity"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1495,6 +1643,10 @@ export interface components {
             /** @description The ready pieces the customer takes now; the others stay on the rack. */
             piece_ids: number[];
         };
+        /** HoldPieceRequest */
+        HoldPieceRequest: {
+            reason: string;
+        };
         /** ImportPricesRequest */
         ImportPricesRequest: {
             /**
@@ -1753,6 +1905,92 @@ export interface components {
          * @enum {string}
          */
         PaymentStatus: "unpaid" | "partially_paid" | "paid" | "refunded";
+        /** PieceDetailResource */
+        PieceDetailResource: {
+            id: number;
+            tag_code: string;
+            number: number;
+            status: components["schemas"]["PieceStatus"];
+            flag: components["schemas"]["PieceFlag"] | null;
+            flag_note: string | null;
+            item_name: string;
+            service_name: string;
+            color_name: string | null;
+            brand: string | null;
+            notes: string | null;
+            defects: string[];
+            branch: {
+                id: number;
+                name: string;
+            } | null;
+            station: {
+                id: number;
+                name: string;
+            } | null;
+            /** @description Where it waits on the rack, once ready. */
+            rack_location: string | null;
+            /** Format: date-time */
+            last_scanned_at: string | null;
+            /** Format: date-time */
+            assembled_at: string | null;
+            /** Format: date-time */
+            ready_at: string | null;
+            /** Format: date-time */
+            handed_over_at: string | null;
+            order: {
+                id: number;
+                ticket_number: string;
+                status: string;
+                due_at: string;
+                is_express: boolean;
+                is_overdue: boolean;
+                piece_count: number;
+                customer_name: string;
+                customer_mobile: string;
+                branch: {
+                    id: number;
+                    name: string;
+                };
+            };
+            events: components["schemas"]["PieceEventResource"][];
+        };
+        /**
+         * PieceEvent
+         * @description What happened to a piece, one row each in its history.
+         * @enum {string}
+         */
+        PieceEvent: "scanned" | "qc_passed" | "qc_failed" | "held" | "released" | "assembled" | "racked" | "sent_back" | "transferred_out" | "transferred_in" | "outsourced" | "returned" | "damaged" | "lost" | "found" | "handed_over";
+        /** PieceEventResource */
+        PieceEventResource: {
+            id: number;
+            event: components["schemas"]["PieceEvent"];
+            station: {
+                id: number;
+                name: string;
+            } | null;
+            branch: {
+                id: number;
+                name: string;
+            } | null;
+            user_name: string | null;
+            note: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        /**
+         * PieceFlag
+         * @description A side state on top of a piece's status.
+         *     | |
+         *     |---|
+         *     | `rework` <br/> Failed quality control; goes back through the stations. |
+         *     | `on_hold` <br/> Held on purpose (waiting for the customer's approval, say). |
+         *     | `outsourced` <br/> At an outside vendor (rugs, leather, tailoring). |
+         *     | `in_transit` <br/> On its way between branches. |
+         *     | `damaged` <br/> Damaged in the shop; a claim is open. Still handed back. |
+         *     | `lost` <br/> Cannot be found; a claim is open. |
+         * @enum {string}
+         */
+        PieceFlag: "rework" | "on_hold" | "outsourced" | "in_transit" | "damaged" | "lost";
         /** PieceResource */
         PieceResource: {
             id: number;
@@ -1778,10 +2016,10 @@ export interface components {
         };
         /**
          * PieceStatus
-         * @description Where a piece is in the simple counter flow. Workshop stations (phase 3) add their own scan history on top of this.
+         * @description Where a piece is in its life: tagged at intake, worked on at stations, gathered with the rest of its order (assembly), on the rack, and back with the customer. Side states (rework, outsourced…) are its flag.
          * @enum {string}
          */
-        PieceStatus: "received" | "ready" | "handed_over";
+        PieceStatus: "received" | "in_process" | "assembled" | "ready" | "handed_over";
         /** PreviewOrderRequest */
         PreviewOrderRequest: {
             /** @description Lets the preview check customer-specific promo code rules. */
@@ -1951,6 +2189,16 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /** SaveStationRequest */
+        SaveStationRequest: {
+            /** @description A station stays in the branch it was made for. */
+            branch_id?: string;
+            name?: string;
+            code?: string;
+            kind?: components["schemas"]["StationKind"];
+            sort_order?: number;
+            is_active?: boolean;
+        };
         /** SaveTurnaroundTierRequest */
         SaveTurnaroundTierRequest: {
             name: string;
@@ -1972,6 +2220,16 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /** ScanRequest */
+        ScanRequest: {
+            station_id: number;
+            /** @description One tag, or a batch (a bag or a cart scanned together). */
+            tags: string[];
+            /** @description Quality-control stations only: whether the pieces passed. */
+            passed?: boolean | null;
+            reason?: string | null;
+            defect_type_ids?: number[] | null;
+        };
         /** ServiceTypeResource */
         ServiceTypeResource: {
             id: number;
@@ -1986,6 +2244,25 @@ export interface components {
          * @enum {string}
          */
         ShiftStatus: "open" | "closed";
+        /**
+         * StationKind
+         * @description | |
+         *     |---|
+         *     | `process` <br/> Scanning records that the piece reached this step. |
+         *     | `qc` <br/> Quality control: every scan passes the piece or sends it back for rework. |
+         * @enum {string}
+         */
+        StationKind: "process" | "qc";
+        /** StationResource */
+        StationResource: {
+            id: number;
+            branch_id: number;
+            name: string;
+            code: string;
+            kind: components["schemas"]["StationKind"];
+            sort_order: number;
+            is_active: boolean;
+        };
         /** StoreBranchRequest */
         StoreBranchRequest: {
             name: string;
@@ -2155,7 +2432,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view" | "reports.view")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -4108,6 +4385,108 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "piece.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tag: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `PieceDetailResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PieceDetailResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "piece.hold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The piece ID */
+                piece: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HoldPieceRequest"];
+            };
+        };
+        responses: {
+            /** @description `PieceDetailResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PieceDetailResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "piece.release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The piece ID */
+                piece: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `PieceDetailResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PieceDetailResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "price.index": {
         parameters: {
             query?: never;
@@ -4610,6 +4989,63 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "production.scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            tag: string;
+                            ok: boolean;
+                            duplicate: boolean;
+                            code: string | null;
+                            message: string | null;
+                            warnings: string[];
+                            piece: {
+                                id: number;
+                                tag_code: string;
+                                item_name: string;
+                                service_name: string;
+                                color_name: string | null;
+                                notes: string | null;
+                                defects: string[];
+                                status: string;
+                                flag: string | null;
+                                flag_note: string | null;
+                                order: {
+                                    id: number;
+                                    ticket_number: string;
+                                    due_at: string;
+                                    is_express: boolean;
+                                    is_overdue: boolean;
+                                    piece_count: number;
+                                    notes: string | null;
+                                };
+                            } | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "service-types.index": {
         parameters: {
             query?: never;
@@ -4813,6 +5249,160 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "stations.index": {
+        parameters: {
+            query?: {
+                /** @description Only this branch's stations. */
+                branch_id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `StationResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["StationResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "stations.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveStationRequest"];
+            };
+        };
+        responses: {
+            /** @description `StationResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["StationResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "stations.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The station ID */
+                station: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveStationRequest"];
+            };
+        };
+        responses: {
+            /** @description `StationResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["StationResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "stations.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The station ID */
+                station: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "station.activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The station ID */
+                station: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            today: {
+                                mine: number;
+                                total: number;
+                            };
+                            recent: {
+                                id: number;
+                                tag_code: string;
+                                item_name: string;
+                                event: string;
+                                user_name: string | null;
+                                created_at: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
         };
     };
     "turnaround-tiers.index": {

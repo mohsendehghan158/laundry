@@ -44,7 +44,9 @@ final class PermissionRegistry
             'promotions' => ['promotions.manage'],
             // manage = edit message texts and resend; view = the send log.
             'notifications' => ['notifications.manage', 'notifications.view'],
-            'reports' => ['reports.view'],
+            'production' => ['production.view', 'production.scan', 'production.manage', 'production.transfer', 'production.outsource'],
+            'claims' => ['claims.view', 'claims.manage'],
+            'reports' => ['reports.view', 'reports.production'],
         ];
     }
 
@@ -77,13 +79,15 @@ final class PermissionRegistry
                 'orders.view', 'orders.create', 'orders.update', 'orders.cancel', 'orders.discount', 'orders.handover', 'orders.handover_unpaid',
                 'payments.create', 'payments.refund', 'shifts.operate', 'shifts.view',
                 'notifications.view',
-                'reports.view',
+                'production.view', 'production.scan', 'production.manage', 'production.transfer', 'production.outsource',
+                'claims.view', 'claims.manage',
+                'reports.view', 'reports.production',
             ],
-            'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'orders.handover', 'payments.create', 'shifts.operate'],
-            'plant_operator' => ['orders.view', 'orders.update'],
+            'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'orders.handover', 'payments.create', 'shifts.operate', 'production.view', 'production.transfer', 'claims.view'],
+            'plant_operator' => ['catalog.view', 'orders.view', 'orders.update', 'production.view', 'production.scan', 'production.transfer', 'production.outsource', 'claims.view', 'reports.production'],
             'driver' => ['customers.view'],
-            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view', 'reports.view'],
-            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create', 'notifications.view'],
+            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view', 'production.view', 'claims.view', 'reports.view', 'reports.production'],
+            'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'orders.view', 'orders.create', 'notifications.view', 'production.view', 'claims.view'],
         ];
     }
 }

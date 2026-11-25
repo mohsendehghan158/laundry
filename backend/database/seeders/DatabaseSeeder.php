@@ -10,6 +10,7 @@ use App\Modules\Identity\Support\PermissionRegistry;
 use App\Modules\Organization\Enums\BranchType;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\Organization;
+use App\Modules\Production\Models\Station;
 use Illuminate\Database\Seeder;
 
 /**
@@ -38,6 +39,9 @@ class DatabaseSeeder extends Seeder
         $this->user($organization, 'رضا نوری', 'driver', 'driver', [$central, $west]);
         $this->user($organization, 'نرگس صادقی', 'accountant', 'accountant', []);
 
+        $this->stations($organization, $plant, [['SORT', 'تفکیک'], ['SPOT', 'لکه‌گیری'], ['WASH', 'شست‌وشو و خشکشویی'], ['PRESS', 'اتو و پرس'], ['QC', 'کنترل کیفیت', 'qc'], ['PACK', 'بسته‌بندی']]);
+        $this->stations($organization, $central, [['PRESS', 'اتو'], ['QC', 'کنترل کیفیت', 'qc']]);
+
         $catalog->run($organization->id);
         $customers->run($organization->id);
     }
@@ -58,6 +62,23 @@ class DatabaseSeeder extends Seeder
             'phone' => $phone,
             'address' => $address,
         ]);
+    }
+
+    /**
+     * @param  list<array{0: string, 1: string, 2?: string}>  $stations  code, name, kind
+     */
+    private function stations(Organization $organization, Branch $branch, array $stations): void
+    {
+        foreach ($stations as $order => $station) {
+            Station::query()->forceCreate([
+                'organization_id' => $organization->id,
+                'branch_id' => $branch->id,
+                'code' => $station[0],
+                'name' => $station[1],
+                'kind' => $station[2] ?? 'process',
+                'sort_order' => $order,
+            ]);
+        }
     }
 
     /**

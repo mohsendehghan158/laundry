@@ -65,7 +65,11 @@
     "promotions": "Promo codes",
     "handover": "Handover",
     "notifications": "SMS",
-    "reports": "Sales report"
+    "reports": "Sales report",
+    "workshop": "Workshop",
+    "station": "Scan station",
+    "pieces": "Find a piece",
+    "stations": "Workshop stations"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -181,7 +185,9 @@
       "billing": "Register & payments",
       "promotions": "Promotions",
       "notifications": "Messages",
-      "reports": "Reports"
+      "reports": "Reports",
+      "production": "Workshop",
+      "claims": "Damage and loss"
     },
     "permissions": {
       "organization": {
@@ -246,7 +252,19 @@
         "view": "View sent messages"
       },
       "reports": {
-        "view": "View the sales dashboard and reports"
+        "view": "View the sales dashboard and reports",
+        "production": "Production and on-time report"
+      },
+      "production": {
+        "view": "View the workshop and find pieces",
+        "scan": "Scan at stations, assemble and hold pieces",
+        "manage": "Set up stations and racks",
+        "transfer": "Transfers between branches and the plant",
+        "outsource": "Send work to vendors"
+      },
+      "claims": {
+        "view": "View damage and loss claims",
+        "manage": "Open and settle damage and loss claims"
       }
     }
   },
@@ -586,6 +604,8 @@
   "pieces": {
     "statuses": {
       "received": "Received",
+      "in_process": "In the workshop",
+      "assembled": "Assembled",
       "ready": "Ready",
       "handed_over": "Handed over"
     }
@@ -836,5 +856,115 @@
     "export": "Export to Excel",
     "empty": "No sales in this period.",
     "lineNote": "By service or item, each row adds up order lines before the order's discount and tax; the Sales card shows the orders' final totals."
+  },
+  "pieceFlags": {
+    "rework": "Rework",
+    "on_hold": "On hold",
+    "outsourced": "At vendor",
+    "in_transit": "In transit",
+    "damaged": "Damaged",
+    "lost": "Lost"
+  },
+  "pieceEvents": {
+    "scanned": "Scanned at station",
+    "qc_passed": "Passed quality control",
+    "qc_failed": "Failed quality control",
+    "held": "Put on hold",
+    "released": "Released",
+    "assembled": "Assembled",
+    "racked": "Put on the rack",
+    "sent_back": "Sent back to the workshop",
+    "transferred_out": "Sent on a transfer",
+    "transferred_in": "Received from a transfer",
+    "outsourced": "Sent to a vendor",
+    "returned": "Back from the vendor",
+    "damaged": "Recorded as damaged",
+    "lost": "Reported lost",
+    "found": "Found",
+    "handed_over": "Handed to the customer"
+  },
+  "stations": {
+    "title": "Workshop stations",
+    "subtitle": "The steps pieces go through in each branch or plant, in order",
+    "new": "New station",
+    "edit": "Edit station",
+    "empty": "No stations yet. A small shop can work without any.",
+    "deleteConfirm": "Delete the station \"{name}\"? Earlier scans stay in the pieces' history.",
+    "fields": {
+      "branch": "Branch",
+      "name": "Name",
+      "code": "Code",
+      "kind": "Kind",
+      "order": "Order"
+    },
+    "kinds": {
+      "process": "Work step",
+      "qc": "Quality control"
+    },
+    "kindHelp": "At a quality-control station each scan passes the piece or sends it back for rework."
+  },
+  "station": {
+    "title": "Scan station",
+    "subtitle": "Choose this device's station",
+    "choose": "Choose station",
+    "chooseFirst": "To start, choose this device's station at the top.",
+    "noStations": "No stations are set up in your branches.",
+    "single": "One by one",
+    "batch": "Batch",
+    "pass": "Pass",
+    "fail": "Fail",
+    "reason": "Reason for failing",
+    "defects": "Defects found",
+    "reasonFirst": "To fail a piece, give a reason or a defect first.",
+    "scanLabel": "Piece code",
+    "scanPlaceholder": "Scan the tag or type the code and press Enter",
+    "batchHelp": "Scan the tags one after another, then record them all at once.",
+    "sendBatch": "Record {count, number} pieces",
+    "clearBatch": "Clear",
+    "batchSummary": "{ok, number} recorded, {failed, number} failed",
+    "duplicate": "This piece was just recorded at this station.",
+    "pieceCount": "{count, number} pieces",
+    "due": "Due {date}",
+    "express": "Express",
+    "mine": "My scans today",
+    "total": "This station today",
+    "recent": "Latest scans",
+    "noRecent": "No scans yet."
+  },
+  "pieceLookup": {
+    "title": "Find a piece",
+    "subtitle": "Where each piece is, its state and history, from its tag",
+    "quickSearch": "Scan or piece code",
+    "searchLabel": "Piece code",
+    "searchPlaceholder": "Scan the tag or type the code",
+    "hint": "Scan a piece's tag to see where it is.",
+    "notFound": "Piece \"{tag}\" was not found.",
+    "where": {
+      "handedOver": "Handed to the customer ({date}).",
+      "inTransit": "On a transfer from \"{from}\".",
+      "outsourced": "At an outside vendor.",
+      "lost": "Reported lost.",
+      "rack": "Ready at \"{branch}\", rack {rack}.",
+      "station": "At \"{branch}\", last seen at \"{station}\".",
+      "branch": "At \"{branch}\", not scanned at a station yet."
+    },
+    "hold": "Hold",
+    "release": "Release",
+    "holdTitle": "Hold piece {tag}",
+    "holdReason": "Reason (e.g. waiting for the customer's approval)",
+    "item": "Item and service",
+    "color": "Colour and brand",
+    "defects": "Defects",
+    "notes": "Notes",
+    "lastScan": "Last scan",
+    "order": "Order",
+    "ticket": "Ticket",
+    "customer": "Customer",
+    "due": "Due",
+    "overdue": "Overdue",
+    "pickupBranch": "Pickup branch",
+    "pieces": "Pieces in the order",
+    "history": "History",
+    "noHistory": "Nothing recorded yet."
   }
 }

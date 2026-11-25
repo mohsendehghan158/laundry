@@ -1,8 +1,8 @@
 "use client";
 
-import { LogoutOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons";
+import { LogoutOutlined, MenuOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { App, Avatar, Button, Dropdown, Grid, Layout, Menu, Result, Space, Spin, Typography, theme, type MenuProps } from "antd";
+import { App, Avatar, Button, Dropdown, Grid, Input, Layout, Menu, Result, Space, Spin, Typography, theme, type MenuProps } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -136,6 +136,23 @@ export function PanelShell({ children }: { children: ReactNode }) {
               {user.organization.name}
             </Typography.Text>
           </Space>
+          {isDesktop && (can("production.view") || can("orders.view")) && (
+            <Input
+              allowClear
+              prefix={<SearchOutlined />}
+              aria-label={t("pieceLookup.quickSearch")}
+              placeholder={t("pieceLookup.quickSearch")}
+              onPressEnter={(event) => {
+                const code = event.currentTarget.value.trim();
+                if (code) {
+                  router.push(`/pieces?tag=${encodeURIComponent(code)}`);
+                  event.currentTarget.value = "";
+                }
+              }}
+              style={{ maxWidth: 280, marginInlineStart: "auto" }}
+              className="ltr"
+            />
+          )}
           <Dropdown
             trigger={["click"]}
             menu={{

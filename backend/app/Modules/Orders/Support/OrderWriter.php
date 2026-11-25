@@ -119,6 +119,7 @@ final class OrderWriter
                 $piece = $orderLine->pieces()->create([
                     'organization_id' => $order->organization_id,
                     'order_id' => $order->id,
+                    'branch_id' => $order->branch_id,
                     'tag_code' => $order->ticket_number.'-'.str_pad((string) $number, $width, '0', STR_PAD_LEFT),
                     'number' => $number,
                     'status' => PieceStatus::Received,
