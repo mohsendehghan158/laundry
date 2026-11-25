@@ -52,4 +52,11 @@ return [
         'scheme' => env('REVERB_PUBLIC_SCHEME', 'http'),
     ],
 
+    'portal' => [
+        // Slug of the organization the customer portal serves (default: the first one).
+        'organization' => env('PORTAL_ORGANIZATION'),
+        // Development and automated tests only: every sign-in code is this. Ignored in production.
+        'otp_fixed_code' => env('OTP_FIXED_CODE'),
+    ],
+
 ];

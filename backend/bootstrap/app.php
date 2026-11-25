@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Modules\Portal\Http\Middleware\CustomerContext;
+use App\Modules\Portal\Http\Middleware\PortalContext;
 use App\Support\Http\ApiExceptionRenderer;
 use App\Support\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -25,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         $middleware->throttleApi();
         $middleware->api(prepend: [SetLocale::class]);
+        $middleware->alias([
+            'portal' => PortalContext::class,
+            'customer.context' => CustomerContext::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

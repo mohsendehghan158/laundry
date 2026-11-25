@@ -63,6 +63,12 @@ return [
         'claim_closed' => 'This claim is closed.',
         'photo_limit' => 'A piece can have at most :max photos.',
 
+        'otp_too_soon' => 'A code was just sent; try again in :seconds seconds.',
+        'otp_too_many' => 'Too many codes for this number; try again later.',
+        'otp_not_sent' => 'The text could not be sent; try again shortly.',
+        'otp_expired' => 'The code has expired or is wrong; ask for a new one.',
+        'otp_wrong' => 'Wrong code. :left tries left.',
+
         'notification_not_failed' => 'Only failed messages can be sent again.',
     ],
 ];

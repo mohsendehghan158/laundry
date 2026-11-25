@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Customers\Models\Customer;
 use App\Modules\Identity\Models\User;
 
 return [
@@ -54,6 +55,12 @@ return [
             'driver' => 'sanctum',
             'provider' => 'users',
         ],
+
+        // Customers in the portal: a separate session guard, so no staff route ever accepts a customer.
+        'customer' => [
+            'driver' => 'session',
+            'provider' => 'customers',
+        ],
     ],
 
     /*
@@ -74,6 +81,11 @@ return [
     */
 
     'providers' => [
+        'customers' => [
+            'driver' => 'eloquent',
+            'model' => Customer::class,
+        ],
+
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),

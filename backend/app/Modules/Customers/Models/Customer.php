@@ -7,6 +7,8 @@ namespace App\Modules\Customers\Models;
 use App\Modules\Customers\Database\Factories\CustomerFactory;
 use App\Modules\Organization\Concerns\BelongsToOrganization;
 use App\Support\Text\Mobile;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -28,19 +30,39 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property string|null $notes
  * @property string|null $alert
  * @property int|null $created_by
+ * @property Carbon|null $last_login_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'mobile', 'phone', 'notes', 'alert'])]
 #[UseFactory(CustomerFactory::class)]
-class Customer extends Model
+class Customer extends Model implements AuthenticatableContract
 {
+    /** Customers sign in to the portal with a texted code; they have no password. */
+    use Authenticatable;
+
     use BelongsToOrganization;
 
     /** @use HasFactory<CustomerFactory> */
     use HasFactory;
 
     use LogsActivity, SoftDeletes;
+
+    /** @var list<string> */
+    protected $hidden = ['remember_token'];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return ['last_login_at' => 'datetime'];
+    }
+
+    public function getAuthPassword(): string
+    {
+        return '';
+    }
 
     /**
      * @return HasMany<CustomerAddress, $this>

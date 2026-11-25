@@ -7,15 +7,6 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
 use Illuminate\Support\Facades\Hash;
 
-/**
- * Sanctum only starts a cookie session for requests coming from the SPA,
- * which it recognises by the Origin header.
- */
-function fromSpa(): array
-{
-    return ['Origin' => 'http://localhost:3000'];
-}
-
 it('signs a user in and returns their profile, permissions and branches', function () {
     $user = $this->userWithRole('branch_manager');
     $branch = Branch::factory()->for($user->organization)->create(['name' => 'شعبه یک']);

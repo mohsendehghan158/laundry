@@ -38,6 +38,9 @@ class AppServiceProvider extends ServiceProvider
         // trying many usernames.
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(20)->by((string) $request->ip()));
 
+        // Customer sign-in codes: per-number limits live in SendOtp; this caps one address.
+        RateLimiter::for('otp', fn (Request $request) => Limit::perMinute(10)->by((string) $request->ip()));
+
         // Pages anyone can open without signing in.
         RateLimiter::for('public', fn (Request $request) => Limit::perMinute(60)->by((string) $request->ip()));
 
