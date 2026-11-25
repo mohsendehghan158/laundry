@@ -64,7 +64,8 @@
     "register": "Register",
     "promotions": "Promo codes",
     "handover": "Handover",
-    "notifications": "SMS"
+    "notifications": "SMS",
+    "reports": "Sales report"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -72,10 +73,30 @@
     "roles": "Your roles",
     "branches": "Branches you can access",
     "noBranches": "You do not have access to any branch yet.",
-    "branchCount": "Active branches",
-    "userCount": "Users",
     "quickLinks": "Quick links",
-    "upcoming": "Sales, workshop status and alerts appear on this page once the counter and orders arrive (phase 2)."
+    "today": {
+      "orders": "Orders today",
+      "pieces": "Pieces received today",
+      "sales": "Sales today",
+      "collected": "Collected today"
+    },
+    "workload": {
+      "title": "Orders",
+      "due_today": "Due today",
+      "overdue": "Overdue",
+      "in_process": "In progress",
+      "ready": "Ready for pickup"
+    },
+    "trend": {
+      "title": "Last 14 days",
+      "sales": "Sales",
+      "orders": "Orders",
+      "chart": "Chart",
+      "table": "Table",
+      "date": "Date",
+      "ordersCount": "{count, number} orders",
+      "aria": "Bar chart of {measure} over the last 14 days"
+    }
   },
   "branches": {
     "title": "Branches",
@@ -159,7 +180,8 @@
       "orders": "Orders",
       "billing": "Register & payments",
       "promotions": "Promotions",
-      "notifications": "Messages"
+      "notifications": "Messages",
+      "reports": "Reports"
     },
     "permissions": {
       "organization": {
@@ -222,6 +244,9 @@
       "notifications": {
         "manage": "Edit message texts",
         "view": "View sent messages"
+      },
+      "reports": {
+        "view": "View the sales dashboard and reports"
       }
     }
   },
@@ -750,5 +775,46 @@
     "settled": "Settled",
     "toman": "toman",
     "rial": "rial"
+  },
+  "reports": {
+    "title": "Sales report",
+    "subtitle": "Sales and money collected for a period, by day, service, item, branch or user",
+    "period": "Report period",
+    "branch": "Branch",
+    "allBranches": "All branches",
+    "groups": {
+      "day": "Day",
+      "service": "Service",
+      "item": "Item",
+      "branch": "Branch",
+      "user": "Taken by"
+    },
+    "columns": {
+      "orders": "Orders",
+      "quantity": "Quantity",
+      "discount": "Discount",
+      "tax": "Tax",
+      "total": "Sales",
+      "collected": "Collected"
+    },
+    "summary": {
+      "sales": "Sales",
+      "collected": "Collected (net of refunds)",
+      "orders": "Orders",
+      "average": "Average order",
+      "quantity": "Items"
+    },
+    "presets": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "Last 7 days",
+      "days30": "Last 30 days",
+      "month": "This month",
+      "lastMonth": "Last month"
+    },
+    "totals": "Total",
+    "export": "Export to Excel",
+    "empty": "No sales in this period.",
+    "lineNote": "By service or item, each row adds up order lines before the order's discount and tax; the Sales card shows the orders' final totals."
   }
 }

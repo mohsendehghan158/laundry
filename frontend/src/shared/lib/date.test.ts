@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayjs, formatDate, formatDateTime, formatJalali } from "./date";
+import { dayjs, formatDate, formatDateTime, formatJalali, jalaliMonthRange } from "./date";
 import { jalaliGenerateConfig as config, parseJalali } from "./jalaliGenerateConfig";
 
 describe("date formatting", () => {
@@ -81,5 +81,23 @@ describe("jalaliGenerateConfig", () => {
     const text = config.locale.format("fa", azar3, "YYYY/MM/DD");
     const parsed = config.locale.parse("fa", text, ["YYYY/MM/DD"]);
     expect(parsed && config.getDate(parsed)).toBe(3);
+  });
+});
+
+describe("jalaliMonthRange", () => {
+  const today = dayjs(new Date(2026, 10, 25, 15, 0)); // ۱۴۰۵/۰۹/۰۴
+
+  it("spans the current Jalali month", () => {
+    const [from, to] = jalaliMonthRange(0, today);
+    expect(formatJalali(from, "YYYY/MM/DD HH:mm")).toBe("1405/09/01 00:00");
+    expect(formatJalali(to, "YYYY/MM/DD")).toBe("1405/09/30");
+  });
+
+  it("goes back across the new year, Esfand included", () => {
+    const [from, to] = jalaliMonthRange(-9, today);
+    expect(formatJalali(from, "YYYY/MM/DD")).toBe("1404/12/01");
+    // 1404 is not a leap year: Esfand has 29 days.
+    expect(formatJalali(to, "YYYY/MM/DD")).toBe("1404/12/29");
+    expect(formatJalali(jalaliMonthRange(-8, today)[0], "YYYY/MM/DD")).toBe("1405/01/01");
   });
 });

@@ -901,6 +901,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Today at a glance
+         * @description Orders and sales taken in today, money collected today, the
+         *     workshop's load, and the last 14 days. Amounts are whole rials;
+         *     days follow the organization's time zone.
+         */
+        get: operations["report.dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sales report
+         * @description Orders taken in between two dates (cancelled ones excluded),
+         *     grouped by day, service, item, branch or the user who took them
+         *     in, with totals. "collected" is money received minus refunds in the
+         *     same period. At most one year at a time.
+         */
+        get: operations["report.sales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/sales/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the sales report as Excel
+         * @description The same figures as the sales report, in an .xlsx file with Persian
+         *     headers, Jalali dates and amounts in the display unit.
+         */
+        get: operations["report.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/permissions": {
         parameters: {
             query?: never;
@@ -2034,7 +2100,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view" | "reports.view")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -4213,6 +4279,129 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    "report.dashboard": {
+        parameters: {
+            query?: {
+                /** @description Limit to one branch. */
+                branch_id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            today: {
+                                orders: number;
+                                pieces: number;
+                                sales: number;
+                                collected: number;
+                            };
+                            workload: {
+                                due_today: number;
+                                overdue: number;
+                                in_process: number;
+                                ready: number;
+                            };
+                            trend: {
+                                date: string;
+                                orders: number;
+                                sales: number;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "report.sales": {
+        parameters: {
+            query: {
+                /** @description Local dates (the organization's time zone), both included. */
+                from: string;
+                to: string;
+                group: "day" | "service" | "item" | "branch" | "user";
+                branch_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            rows: {
+                                key: string;
+                                label: string;
+                                orders: number | null;
+                                quantity: number | null;
+                                discount: number | null;
+                                tax: number | null;
+                                total: number;
+                                collected: number | null;
+                            }[];
+                            totals: {
+                                orders: number;
+                                quantity: number | null;
+                                lines: number | null;
+                                discount: number;
+                                tax: number;
+                                total: number;
+                                collected: number;
+                            };
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "report.export": {
+        parameters: {
+            query: {
+                /** @description Local dates (the organization's time zone), both included. */
+                from: string;
+                to: string;
+                group: "day" | "service" | "item" | "branch" | "user";
+                branch_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "role.permissions": {

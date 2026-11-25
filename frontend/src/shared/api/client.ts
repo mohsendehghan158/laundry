@@ -124,6 +124,32 @@ async function send(path: string, options: RequestOptions, csrfRetry: boolean): 
   return response;
 }
 
+/**
+ * Downloads a file from the API (an Excel export, say) and hands it to the
+ * browser to save under the name the server gave it.
+ */
+export async function apiDownload(path: string, query?: Query): Promise<string> {
+  const response = await send(path, { query }, true);
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => ({}));
+    if (response.status === 401 && unauthenticatedHandler) {
+      unauthenticatedHandler();
+    }
+    throw new ApiError(response.status, (body ?? {}) as Partial<ApiErrorBody>);
+  }
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const filename = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition)?.[1] ?? "download";
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = decodeURIComponent(filename);
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  return link.download;
+}
+
 export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const response = await send(path, options, true);
 

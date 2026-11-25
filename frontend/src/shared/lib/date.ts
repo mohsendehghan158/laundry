@@ -26,6 +26,19 @@ export function fromJalali(jy: number, jm: number, jd: number, time?: Dayjs): Da
   return dayjs(new Date(gy, gm - 1, gd, t.hour(), t.minute(), t.second(), t.millisecond()));
 }
 
+/**
+ * First and last day of a Jalali month: the current one (offset 0), the
+ * previous one (−1) and so on.
+ */
+export function jalaliMonthRange(offset = 0, today: Dayjs = dayjs()): [Dayjs, Dayjs] {
+  const [jy, jm] = jalaliParts(today);
+  const months = jy * 12 + (jm - 1) + offset;
+  const [year, month] = [Math.floor(months / 12), (months % 12) + 1];
+  const first = fromJalali(year, month, 1).startOf("day");
+  const next = month === 12 ? fromJalali(year + 1, 1, 1) : fromJalali(year, month + 1, 1);
+  return [first, next.startOf("day").subtract(1, "day")];
+}
+
 const pad = (value: number, width = 2) => String(value).padStart(width, "0");
 
 /**

@@ -44,3 +44,10 @@ body {
 .handover-matched > td {
   background: rgba(22, 104, 220, 0.08) !important;
 }
+
+/* The hovered or focused day in the dashboard trend chart. */
+.trend-chart-column:hover,
+.trend-chart-column:focus-visible {
+  background: rgba(127, 127, 127, 0.12);
+  outline: none;
+}

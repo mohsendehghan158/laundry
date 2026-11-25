@@ -1,0 +1,130 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Reporting\Http\Controllers;
+
+use App\Modules\Identity\Models\User;
+use App\Modules\Organization\Support\Settings;
+use App\Modules\Reporting\Http\Requests\SalesReportRequest;
+use App\Modules\Reporting\Support\Reports;
+use App\Support\Export\XlsxWriter;
+use App\Support\Text\Jalali;
+use Carbon\CarbonImmutable;
+use Dedoc\Scramble\Attributes\QueryParameter;
+use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+
+class ReportController
+{
+    /**
+     * Today at a glance
+     *
+     * Orders and sales taken in today, money collected today, the
+     * workshop's load, and the last 14 days. Amounts are whole rials;
+     * days follow the organization's time zone.
+     *
+     * @response array{data: array{today: array{orders: int, pieces: int, sales: int, collected: int}, workload: array{due_today: int, overdue: int, in_process: int, ready: int}, trend: list<array{date: string, orders: int, sales: int}>}}
+     */
+    #[QueryParameter('branch_id', 'Limit to one branch.', type: 'integer')]
+    public function dashboard(Request $request, #[CurrentUser] User $actor, Reports $reports): JsonResponse
+    {
+        Gate::authorize('reports.view');
+
+        $branchId = $request->filled('branch_id') ? $request->integer('branch_id') : null;
+
+        return response()->json(['data' => $reports->dashboard($reports->branches($actor, $branchId))]);
+    }
+
+    /**
+     * Sales report
+     *
+     * Orders taken in between two dates (cancelled ones excluded),
+     * grouped by day, service, item, branch or the user who took them
+     * in, with totals. "collected" is money received minus refunds in the
+     * same period. At most one year at a time.
+     *
+     * @response array{data: array{rows: list<array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null}>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int}}}
+     */
+    public function sales(SalesReportRequest $request, Reports $reports): JsonResponse
+    {
+        return response()->json(['data' => $this->report($request, $reports)]);
+    }
+
+    /**
+     * Download the sales report as Excel
+     *
+     * The same figures as the sales report, in an .xlsx file with Persian
+     * headers, Jalali dates and amounts in the display unit.
+     */
+    public function export(SalesReportRequest $request, Reports $reports, Settings $settings): Response
+    {
+        $report = $this->report($request, $reports);
+        $group = (string) $request->validated('group');
+        $toman = $settings->get('general.currency_unit') === 'toman';
+        $unit = $toman ? __('reports.toman') : __('reports.rial');
+        $money = fn (?int $rial): ?int => $rial === null ? null : ($toman ? intdiv($rial, 10) : $rial);
+        $label = fn (string $value): string => $group === 'day'
+            ? Jalali::format(CarbonImmutable::parse($value, $reports->timezone()), $reports->timezone(), false)
+            : $value;
+
+        $headers = [__("reports.groups.{$group}"), __('reports.orders')];
+        if (in_array($group, ['service', 'item'], true)) {
+            $headers[] = __('reports.quantity');
+        } else {
+            $headers[] = __('reports.discount')." ({$unit})";
+            $headers[] = __('reports.tax')." ({$unit})";
+        }
+        $headers[] = __('reports.total')." ({$unit})";
+        if ($group === 'day') {
+            $headers[] = __('reports.collected')." ({$unit})";
+        }
+
+        $line = function (array $row) use ($group, $money): array {
+            $cells = [$row['orders']];
+            if (in_array($group, ['service', 'item'], true)) {
+                $cells[] = $row['quantity'];
+            } else {
+                $cells[] = $money($row['discount']);
+                $cells[] = $money($row['tax']);
+            }
+            $cells[] = $money($row['total']);
+            if ($group === 'day') {
+                $cells[] = $money($row['collected']);
+            }
+
+            return $cells;
+        };
+
+        $rows = array_map(fn (array $row): array => [$label($row['label']), ...$line($row)], $report['rows']);
+        // By service or item the rows are order lines, so their total is too.
+        $rows[] = [__('reports.totals'), ...$line([...$report['totals'], 'total' => $report['totals']['lines'] ?? $report['totals']['total']])];
+
+        $from = (string) $request->validated('from');
+        $to = (string) $request->validated('to');
+        $bytes = XlsxWriter::build(__('reports.sheet'), $headers, $rows);
+
+        return response($bytes, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="sales-'.$group.'-'.$from.'-'.$to.'.xlsx"',
+        ]);
+    }
+
+    /**
+     * @return array{rows: list<array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null}>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int}}
+     */
+    private function report(SalesReportRequest $request, Reports $reports): array
+    {
+        $branchId = $request->validated('branch_id');
+
+        return $reports->sales(
+            $reports->branches($request->actor(), $branchId === null ? null : (int) $branchId),
+            (string) $request->validated('from'),
+            (string) $request->validated('to'),
+            (string) $request->validated('group'),
+        );
+    }
+}

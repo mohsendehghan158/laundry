@@ -65,6 +65,10 @@ export type PricePreview = Json<operations["orders.orderPreview"]>["data"];
 export type NotificationTemplate = Json<operations["notificationTemplate.index"]>["data"][number];
 export type NotificationLog = Schemas["NotificationLogResource"];
 export type PublicTracking = Json<operations["orders.publicTracking"]>["data"];
+export type DashboardReport = Json<operations["report.dashboard"]>["data"];
+export type SalesReport = Json<operations["report.sales"]>["data"];
+export type SalesRow = SalesReport["rows"][number];
+export type SalesGroup = operations["report.sales"]["parameters"]["query"]["group"];
 
 /** Laravel's paginated resource collection. */
 export type Paginated<T> = {

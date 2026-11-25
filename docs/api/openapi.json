@@ -4527,6 +4527,400 @@
                 "security": []
             }
         },
+        "/reports/dashboard": {
+            "get": {
+                "operationId": "report.dashboard",
+                "description": "Orders and sales taken in today, money collected today, the\nworkshop's load, and the last 14 days. Amounts are whole rials;\ndays follow the organization's time zone.",
+                "summary": "Today at a glance",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "Limit to one branch.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "today": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "orders": {
+                                                            "type": "integer"
+                                                        },
+                                                        "pieces": {
+                                                            "type": "integer"
+                                                        },
+                                                        "sales": {
+                                                            "type": "integer"
+                                                        },
+                                                        "collected": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "orders",
+                                                        "pieces",
+                                                        "sales",
+                                                        "collected"
+                                                    ]
+                                                },
+                                                "workload": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "due_today": {
+                                                            "type": "integer"
+                                                        },
+                                                        "overdue": {
+                                                            "type": "integer"
+                                                        },
+                                                        "in_process": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ready": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "due_today",
+                                                        "overdue",
+                                                        "in_process",
+                                                        "ready"
+                                                    ]
+                                                },
+                                                "trend": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "date": {
+                                                                "type": "string"
+                                                            },
+                                                            "orders": {
+                                                                "type": "integer"
+                                                            },
+                                                            "sales": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "date",
+                                                            "orders",
+                                                            "sales"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "today",
+                                                "workload",
+                                                "trend"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/reports/sales": {
+            "get": {
+                "operationId": "report.sales",
+                "description": "Orders taken in between two dates (cancelled ones excluded),\ngrouped by day, service, item, branch or the user who took them\nin, with totals. \"collected\" is money received minus refunds in the\nsame period. At most one year at a time.",
+                "summary": "Sales report",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "description": "Local dates (the organization's time zone), both included.",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "group",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "day",
+                                "service",
+                                "item",
+                                "branch",
+                                "user"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "rows": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "orders": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "quantity": {
+                                                                "type": [
+                                                                    "number",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "discount": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "tax": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "total": {
+                                                                "type": "integer"
+                                                            },
+                                                            "collected": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "key",
+                                                            "label",
+                                                            "orders",
+                                                            "quantity",
+                                                            "discount",
+                                                            "tax",
+                                                            "total",
+                                                            "collected"
+                                                        ]
+                                                    }
+                                                },
+                                                "totals": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "orders": {
+                                                            "type": "integer"
+                                                        },
+                                                        "quantity": {
+                                                            "type": [
+                                                                "number",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "lines": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "discount": {
+                                                            "type": "integer"
+                                                        },
+                                                        "tax": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "collected": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "orders",
+                                                        "quantity",
+                                                        "lines",
+                                                        "discount",
+                                                        "tax",
+                                                        "total",
+                                                        "collected"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "rows",
+                                                "totals"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/reports/sales/export": {
+            "get": {
+                "operationId": "report.export",
+                "description": "The same figures as the sales report, in an .xlsx file with Persian\nheaders, Jalali dates and amounts in the display unit.",
+                "summary": "Download the sales report as Excel",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "description": "Local dates (the organization's time zone), both included.",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "group",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "day",
+                                "service",
+                                "item",
+                                "branch",
+                                "user"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/permissions": {
             "get": {
                 "operationId": "role.permissions",
@@ -9091,7 +9485,8 @@
                                 "shifts.view",
                                 "promotions.manage",
                                 "notifications.manage",
-                                "notifications.view"
+                                "notifications.view",
+                                "reports.view"
                             ]
                         },
                         "uniqueItems": true

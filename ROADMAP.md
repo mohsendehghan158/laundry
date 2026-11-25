@@ -565,7 +565,7 @@ flowchart TB
 | زبان | `typescript` | 5.x | حالت strict |
 | سیستم طراحی | `antd` | 6.x | همه اجزای رابط |
 | اتصال antd به Next | `@ant-design/nextjs-registry` | 1.x | استایل در رندر سرور |
-| نمودار | `@ant-design/charts` | 2.x | داشبورد و گزارش |
+| نمودار | `@ant-design/charts` | 2.x | گزارش‌های پیشرفته (فاز ۷)؛ نمودار ستونی سبک داشبورد فاز ۲ بدون کتابخانه ساخته شده است |
 | داده سرور | `@tanstack/react-query` | 5.x | کش، هم‌گام‌سازی، به‌روزرسانی خوش‌بینانه |
 | وضعیت محلی | `zustand` | 5.x | سبد صندوق، نشست پین، تنظیمات دستگاه |
 | وضعیت در نشانی | `nuqs` | 2.x | فیلتر و صفحه‌بندی جدول‌ها |
@@ -677,7 +677,7 @@ erDiagram
 | لجستیک | `GET /slots/available`، `POST /logistics/tasks`، `POST /routes`، `POST /routes/{id}/optimize`، `GET /driver/route/today`، `POST /driver/tasks/{id}/complete` |
 | مالی | `POST /orders/{id}/payments`، `POST /payments/{id}/refund`، `POST /cash-shifts/open`، `POST /cash-shifts/{id}/close`، `GET /invoices/{id}/pdf`، `POST /payments/gateway/callback` |
 | اعلان | CRUD روی `notification-templates`، `GET /notification-logs`، `POST /push/subscribe` |
-| گزارش | `GET /reports/dashboard`، `GET /reports/sales`، `GET /reports/production`، `POST /reports/export` |
+| گزارش | `GET /reports/dashboard`، `GET /reports/sales`، `GET /reports/sales/export` (اکسل)، `GET /reports/production` |
 | عمومی | `GET /public/track/{code}`، `GET /public/price-list`، `GET /public/zones/check` |
 
 ---
