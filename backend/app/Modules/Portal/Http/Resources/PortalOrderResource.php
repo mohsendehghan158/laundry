@@ -43,7 +43,7 @@ class PortalOrderResource extends JsonResource
                 'item_name' => $line->item_name,
                 'service_name' => $line->service_name,
                 'quantity' => (string) $line->quantity,
-                'unit' => (string) $line->unit,
+                'unit' => $line->unit->value,
                 'line_total' => $line->line_total,
             ])->values()->all()),
             /** @var list<array{status: string, at: string}> */

@@ -74,7 +74,10 @@ it('signs in a customer the counter already knows, and keeps customers and staff
 
     // A staff session opens no customer route.
     $this->postJson('/api/v1/customer/auth/logout', [], fromSpa());
-    $this->actingAs(staff($this->shop));
+    // Named explicitly: the test application keeps the guard the last
+    // request switched to ("customer"), and staff sign in on "web".
+    $this->actingAs(staff($this->shop), 'web');
+    $this->getJson('/api/v1/me', fromSpa())->assertOk();
     $this->getJson('/api/v1/customer/me', fromSpa())->assertUnauthorized();
 });
 

@@ -20,7 +20,9 @@ final class VerifyOtp
 
     public function handle(int $organizationId, string $mobile, string $code): Customer
     {
-        return DB::transaction(function () use ($organizationId, $mobile, $code): Customer {
+        // A wrong try is counted and committed before it is reported; an
+        // exception thrown inside the transaction would roll the count back.
+        $outcome = DB::transaction(function () use ($organizationId, $mobile, $code): Customer|int {
             $otp = OtpCode::query()
                 ->where('mobile', $mobile)
                 ->whereNull('used_at')
@@ -30,12 +32,13 @@ final class VerifyOtp
                 ->first();
 
             if ($otp === null || $otp->attempts >= self::MAX_ATTEMPTS) {
-                throw new ApiException('otp_expired', __('api.errors.otp_expired'), 422);
+                return 0;
             }
 
             if (! Hash::check($code, $otp->code_hash)) {
                 $otp->increment('attempts');
-                throw new ApiException('otp_wrong', __('api.errors.otp_wrong', ['left' => self::MAX_ATTEMPTS - $otp->attempts]), 422);
+
+                return self::MAX_ATTEMPTS - $otp->attempts;
             }
 
             $otp->update(['used_at' => now()]);
@@ -46,5 +49,16 @@ final class VerifyOtp
 
             return $customer;
         });
+
+        if ($outcome instanceof Customer) {
+            return $outcome;
+        }
+
+        // No code to try, or this was its last try.
+        if ($outcome === 0) {
+            throw new ApiException('otp_expired', __('api.errors.otp_expired'), 422);
+        }
+
+        throw new ApiException('otp_wrong', __('api.errors.otp_wrong', ['left' => $outcome]), 422);
     }
 }

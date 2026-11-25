@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Actions;
 
+use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Support\PermissionRegistry;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -27,7 +28,7 @@ final class SyncPermissions
         $introduced = array_values(array_diff($names, $existing));
 
         foreach ($names as $name) {
-            Permission::findOrCreate($name);
+            Permission::findOrCreate($name, User::GUARD);
         }
 
         Permission::query()->whereNotIn('name', $names)->delete();
@@ -35,7 +36,7 @@ final class SyncPermissions
         foreach (PermissionRegistry::defaultRoles() as $roleName => $permissions) {
             $role = Role::query()->firstOrNew([
                 'name' => $roleName,
-                'guard_name' => config('auth.defaults.guard'),
+                'guard_name' => User::GUARD,
             ]);
 
             if (! $role->exists) {

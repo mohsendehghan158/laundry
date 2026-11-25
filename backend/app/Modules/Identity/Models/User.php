@@ -55,6 +55,16 @@ class User extends Authenticatable
 
     use HasRoles, LogsActivity, SoftDeletes;
 
+    /** The session guard staff sign in with; roles and permissions belong to it. */
+    public const string GUARD = 'web';
+
+    /**
+     * Read by spatie/laravel-permission. Without it, roles would be looked up
+     * under whatever guard the request last switched to, which in a customer
+     * portal request is "customer".
+     */
+    protected string $guard_name = self::GUARD;
+
     /** @var array<string, mixed> */
     protected $attributes = [
         'is_active' => true,
