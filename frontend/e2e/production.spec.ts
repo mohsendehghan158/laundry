@@ -75,6 +75,14 @@ test("the plant scans a piece through its stations and anyone can find it", asyn
   await page.getByRole("button", { name: "ثبت ۲ قطعه" }).click();
   await expect(result).toContainText("۱ قطعه ثبت شد، ۱ مورد ناموفق");
   await expect(result).toContainText("قطعه‌ای با این کد پیدا نشد.");
+
+  // The plant's board shows the order at quality control, the last station that scanned it.
+  await page.goto("/production");
+  await expect(page.getByRole("heading", { name: "تابلوی تولید · کارگاه مرکزی" })).toBeVisible();
+  await expect(page.getByText("به‌روزرسانی خودکار هر ۱۵ ثانیه")).toBeVisible();
+  const ticket = tag.slice(0, tag.lastIndexOf("-"));
+  await expect(page.getByTestId("board-column").filter({ hasText: "کنترل کیفیت" })).toContainText(ticket);
+  await expect(page.getByTestId("board-counter-pieces")).not.toContainText("قطعه در کار۰");
   await page.context().clearCookies();
 
   // At the counter, the quick search finds where the piece is.

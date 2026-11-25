@@ -12,6 +12,7 @@ use App\Modules\Production\Http\Requests\AssemblyScanRequest;
 use App\Modules\Production\Http\Requests\CompleteAssemblyRequest;
 use App\Modules\Production\Models\RackSlot;
 use App\Modules\Production\Support\Assembly;
+use App\Modules\Production\Support\Board;
 use App\Modules\Production\Support\Tags;
 use App\Support\Exceptions\ApiException;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -55,6 +56,7 @@ class AssemblyController
         $this->authorize($request->actor(), $piece->order);
 
         $assemble->piece($request->actor(), $piece);
+        Board::changed([$piece->order->branch_id], 'assembly', $piece->order_id);
 
         return response()->json(['data' => $assembly->state($piece->order->refresh()), 'scanned_piece_id' => $piece->id]);
     }
@@ -83,6 +85,7 @@ class AssemblyController
         /** @var list<int> $pieceIds */
         $pieceIds = array_map('intval', $request->validated('piece_ids') ?? []);
         $order = $assemble->complete($request->actor(), $order, $pieceIds, $slot, $request->validated('rack_location'), $request->boolean('partial'));
+        Board::changed([$order->branch_id], 'assembly', $order->id);
 
         return response()->json(['data' => $assembly->state($order)]);
     }

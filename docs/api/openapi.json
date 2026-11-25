@@ -1097,6 +1097,209 @@
                 }
             }
         },
+        "/production/board": {
+            "get": {
+                "operationId": "board.show",
+                "description": "The pieces in work at a branch, by station: a column for pieces not\nyet scanned, one per active station in workflow order, and one for\npieces gathered and waiting for the rack. Each column lists orders,\noverdue first, then express, then by due time. Counters cover the\nwhole branch. Boards reload when told to on the private channel\n`plant.{branch_id}.board`.",
+                "summary": "Production board",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "required": true,
+                        "description": "The branch (usually a plant) to show.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "branch": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "counters": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "pieces": {
+                                                            "type": "integer"
+                                                        },
+                                                        "orders": {
+                                                            "type": "integer"
+                                                        },
+                                                        "due_today": {
+                                                            "type": "integer"
+                                                        },
+                                                        "overdue": {
+                                                            "type": "integer"
+                                                        },
+                                                        "express": {
+                                                            "type": "integer"
+                                                        },
+                                                        "rework": {
+                                                            "type": "integer"
+                                                        },
+                                                        "on_hold": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "pieces",
+                                                        "orders",
+                                                        "due_today",
+                                                        "overdue",
+                                                        "express",
+                                                        "rework",
+                                                        "on_hold"
+                                                    ]
+                                                },
+                                                "columns": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "station": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "kind": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "name",
+                                                                    "kind"
+                                                                ]
+                                                            },
+                                                            "pieces": {
+                                                                "type": "integer"
+                                                            },
+                                                            "orders": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "ticket_number": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "customer_name": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "pieces": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "total_pieces": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "due_at": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "is_express": {
+                                                                            "type": "boolean"
+                                                                        },
+                                                                        "is_overdue": {
+                                                                            "type": "boolean"
+                                                                        },
+                                                                        "rework": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "on_hold": {
+                                                                            "type": "integer"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "ticket_number",
+                                                                        "customer_name",
+                                                                        "pieces",
+                                                                        "total_pieces",
+                                                                        "due_at",
+                                                                        "is_express",
+                                                                        "is_overdue",
+                                                                        "rework",
+                                                                        "on_hold"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "key",
+                                                            "station",
+                                                            "pieces",
+                                                            "orders"
+                                                        ]
+                                                    }
+                                                },
+                                                "generated_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "branch",
+                                                "counters",
+                                                "columns",
+                                                "generated_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/branches": {
             "get": {
                 "operationId": "branches.index",
@@ -1485,6 +1688,30 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/broadcasting/auth": {
+            "get": {
+                "operationId": "broadcast.authenticate",
+                "summary": "Authenticate the request for channel access",
+                "tags": [
+                    "Broadcast"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -5863,6 +6090,73 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/realtime": {
+            "get": {
+                "operationId": "production.realtime",
+                "description": "Where the browser connects for live board updates (Reverb, Pusher\nprotocol). `enabled` is false when no socket server is configured;\nscreens then refresh on a timer.",
+                "summary": "Live updates settings",
+                "tags": [
+                    "Realtime"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "key": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "host": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "port": {
+                                                    "type": "integer"
+                                                },
+                                                "scheme": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "http",
+                                                        "https"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "enabled",
+                                                "key",
+                                                "host",
+                                                "port",
+                                                "scheme"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

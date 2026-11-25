@@ -133,6 +133,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/production/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Production board
+         * @description The pieces in work at a branch, by station: a column for pieces not
+         *     yet scanned, one per active station in workflow order, and one for
+         *     pieces gathered and waiting for the rack. Each column lists orders,
+         *     overdue first, then express, then by due time. Counters cover the
+         *     whole branch. Boards reload when told to on the private channel
+         *     `plant.{branch_id}.board`.
+         */
+        get: operations["board.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/branches": {
         parameters: {
             query?: never;
@@ -171,6 +196,23 @@ export interface paths {
          * @description Fails with 409 `branch_last` when it is the only branch left.
          */
         delete: operations["branches.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/broadcasting/auth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Authenticate the request for channel access */
+        get: operations["broadcast.authenticate"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1121,6 +1163,28 @@ export interface paths {
          * @description Fails with 409 `rack_slots_in_use` while orders wait in it.
          */
         delete: operations["racks.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/realtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live updates settings
+         * @description Where the browser connects for live board updates (Reverb, Pusher
+         *     protocol). `enabled` is false when no socket server is configured;
+         *     screens then refresh on a timer.
+         */
+        get: operations["production.realtime"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3069,6 +3133,69 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "board.show": {
+        parameters: {
+            query: {
+                /** @description The branch (usually a plant) to show. */
+                branch_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            branch: {
+                                id: number;
+                                name: string;
+                            };
+                            counters: {
+                                pieces: number;
+                                orders: number;
+                                due_today: number;
+                                overdue: number;
+                                express: number;
+                                rework: number;
+                                on_hold: number;
+                            };
+                            columns: {
+                                key: string;
+                                station: {
+                                    id: number;
+                                    name: string;
+                                    kind: string;
+                                } | null;
+                                pieces: number;
+                                orders: {
+                                    id: number;
+                                    ticket_number: string;
+                                    customer_name: string;
+                                    pieces: number;
+                                    total_pieces: number;
+                                    due_at: string;
+                                    is_express: boolean;
+                                    is_overdue: boolean;
+                                    rework: number;
+                                    on_hold: number;
+                                }[];
+                            }[];
+                            generated_at: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "branches.index": {
         parameters: {
             query?: {
@@ -3241,6 +3368,26 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "broadcast.authenticate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "cashShift.current": {
@@ -5291,6 +5438,35 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "production.realtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            enabled: boolean;
+                            key: string | null;
+                            host: string | null;
+                            port: number;
+                            /** @enum {string} */
+                            scheme: "http" | "https";
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "report.dashboard": {

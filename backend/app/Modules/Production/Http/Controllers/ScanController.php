@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Modules\Production\Http\Controllers;
 
 use App\Modules\Catalog\Models\DefectType;
+use App\Modules\Orders\Models\Piece;
 use App\Modules\Production\Actions\ScanPieces;
 use App\Modules\Production\Enums\StationKind;
 use App\Modules\Production\Http\Requests\ScanRequest;
 use App\Modules\Production\Models\Station;
+use App\Modules\Production\Support\Board;
+use App\Modules\Production\Support\Tags;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 
@@ -46,6 +49,8 @@ class ScanController
 
         /** @var list<string> $tags */
         $tags = $request->validated('tags');
+        // Boards of the branches the pieces come from change too.
+        $from = Piece::query()->whereIn('tag_code', array_map(Tags::normalize(...), $tags))->distinct()->pluck('branch_id')->all();
         $results = $scanPieces->handle(
             $request->actor(),
             $station,
@@ -54,6 +59,8 @@ class ScanController
             $request->validated('reason'),
             array_map(strval(...), $defects),
         );
+
+        Board::changed([$station->branch_id, ...$from], 'scan');
 
         return response()->json(['data' => $results]);
     }

@@ -45,4 +45,11 @@ return [
         ],
     ],
 
+    // Where browsers reach the Reverb socket server (may differ from REVERB_HOST, which the API uses).
+    'realtime' => [
+        'host' => env('REVERB_PUBLIC_HOST'),
+        'port' => env('REVERB_PUBLIC_PORT', 8080),
+        'scheme' => env('REVERB_PUBLIC_SCHEME', 'http'),
+    ],
+
 ];

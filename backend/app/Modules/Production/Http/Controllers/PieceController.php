@@ -9,6 +9,7 @@ use App\Modules\Orders\Models\Piece;
 use App\Modules\Production\Actions\HoldPiece;
 use App\Modules\Production\Http\Requests\HoldPieceRequest;
 use App\Modules\Production\Http\Resources\PieceDetailResource;
+use App\Modules\Production\Support\Board;
 use App\Modules\Production\Support\Tags;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Gate;
@@ -41,6 +42,7 @@ class PieceController
     {
         abort_unless($this->inReach($request->actor(), $piece), 404);
         $holdPiece->hold($request->actor(), $piece, (string) $request->validated('reason'));
+        Board::changed([$piece->branch_id], 'hold', $piece->order_id);
 
         return new PieceDetailResource($this->load($piece));
     }
@@ -53,6 +55,7 @@ class PieceController
         Gate::authorize('production.scan');
         abort_unless($this->inReach($actor, $piece), 404);
         $holdPiece->release($actor, $piece);
+        Board::changed([$piece->branch_id], 'hold', $piece->order_id);
 
         return new PieceDetailResource($this->load($piece));
     }

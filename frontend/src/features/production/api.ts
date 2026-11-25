@@ -2,7 +2,7 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/shared/api/client";
-import type { AssemblyState, PieceDetail, Rack, ScanResult, Station, StationActivity, StationKind, Wrapped } from "@/shared/api/types";
+import type { AssemblyState, PieceDetail, ProductionBoard, Rack, ScanResult, Station, StationActivity, StationKind, Wrapped } from "@/shared/api/types";
 
 export const productionKeys = {
   stations: ["stations"] as const,
@@ -10,6 +10,7 @@ export const productionKeys = {
   piece: (tag: string) => ["pieces", tag] as const,
   racks: ["racks"] as const,
   assembly: (orderId: number) => ["assembly", orderId] as const,
+  board: (branchId: number) => ["production", "board", branchId] as const,
 };
 
 export function useStations(enabled = true) {
@@ -135,5 +136,16 @@ export function useCompleteAssembly() {
       queryClient.invalidateQueries({ queryKey: productionKeys.racks });
       queryClient.invalidateQueries({ queryKey: ["pieces"] });
     },
+  });
+}
+
+/** A branch's board; refreshed on a timer, quickly when no live updates arrive. */
+export function useProductionBoard(branchId: number | null, live: boolean) {
+  return useQuery({
+    queryKey: productionKeys.board(branchId ?? 0),
+    queryFn: async () => (await api.get<Wrapped<ProductionBoard>>("/production/board", { branch_id: branchId })).data,
+    enabled: branchId !== null,
+    refetchInterval: live ? 60_000 : 15_000,
+    placeholderData: keepPreviousData,
   });
 }

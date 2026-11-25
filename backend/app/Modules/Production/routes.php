@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Modules\Production\Http\Controllers\AssemblyController;
+use App\Modules\Production\Http\Controllers\BoardController;
 use App\Modules\Production\Http\Controllers\PieceController;
 use App\Modules\Production\Http\Controllers\RackController;
+use App\Modules\Production\Http\Controllers\RealtimeController;
 use App\Modules\Production\Http\Controllers\ScanController;
 use App\Modules\Production\Http\Controllers\StationController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +16,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('stations/{station}/activity', [StationController::class, 'activity']);
 
     Route::post('scans', ScanController::class);
+    Route::get('production/board', [BoardController::class, 'show']);
+    Route::get('realtime', RealtimeController::class);
 
     Route::apiResource('racks', RackController::class)->except('show');
     Route::post('assembly/scan', [AssemblyController::class, 'scan']);

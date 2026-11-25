@@ -27,6 +27,17 @@ x-api-env: &api-env
   SMS_DRIVER: ${SMS_DRIVER:-log}
   KAVENEGAR_API_KEY: ${KAVENEGAR_API_KEY:-}
   KAVENEGAR_SENDER: ${KAVENEGAR_SENDER:-}
+  # Live production boards through the Reverb socket server below.
+  BROADCAST_CONNECTION: reverb
+  REVERB_APP_ID: laundry
+  REVERB_APP_KEY: ${REVERB_APP_KEY:-laundry-key}
+  REVERB_APP_SECRET: ${REVERB_APP_SECRET:-change-me}
+  REVERB_HOST: reverb
+  REVERB_PORT: "8080"
+  REVERB_SCHEME: http
+  # Browsers connect to the socket on the same host name as the panel.
+  REVERB_PUBLIC_PORT: "8080"
+  REVERB_PUBLIC_SCHEME: http
 
 services:
   postgres:
@@ -68,6 +79,30 @@ services:
     build: ./backend
     command: ["php", "artisan", "queue:work", "--tries=3", "--max-time=3600"]
     environment: *api-env
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Runs scheduled jobs (overdue alerts on the production boards).
+  scheduler:
+    build: ./backend
+    command: ["php", "artisan", "schedule:work"]
+    environment: *api-env
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # WebSocket server for live production boards.
+  reverb:
+    build: ./backend
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    environment: *api-env
+    ports:
+      - "8080:8080"
     healthcheck:
       disable: true
     depends_on:

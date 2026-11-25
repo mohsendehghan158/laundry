@@ -20,9 +20,11 @@
     "antd": "^6.7.2",
     "bwip-js": "^4.11.4",
     "dayjs": "^1.11.23",
+    "laravel-echo": "^2.6.3",
     "next": "16.4.6",
     "next-intl": "^4.16.0",
     "nuqs": "^2.10.3",
+    "pusher-js": "^8.6.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "vazirmatn": "^33.0.3"

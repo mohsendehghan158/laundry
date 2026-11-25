@@ -100,7 +100,13 @@ export function PanelShell({ children }: { children: ReactNode }) {
         collapsed={isDesktop ? false : collapsed}
         onCollapse={setCollapsed}
         trigger={null}
-        style={{ borderInlineStart: `1px solid ${token.colorBorderSecondary}`, ...(isDesktop ? {} : { position: "fixed", insetBlock: 0, insetInlineStart: 0, zIndex: 20 }) }}
+        // The menu is longer than a phone screen: the sidebar scrolls on its own, and stays put on desktop.
+        style={{
+          borderInlineStart: `1px solid ${token.colorBorderSecondary}`,
+          height: "100vh",
+          overflowY: "auto",
+          ...(isDesktop ? { position: "sticky", top: 0 } : { position: "fixed", insetBlock: 0, insetInlineStart: 0, zIndex: 20 }),
+        }}
       >
         <div style={{ height: 64, display: "flex", alignItems: "center", paddingInline: 24 }}>
           <Typography.Text strong style={{ fontSize: 16 }}>

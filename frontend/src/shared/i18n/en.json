@@ -71,7 +71,8 @@
     "pieces": "Find a piece",
     "stations": "Workshop stations",
     "assembly": "Assembly",
-    "racks": "Racks"
+    "racks": "Racks",
+    "board": "Production board"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -1012,5 +1013,36 @@
       "code": "Code",
       "slots": "Slots"
     }
+  },
+  "board": {
+    "title": "Production board",
+    "titleFor": "Production board · {branch}",
+    "branch": "Branch",
+    "noBranch": "You do not work in any branch.",
+    "live": "Live",
+    "polling": "Refreshing every 15 seconds",
+    "updated": "Updated {time}",
+    "tv": "TV view",
+    "exitTv": "Exit full screen",
+    "columnsLabel": "Station columns",
+    "emptyColumn": "Empty",
+    "columns": {
+      "waiting": "Not started",
+      "assembled": "Gathered, waiting for the rack"
+    },
+    "counters": {
+      "pieces": "Pieces in work",
+      "orders": "Orders",
+      "due_today": "Due today",
+      "overdue": "Overdue",
+      "express": "Express",
+      "rework": "Rework",
+      "on_hold": "On hold"
+    },
+    "pieces": "{count}/{total}",
+    "dueAt": "by {time}",
+    "rework": "{count, number} rework",
+    "onHold": "{count, number} on hold",
+    "overdueAlert": "These orders just passed their due time"
   }
 }

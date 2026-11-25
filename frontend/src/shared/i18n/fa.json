@@ -71,7 +71,8 @@
     "pieces": "ردیابی قطعه",
     "stations": "ایستگاه‌های کارگاه",
     "assembly": "مونتاژ سفارش",
-    "racks": "قفسه‌ها"
+    "racks": "قفسه‌ها",
+    "board": "تابلوی تولید"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -1012,5 +1013,36 @@
       "code": "کد",
       "slots": "تعداد خانه"
     }
+  },
+  "board": {
+    "title": "تابلوی تولید",
+    "titleFor": "تابلوی تولید · {branch}",
+    "branch": "شعبه",
+    "noBranch": "به شعبه‌ای دسترسی ندارید.",
+    "live": "زنده",
+    "polling": "به‌روزرسانی خودکار هر ۱۵ ثانیه",
+    "updated": "آخرین به‌روزرسانی {time}",
+    "tv": "نمای تلویزیون",
+    "exitTv": "خروج از تمام‌صفحه",
+    "columnsLabel": "ستون‌های ایستگاه‌ها",
+    "emptyColumn": "خالی",
+    "columns": {
+      "waiting": "در انتظار شروع",
+      "assembled": "مونتاژشده، منتظر قفسه"
+    },
+    "counters": {
+      "pieces": "قطعه در کار",
+      "orders": "سفارش",
+      "due_today": "موعد امروز",
+      "overdue": "عقب‌افتاده",
+      "express": "فوری",
+      "rework": "دوباره‌کاری",
+      "on_hold": "نگه‌داشته"
+    },
+    "pieces": "{count}/{total}",
+    "dueAt": "تا {time}",
+    "rework": "{count, number} دوباره‌کاری",
+    "onHold": "{count, number} نگه‌داشته",
+    "overdueAlert": "این سفارش‌ها از موعد گذشتند"
   }
 }
