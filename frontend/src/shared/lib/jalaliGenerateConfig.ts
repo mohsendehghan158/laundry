@@ -1,6 +1,7 @@
 import type generatePicker from "antd/es/date-picker/generatePicker";
-import { dayjs, JALALI_MONTHS, toJalali, type Dayjs } from "./date";
+import { dayjs, formatJalali, fromJalali, JALALI_MONTHS, jalaliParts, type Dayjs } from "./date";
 import { toLatinDigits, toPersianDigits } from "./digits";
+import { jalaliMonthLength } from "./jalali";
 
 type GenerateConfig = Parameters<typeof generatePicker<Dayjs>>[0];
 
@@ -8,7 +9,14 @@ type GenerateConfig = Parameters<typeof generatePicker<Dayjs>>[0];
 const WEEK_FIRST_DAY = 6;
 const SHORT_WEEK_DAYS = ["ی", "د", "س", "چ", "پ", "ج", "ش"];
 
-const j = (value: Dayjs): Dayjs => (value.calendar("jalali") as Dayjs).locale("fa");
+/** Same time of day, another Jalali date; the day is kept within the month. */
+function withJalali(value: Dayjs, jy: number, jm: number, jd: number): Dayjs {
+  // Normalize a month outside 1–12 into the right year.
+  const months = jy * 12 + (jm - 1);
+  const year = Math.floor(months / 12);
+  const month = (((months % 12) + 12) % 12) + 1;
+  return fromJalali(year, month, Math.min(Math.max(jd, 1), jalaliMonthLength(year, month)), value);
+}
 
 /**
  * Reads Jalali text typed into the picker: "۱۴۰۵/۹/۳", "1405-09-03",
@@ -22,73 +30,76 @@ export function parseJalali(text: string): Dayjs | null {
     return null;
   }
   const [, y, m, d, hh = "0", mm = "0", ss = "0"] = match;
-  const month = Number(m);
-  const day = Number(d);
-  if (month < 1 || month > 12 || day < 1) {
+  const [year, month, day] = [Number(y), Number(m), Number(d)];
+  if (month < 1 || month > 12 || day < 1 || day > jalaliMonthLength(year, month)) {
     return null;
   }
-  const first = dayjs(`${y}-${m.padStart(2, "0")}-01`, { jalali: true });
-  const parsed = toJalali(first);
-  if (!parsed.isValid() || day > parsed.endOf("month").date()) {
-    return null;
-  }
-  return parsed
-    .date(day)
-    .hour(Number(hh))
-    .minute(Number(mm))
-    .second(Number(ss))
-    .millisecond(0);
+  return fromJalali(year, month, day).hour(Number(hh)).minute(Number(mm)).second(Number(ss)).millisecond(0);
 }
 
 /**
- * Ant Design picker configuration that works on the Jalali calendar.
- * Every value it produces is a Jalali dayjs object, so year/month/date
- * getters and setters, adding months and end-of-month all follow the
- * Persian calendar. The moment in time is unchanged, so values can be
- * sent to the API with `.toISOString()` as usual.
+ * Ant Design picker configuration on the Jalali calendar. Values are
+ * ordinary dayjs objects (Gregorian underneath); only what the picker
+ * reads and sets is translated, so values go to the API with
+ * `.toISOString()` as usual.
  */
 export const jalaliGenerateConfig: GenerateConfig = {
-  getNow: () => toJalali(dayjs()),
-  getFixedDate: (fixed) => toJalali(dayjs(fixed, ["YYYY-M-DD", "YYYY-MM-DD"])),
-  getEndDate: (date) => j(date).endOf("month"),
-  getWeekDay: (date) => j(date).day(),
-  getYear: (date) => j(date).year(),
-  getMonth: (date) => j(date).month(),
-  getDate: (date) => j(date).date(),
+  getNow: () => dayjs(),
+  getFixedDate: (fixed) => dayjs(fixed, ["YYYY-M-DD", "YYYY-MM-DD"]),
+  getEndDate: (date) => {
+    const [jy, jm] = jalaliParts(date);
+    return withJalali(date, jy, jm, jalaliMonthLength(jy, jm));
+  },
+  getWeekDay: (date) => date.day(),
+  getYear: (date) => jalaliParts(date)[0],
+  getMonth: (date) => jalaliParts(date)[1] - 1,
+  getDate: (date) => jalaliParts(date)[2],
   getHour: (date) => date.hour(),
   getMinute: (date) => date.minute(),
   getSecond: (date) => date.second(),
   getMillisecond: (date) => date.millisecond(),
 
-  addYear: (date, diff) => j(date).add(diff, "year"),
-  addMonth: (date, diff) => j(date).add(diff, "month"),
-  addDate: (date, diff) => j(date).add(diff, "day"),
-  setYear: (date, year) => j(date).year(year),
-  setMonth: (date, month) => j(date).month(month),
-  setDate: (date, value) => j(date).date(value),
-  setHour: (date, hour) => j(date).hour(hour),
-  setMinute: (date, minute) => j(date).minute(minute),
-  setSecond: (date, second) => j(date).second(second),
-  setMillisecond: (date, ms) => j(date).millisecond(ms),
+  addYear: (date, diff) => {
+    const [jy, jm, jd] = jalaliParts(date);
+    return withJalali(date, jy + diff, jm, jd);
+  },
+  addMonth: (date, diff) => {
+    const [jy, jm, jd] = jalaliParts(date);
+    return withJalali(date, jy, jm + diff, jd);
+  },
+  addDate: (date, diff) => date.add(diff, "day"),
+  setYear: (date, year) => {
+    const [, jm, jd] = jalaliParts(date);
+    return withJalali(date, year, jm, jd);
+  },
+  setMonth: (date, month) => {
+    const [jy, , jd] = jalaliParts(date);
+    return withJalali(date, jy, month + 1, jd);
+  },
+  setDate: (date, value) => {
+    const [jy, jm] = jalaliParts(date);
+    return withJalali(date, jy, jm, 1).add(value - 1, "day");
+  },
+  setHour: (date, hour) => date.hour(hour),
+  setMinute: (date, minute) => date.minute(minute),
+  setSecond: (date, second) => date.second(second),
+  setMillisecond: (date, ms) => date.millisecond(ms),
 
   isAfter: (a, b) => a.isAfter(b),
   isValidate: (date) => date.isValid(),
 
   locale: {
     getWeekFirstDay: () => WEEK_FIRST_DAY,
-    getWeekFirstDate: (_locale, date) => {
-      const value = j(date);
-      return value.subtract((value.day() - WEEK_FIRST_DAY + 7) % 7, "day").startOf("day");
-    },
+    getWeekFirstDate: (_locale, date) => date.subtract((date.day() - WEEK_FIRST_DAY + 7) % 7, "day").startOf("day"),
     getWeek: (_locale, date) => {
-      const value = j(date);
-      const yearStart = value.startOf("year");
+      const [jy] = jalaliParts(date);
+      const yearStart = fromJalali(jy, 1, 1);
       const offset = (yearStart.day() - WEEK_FIRST_DAY + 7) % 7;
-      return Math.floor((value.diff(yearStart, "day") + offset) / 7) + 1;
+      return Math.floor((date.startOf("day").diff(yearStart, "day") + offset) / 7) + 1;
     },
     getShortWeekDays: () => SHORT_WEEK_DAYS,
     getShortMonths: () => [...JALALI_MONTHS],
-    format: (_locale, date, format) => toPersianDigits(j(date).format(format)),
+    format: (_locale, date, format) => toPersianDigits(formatJalali(date, format)),
     parse: (_locale, text) => parseJalali(text),
   },
 };

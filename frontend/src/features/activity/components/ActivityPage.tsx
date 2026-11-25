@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { parseAsIsoDateTime, parseAsStringLiteral } from "nuqs";
 import type { Activity } from "@/shared/api/types";
 import { useListParams } from "@/shared/hooks/useListParams";
-import { formatDateTime, toJalali } from "@/shared/lib/date";
+import { dayjs, formatDateTime } from "@/shared/lib/date";
 import { DataTable } from "@/shared/ui/DataTable";
 import { JalaliRangePicker } from "@/shared/ui/JalaliDatePicker";
 import { PageHeader } from "@/shared/ui/PageHeader";
@@ -117,7 +117,7 @@ export function ActivityPage() {
           <JalaliRangePicker
             allowEmpty={[true, true]}
             placeholder={[t("filters.from"), t("filters.to")]}
-            value={[params.from ? toJalali(params.from) : null, params.to ? toJalali(params.to) : null]}
+            value={[params.from ? dayjs(params.from) : null, params.to ? dayjs(params.to) : null]}
             onChange={(range) =>
               setFilter({
                 from: range?.[0] ? range[0].startOf("day").toDate() : null,

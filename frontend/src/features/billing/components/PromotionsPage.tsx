@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { applyFormErrors, errorMessage } from "@/shared/api/formErrors";
 import type { PromoCode } from "@/shared/api/types";
 import { useCurrencyUnit } from "@/shared/hooks/useCurrencyUnit";
-import { dayjs, formatDate, toJalali, type Dayjs } from "@/shared/lib/date";
+import { dayjs, formatDate, type Dayjs } from "@/shared/lib/date";
 import { formatNumber, inputNumberFormatter, toLatinDigits } from "@/shared/lib/digits";
 import { formatMoney, parseAmount } from "@/shared/lib/money";
 import { JalaliRangePicker } from "@/shared/ui/JalaliDatePicker";
@@ -50,7 +50,7 @@ export function PromotionsPage() {
         ? { type: "percent", first_order_only: false, is_active: true, min_order: 0 }
         : {
             ...editing,
-            period: editing.starts_at || editing.ends_at ? [editing.starts_at ? toJalali(editing.starts_at) : null, editing.ends_at ? toJalali(editing.ends_at) : null] : null,
+            period: editing.starts_at || editing.ends_at ? [editing.starts_at ? dayjs(editing.starts_at) : null, editing.ends_at ? dayjs(editing.ends_at) : null] : null,
           },
     );
   }, [editing, form]);

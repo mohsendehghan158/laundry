@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, toJalali } from "./date";
+import { dayjs, formatDate, formatDateTime, formatJalali } from "./date";
 import { jalaliGenerateConfig as config, parseJalali } from "./jalaliGenerateConfig";
 
 describe("date formatting", () => {
@@ -19,7 +19,7 @@ describe("parseJalali", () => {
   it("reads Jalali dates typed with any digits and separators", () => {
     const date = parseJalali("۱۴۰۵/۹/۳");
     expect(date?.toISOString()).toBe("2026-11-23T20:30:00.000Z");
-    expect(parseJalali("1405-09-03 14:30")?.format("YYYY-MM-DD HH:mm")).toBe("1405-09-03 14:30");
+    expect(formatJalali(parseJalali("1405-09-03 14:30")!, "YYYY-MM-DD HH:mm")).toBe("1405-09-03 14:30");
   });
 
   it("rejects impossible dates", () => {
@@ -32,7 +32,7 @@ describe("parseJalali", () => {
 });
 
 describe("jalaliGenerateConfig", () => {
-  const azar3 = toJalali("2026-11-24T10:30:00Z");
+  const azar3 = dayjs("2026-11-24T10:30:00Z");
 
   it("reads Jalali year, month and day", () => {
     expect(config.getYear(azar3)).toBe(1405);
@@ -58,6 +58,23 @@ describe("jalaliGenerateConfig", () => {
   it("uses Jalali month names", () => {
     expect(config.locale.getShortMonths?.("fa")[8]).toBe("آذر");
     expect(config.locale.format("fa", azar3, "MMMM")).toBe("آذر");
+  });
+
+  it("formats with Jalali tokens and keeps bracketed text", () => {
+    expect(formatJalali(azar3, "dddd D MMMM YYYY [ساعت] HH:mm")).toBe("سه‌شنبه 3 آذر 1405 ساعت 14:00");
+  });
+
+  it("handles the days jalaliday 3.1.1 got wrong", () => {
+    expect(formatDate("2028-01-01T12:00:00Z")).toBe("۱۴۰۶/۱۰/۱۱");
+    expect(config.getDate(dayjs("2024-02-29T12:00:00"))).toBe(10);
+  });
+
+  it("keeps the day within the month when moving between months", () => {
+    // 31 Shahrivar + 1 month → 30 Mehr (Mehr has 30 days).
+    const shahrivar31 = dayjs("2026-09-22T09:00:00");
+    const next = config.addMonth(shahrivar31, 1);
+    expect(config.locale.format("fa", next, "YYYY/MM/DD HH:mm")).toBe("۱۴۰۵/۰۷/۳۰ ۰۹:۰۰");
+    expect(config.locale.format("fa", config.addMonth(shahrivar31, -7), "YYYY/MM/DD")).toBe("۱۴۰۴/۱۱/۳۰");
   });
 
   it("parses what it formats", () => {

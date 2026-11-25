@@ -29,4 +29,12 @@ final class Digits
     {
         return str_replace(['٫', '٬', ','], ['.', '', ''], self::toLatin(trim($value)));
     }
+
+    /**
+     * Converts Latin digits to Persian digits for texts shown to people.
+     */
+    public static function toPersian(string $value): string
+    {
+        return str_replace(self::LATIN, self::PERSIAN, $value);
+    }
 }
