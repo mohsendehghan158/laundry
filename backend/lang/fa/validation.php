@@ -210,5 +210,7 @@ return [
         'usage_limit' => 'سقف استفاده',
         'per_customer_limit' => 'سقف استفاده هر مشتری',
         'first_order_only' => 'فقط اولین سفارش',
+        'piece_ids' => 'قطعه‌ها',
+        'piece_ids.*' => 'قطعه',
     ],
 ];

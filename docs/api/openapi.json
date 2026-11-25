@@ -2526,7 +2526,7 @@
                     {
                         "name": "filter[q]",
                         "in": "query",
-                        "description": "Ticket number, or part of the customer's name or mobile.",
+                        "description": "Ticket number, rack location, or part of the customer's name or mobile.",
                         "schema": {
                             "type": "string"
                         }
@@ -2862,6 +2862,290 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/UpdateOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "promo_code",
+                                                        "created_by",
+                                                        "lines",
+                                                        "payments",
+                                                        "history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/orders/lookup": {
+            "get": {
+                "operationId": "orderCounter.lookup",
+                "description": "Accepts a ticket number (T1-00042) or a piece's tag code\n(T1-00042-03), typed with any digits and in any case. Returns the\norder, plus the id of the piece when a tag was scanned.",
+                "summary": "Find an order by scanning",
+                "tags": [
+                    "OrderCounter"
+                ],
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "required": true,
+                        "description": "Ticket number or tag code.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderResource"
+                                        },
+                                        "matched_piece_id": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "matched_piece_id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/receipt-settings": {
+            "get": {
+                "operationId": "orderCounter.receiptSettings",
+                "description": "Texts and details printed on receipts and tags, for anyone who can\nsee orders (settings themselves need settings.view).",
+                "summary": "Show receipt settings",
+                "tags": [
+                    "OrderCounter"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "organization_name": {
+                                                    "type": "string"
+                                                },
+                                                "header_text": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "footer_text": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "currency_unit": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "toman",
+                                                        "rial"
+                                                    ]
+                                                },
+                                                "prices_include_vat": {
+                                                    "type": "boolean"
+                                                },
+                                                "vat_percent": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "required": [
+                                                "organization_name",
+                                                "header_text",
+                                                "footer_text",
+                                                "currency_unit",
+                                                "prices_include_vat",
+                                                "vat_percent"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/handover": {
+            "post": {
+                "operationId": "orderCounter.handover",
+                "description": "Marks the chosen ready pieces as given back; the order is completed\nwhen none are left. Fails with 409 `handover_unpaid` while money is\nowed (unless the user has `orders.handover_unpaid`),\n`handover_not_ready` before the order is ready, and\n`handover_piece_unavailable` for pieces not ready or not in it.",
+                "summary": "Hand an order over",
+                "tags": [
+                    "OrderCounter"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HandOverOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`OrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/OrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "promo_code",
+                                                        "created_by",
+                                                        "lines",
+                                                        "payments",
+                                                        "history"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/orders/{order}/rack": {
+            "put": {
+                "operationId": "orderCounter.rack",
+                "summary": "Set where an order is kept",
+                "tags": [
+                    "OrderCounter"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRackRequest"
                             }
                         }
                     }
@@ -5786,6 +6070,25 @@
                 ],
                 "title": "DiscountType"
             },
+            "HandOverOrderRequest": {
+                "type": "object",
+                "properties": {
+                    "piece_ids": {
+                        "type": "array",
+                        "description": "The ready pieces the customer takes now; the others stay on the rack.",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "minItems": 1,
+                        "maxItems": 500,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "piece_ids"
+                ],
+                "title": "HandOverOrderRequest"
+            },
             "ItemCategoryResource": {
                 "type": "object",
                 "properties": {
@@ -8049,6 +8352,23 @@
                 ],
                 "title": "UpdatePricesRequest"
             },
+            "UpdateRackRequest": {
+                "type": "object",
+                "properties": {
+                    "rack_location": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Where the order is kept, e.g. \"A-12\"; null clears it.",
+                        "maxLength": 50
+                    }
+                },
+                "required": [
+                    "rack_location"
+                ],
+                "title": "UpdateRackRequest"
+            },
             "UpdateRoleRequest": {
                 "type": "object",
                 "properties": {
@@ -8084,6 +8404,8 @@
                                 "orders.cancel",
                                 "orders.discount",
                                 "orders.discount_unlimited",
+                                "orders.handover",
+                                "orders.handover_unpaid",
                                 "payments.create",
                                 "payments.refund",
                                 "shifts.operate",

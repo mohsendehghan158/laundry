@@ -542,6 +542,90 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find an order by scanning
+         * @description Accepts a ticket number (T1-00042) or a piece's tag code
+         *     (T1-00042-03), typed with any digits and in any case. Returns the
+         *     order, plus the id of the piece when a tag was scanned.
+         */
+        get: operations["orderCounter.lookup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/receipt-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show receipt settings
+         * @description Texts and details printed on receipts and tags, for anyone who can
+         *     see orders (settings themselves need settings.view).
+         */
+        get: operations["orderCounter.receiptSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{order}/handover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hand an order over
+         * @description Marks the chosen ready pieces as given back; the order is completed
+         *     when none are left. Fails with 409 `handover_unpaid` while money is
+         *     owed (unless the user has `orders.handover_unpaid`),
+         *     `handover_not_ready` before the order is ready, and
+         *     `handover_piece_unavailable` for pieces not ready or not in it.
+         */
+        post: operations["orderCounter.handover"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{order}/rack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set where an order is kept */
+        put: operations["orderCounter.rack"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orders/{order}/payments": {
         parameters: {
             query?: never;
@@ -1197,6 +1281,11 @@ export interface components {
          * @enum {string}
          */
         DiscountType: "amount" | "percent";
+        /** HandOverOrderRequest */
+        HandOverOrderRequest: {
+            /** @description The ready pieces the customer takes now; the others stay on the rack. */
+            piece_ids: number[];
+        };
         /** ItemCategoryResource */
         ItemCategoryResource: {
             id: number;
@@ -1812,10 +1901,15 @@ export interface components {
                 price: number | null;
             }[];
         };
+        /** UpdateRackRequest */
+        UpdateRackRequest: {
+            /** @description Where the order is kept, e.g. "A-12"; null clears it. */
+            rack_location: string | null;
+        };
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -3134,7 +3228,7 @@ export interface operations {
     "orders.index": {
         parameters: {
             query?: {
-                /** @description Ticket number, or part of the customer's name or mobile. */
+                /** @description Ticket number, rack location, or part of the customer's name or mobile. */
                 "filter[q]"?: string;
                 /** @description One or more statuses, comma separated. */
                 "filter[status]"?: string;
@@ -3261,6 +3355,131 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdateOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description `OrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "orderCounter.lookup": {
+        parameters: {
+            query: {
+                /** @description Ticket number or tag code. */
+                code: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"];
+                        matched_piece_id: number | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "orderCounter.receiptSettings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            organization_name: string;
+                            header_text: string | null;
+                            footer_text: string | null;
+                            /** @enum {string} */
+                            currency_unit: "toman" | "rial";
+                            prices_include_vat: boolean;
+                            vat_percent: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "orderCounter.handover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandOverOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description `OrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "orderCounter.rack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The order ID */
+                order: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRackRequest"];
             };
         };
         responses: {

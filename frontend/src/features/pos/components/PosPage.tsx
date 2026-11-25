@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircleFilled, DollarOutlined, GiftOutlined, PercentageOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { CheckCircleFilled, DollarOutlined, GiftOutlined, PercentageOutlined, PrinterOutlined, ShoppingCartOutlined, TagsOutlined } from "@ant-design/icons";
 import { Alert, App, Button, Card, Col, Descriptions, Divider, Empty, Flex, Input, InputNumber, Modal, Popover, Radio, Result, Row, Segmented, Select, Skeleton, Space, Typography } from "antd";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -8,6 +8,7 @@ import { useMemo, useReducer, useRef, useState } from "react";
 import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { useCounterCatalog } from "@/features/catalog/api";
 import { useCreateOrder, usePricePreview } from "@/features/orders/api";
+import { openPrint } from "@/features/printing/api";
 import { errorMessage } from "@/shared/api/formErrors";
 import { isApiError } from "@/shared/api/client";
 import type { Order } from "@/shared/api/types";
@@ -200,6 +201,14 @@ export function PosPage() {
               </Flex>
             }
             extra={[
+              <Flex key="print" gap={8} justify="center" style={{ marginBottom: 8 }}>
+                <Button icon={<PrinterOutlined />} onClick={() => openPrint(created.id, "receipt")}>
+                  {t("printing.receipt")}
+                </Button>
+                <Button icon={<TagsOutlined />} onClick={() => openPrint(created.id, "tags")}>
+                  {t("printing.tags")}
+                </Button>
+              </Flex>,
               created.balance > 0 && can("payments.create") && (
                 <Button key="pay" icon={<DollarOutlined />} onClick={() => setPaying(true)}>
                   {t("billing.pay")}

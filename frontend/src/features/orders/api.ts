@@ -91,3 +91,39 @@ export function usePricePreview(payload: OrderPayload | null) {
     retry: false,
   });
 }
+
+/** Finds an order by a scanned ticket number or piece tag. */
+export function useOrderLookup(code: string | null) {
+  return useQuery({
+    queryKey: ["orders", "lookup", code],
+    queryFn: async () => {
+      const result = await api.get<{ data: Order; matched_piece_id: number | null }>("/orders/lookup", { code });
+      return { order: result.data, matchedPieceId: result.matched_piece_id };
+    },
+    enabled: Boolean(code),
+    retry: false,
+  });
+}
+
+export function useHandOver() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, pieceIds }: { id: number; pieceIds: number[] }) =>
+      (await api.post<Wrapped<Order>>(`/orders/${id}/handover`, { piece_ids: pieceIds })).data,
+    onSuccess: (order) => {
+      queryClient.setQueryData(orderKeys.detail(order.id), order);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+}
+
+export function useUpdateRack() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, rack }: { id: number; rack: string | null }) => (await api.put<Wrapped<Order>>(`/orders/${id}/rack`, { rack_location: rack })).data,
+    onSuccess: (order) => {
+      queryClient.setQueryData(orderKeys.detail(order.id), order);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+}

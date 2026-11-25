@@ -3,6 +3,7 @@ import {
   ContactsOutlined,
   FileTextOutlined,
   GiftOutlined,
+  ExportOutlined,
   WalletOutlined,
   ShopOutlined,
   DashboardOutlined,
@@ -18,7 +19,7 @@ import type { Permission } from "@/shared/api/types";
 export type NavItem = {
   href: string;
   /** Key under the "nav" messages. */
-  label: "dashboard" | "pos" | "orders" | "register" | "promotions" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
+  label: "dashboard" | "pos" | "handover" | "orders" | "register" | "promotions" | "customers" | "catalog" | "branches" | "users" | "roles" | "settings" | "activity";
   icon: ReactNode;
   /** Shown only to users holding this permission (or any one of a list). */
   permission?: Permission | Permission[];
@@ -31,6 +32,7 @@ export const NAV: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "dashboard", icon: <DashboardOutlined /> },
       { href: "/pos", label: "pos", icon: <ShopOutlined />, permission: "orders.create" },
+      { href: "/handover", label: "handover", icon: <ExportOutlined />, permission: "orders.handover" },
       { href: "/orders", label: "orders", icon: <FileTextOutlined />, permission: "orders.view" },
       { href: "/register", label: "register", icon: <WalletOutlined />, permission: ["shifts.operate", "shifts.view"] },
       { href: "/customers", label: "customers", icon: <ContactsOutlined />, permission: "customers.view" },

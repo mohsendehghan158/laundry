@@ -57,7 +57,7 @@ test("a cashier takes an order for a new customer at the counter", async ({ page
 
   // The workshop finishes it.
   await page.getByRole("button", { name: "آماده شد" }).click();
-  await page.getByLabel("محل قفسه").fill("B-7");
+  await page.getByRole("dialog").getByLabel("محل قفسه").fill("B-7");
   await page.getByRole("button", { name: "تأیید" }).click();
   await expect(page.locator(".ant-tag").filter({ hasText: "آماده تحویل" })).toBeVisible();
   await expect(page.getByText("B-7")).toBeVisible();

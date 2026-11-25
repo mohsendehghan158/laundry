@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckOutlined, CloseCircleOutlined, DollarOutlined, PlayCircleOutlined, RollbackOutlined, UndoOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseCircleOutlined, DollarOutlined, EditOutlined, ExportOutlined, PlayCircleOutlined, PrinterOutlined, RollbackOutlined, TagsOutlined, UndoOutlined } from "@ant-design/icons";
 import { Alert, App, Button, Card, Col, Descriptions, Flex, Input, Modal, Result, Row, Skeleton, Table, Tag, Timeline, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
@@ -17,7 +17,8 @@ import { formatNumber } from "@/shared/lib/digits";
 import { formatMoney } from "@/shared/lib/money";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { PaymentModal } from "@/features/billing/components/PaymentModal";
-import { useOrder, useTransitionOrder } from "../api";
+import { openPrint } from "@/features/printing/api";
+import { useOrder, useTransitionOrder, useUpdateRack } from "../api";
 import { OPEN_STATUSES, ORDER_STATUS_COLOR, PAYMENT_STATUS_COLOR } from "../status";
 
 type PieceRow = Piece & { item_name: string; service_name: string };
@@ -30,6 +31,7 @@ export function OrderDetailPage() {
   const id = Number(useParams<{ id: string }>().id);
   const order = useOrder(Number.isFinite(id) ? id : null);
   const transition = useTransitionOrder();
+  const updateRack = useUpdateRack();
   const [asking, setAsking] = useState<"ready" | "cancelled" | null>(null);
   const [answer, setAnswer] = useState("");
   const [paying, setPaying] = useState<"pay" | "refund" | null>(null);
@@ -123,6 +125,19 @@ export function OrderDetailPage() {
         }
         extra={
           <>
+            <Button icon={<PrinterOutlined />} onClick={() => openPrint(data.id, "receipt")} aria-label={t("printing.receipt")}>
+              {t("printing.receipt")}
+            </Button>
+            <Button icon={<TagsOutlined />} onClick={() => openPrint(data.id, "tags")} aria-label={t("printing.tags")}>
+              {t("printing.tags")}
+            </Button>
+            {["ready", "partially_ready"].includes(data.status) && can("orders.handover") && (
+              <Link href={`/handover?code=${encodeURIComponent(data.ticket_number)}`}>
+                <Button type="primary" icon={<ExportOutlined />}>
+                  {t("handover.action")}
+                </Button>
+              </Link>
+            )}
             {can_("in_process") && (
               <Button icon={data.status === "ready" ? <RollbackOutlined /> : <PlayCircleOutlined />} loading={transition.isPending} onClick={() => move("in_process")}>
                 {data.status === "ready" ? t("orders.actions.backToProcess") : t("orders.actions.in_process")}
@@ -227,11 +242,32 @@ export function OrderDetailPage() {
                 </Descriptions.Item>
                 {data.turnaround.name && <Descriptions.Item label={t("orders.detail.turnaround")}>{data.turnaround.name}</Descriptions.Item>}
                 {data.ready_at && <Descriptions.Item label={t("orders.detail.readyAt")}>{formatDateTime(data.ready_at)}</Descriptions.Item>}
-                {data.rack_location && (
+                {(data.rack_location || (data.status !== "completed" && data.status !== "cancelled")) && (
                   <Descriptions.Item label={t("orders.detail.rack")}>
-                    <Tag color="green" className="ltr">
-                      {data.rack_location}
-                    </Tag>
+                    <Typography.Text
+                      editable={
+                        can("orders.update") && data.status !== "completed" && data.status !== "cancelled"
+                          ? {
+                              icon: <EditOutlined aria-label={t("handover.rackEdit")} />,
+                              tooltip: t("handover.rackEdit"),
+                              text: data.rack_location ?? "",
+                              onChange: (value) =>
+                                updateRack.mutate(
+                                  { id: data.id, rack: value.trim() || null },
+                                  { onError: (error) => message.error(errorMessage(error, t("common.error"))) },
+                                ),
+                            }
+                          : false
+                      }
+                    >
+                      {data.rack_location ? (
+                        <Tag color="green" className="ltr">
+                          {data.rack_location}
+                        </Tag>
+                      ) : (
+                        "—"
+                      )}
+                    </Typography.Text>
                   </Descriptions.Item>
                 )}
                 <Descriptions.Item label={t("orders.columns.branch")}>{data.branch.name}</Descriptions.Item>

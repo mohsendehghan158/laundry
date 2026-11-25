@@ -10,6 +10,10 @@ use Illuminate\Validation\Rule;
 
 class TransitionOrderRequest extends ApiFormRequest
 {
+    protected array $latinDigits = ['rack_location'];
+
+    protected array $uppercase = ['rack_location'];
+
     public function authorize(): bool
     {
         return $this->input('to') === OrderStatus::Cancelled->value

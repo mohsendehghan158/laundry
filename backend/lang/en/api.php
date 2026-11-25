@@ -40,5 +40,9 @@ return [
         'payment_order_cancelled' => 'A cancelled order cannot be paid.',
         'payment_exceeds_balance' => 'The amount is more than the order\'s balance.',
         'refund_exceeds_paid' => 'The refund is more than what was paid.',
+
+        'handover_not_ready' => 'The order is not ready yet.',
+        'handover_unpaid' => 'The order has an unpaid balance; take the payment first.',
+        'handover_piece_unavailable' => 'Some chosen pieces are not ready or not part of this order.',
     ],
 ];

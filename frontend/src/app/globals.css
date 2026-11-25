@@ -39,3 +39,8 @@ body {
 .catalog-row-inactive > td {
   opacity: 0.55;
 }
+
+/* The piece whose tag was just scanned at handover. */
+.handover-matched > td {
+  background: rgba(22, 104, 220, 0.08) !important;
+}

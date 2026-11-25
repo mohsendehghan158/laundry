@@ -35,7 +35,7 @@ class OrderController
      *
      * Orders of the branches the user can work in, newest first.
      */
-    #[QueryParameter('filter[q]', 'Ticket number, or part of the customer\'s name or mobile.', type: 'string')]
+    #[QueryParameter('filter[q]', 'Ticket number, rack location, or part of the customer\'s name or mobile.', type: 'string')]
     #[QueryParameter('filter[status]', 'One or more statuses, comma separated.', type: 'string')]
     #[QueryParameter('filter[branch_id]', type: 'integer')]
     #[QueryParameter('filter[customer_id]', type: 'integer')]
@@ -53,6 +53,7 @@ class OrderController
                     $term = trim(Digits::toLatin(is_array($value) ? implode(',', $value) : (string) $value));
                     $query->where(fn (Builder $query) => $query
                         ->whereLike('ticket_number', '%'.mb_strtoupper($term).'%')
+                        ->orWhere('rack_location', mb_strtoupper($term))
                         ->orWhereHas('customer', fn (Builder $customers) => $customers->search($term)));
                 }),
                 AllowedFilter::callback('status', fn (Builder $query, mixed $value) => $query->whereIn('status', (array) $value)),
