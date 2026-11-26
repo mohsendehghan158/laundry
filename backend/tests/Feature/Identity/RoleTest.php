@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Models\Activity;
 use App\Modules\Identity\Actions\SyncPermissions;
+use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Support\PermissionRegistry;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -39,7 +40,7 @@ it('lists every permission grouped by area', function () {
 it('replaces the permissions of a role and takes effect immediately', function () {
     $owner = $this->actingAsOwner();
     $cashier = $this->userWithRole('cashier', $owner->organization);
-    $role = Role::findByName('cashier');
+    $role = Role::findByName('cashier', User::GUARD);
 
     $this->putJson("/api/v1/roles/{$role->id}", ['permissions' => ['branches.view', 'users.view']])
         ->assertOk()
@@ -59,7 +60,7 @@ it('replaces the permissions of a role and takes effect immediately', function (
 
 it('rejects unknown permissions', function () {
     $this->actingAsOwner();
-    $role = Role::findByName('cashier');
+    $role = Role::findByName('cashier', User::GUARD);
 
     $this->putJson("/api/v1/roles/{$role->id}", ['permissions' => ['orders.fly']])
         ->assertUnprocessable()->assertJsonValidationErrors('permissions.0');
@@ -69,7 +70,7 @@ it('rejects unknown permissions', function () {
 
 it('keeps the owner role fixed', function () {
     $this->actingAsOwner();
-    $role = Role::findByName(PermissionRegistry::OWNER);
+    $role = Role::findByName(PermissionRegistry::OWNER, User::GUARD);
 
     $this->putJson("/api/v1/roles/{$role->id}", ['permissions' => []])
         ->assertConflict()
@@ -77,7 +78,7 @@ it('keeps the owner role fixed', function () {
 });
 
 it('requires permission to view or edit roles', function () {
-    $role = Role::findByName('cashier');
+    $role = Role::findByName('cashier', User::GUARD);
 
     $this->actingAs($this->userWithRole('cashier'));
     $this->getJson('/api/v1/roles')->assertForbidden();
@@ -92,7 +93,7 @@ it('does not let someone grant a permission they do not hold', function () {
     $manager = $this->userWithRole('branch_manager');
     $manager->givePermissionTo('roles.update');
     $this->actingAs($manager);
-    $role = Role::findByName('cashier');
+    $role = Role::findByName('cashier', User::GUARD);
 
     $this->putJson("/api/v1/roles/{$role->id}", ['permissions' => ['users.view', 'users.delete']])
         ->assertUnprocessable()
@@ -103,16 +104,16 @@ it('does not let someone grant a permission they do not hold', function () {
 
 it('gives owners permissions that are added later, without a role edit', function () {
     $owner = $this->owner();
-    Permission::findOrCreate('future.feature');
+    Permission::findOrCreate('future.feature', User::GUARD);
 
     expect($owner->can('future.feature'))->toBeTrue()
         ->and($this->userWithRole('cashier')->can('future.feature'))->toBeFalse();
 });
 
 it('syncs permissions without undoing an administrator\'s changes', function () {
-    $role = Role::findByName('branch_manager');
+    $role = Role::findByName('branch_manager', User::GUARD);
     $role->syncPermissions(['branches.view']);
-    Permission::findOrCreate('legacy.permission');
+    Permission::findOrCreate('legacy.permission', User::GUARD);
 
     app(SyncPermissions::class)->handle();
 
@@ -122,11 +123,11 @@ it('syncs permissions without undoing an administrator\'s changes', function () 
 });
 
 it('grants a newly released permission to the built-in roles that have it by default, once', function () {
-    $manager = Role::findByName('branch_manager');
-    $accountant = Role::findByName('accountant');
+    $manager = Role::findByName('branch_manager', User::GUARD);
+    $accountant = Role::findByName('accountant', User::GUARD);
     // Simulate an install made before "branches.view" existed: the
     // permission is gone and the administrator also trimmed the accountant.
-    Permission::findByName('branches.view')->delete();
+    Permission::findByName('branches.view', User::GUARD)->delete();
     $accountant->syncPermissions(['settings.view']);
 
     app(SyncPermissions::class)->handle();
@@ -134,7 +135,7 @@ it('grants a newly released permission to the built-in roles that have it by def
     expect($manager->fresh()->hasPermissionTo('branches.view'))->toBeTrue()
         ->and($accountant->fresh()->hasPermissionTo('branches.view'))->toBeTrue()
         ->and($accountant->fresh()->hasPermissionTo('branches.access_all'))->toBeFalse()
-        ->and(Role::findByName('cashier')->hasPermissionTo('branches.view'))->toBeFalse();
+        ->and(Role::findByName('cashier', User::GUARD)->hasPermissionTo('branches.view'))->toBeFalse();
 
     // Removing it again is respected by the next sync.
     $manager->revokePermissionTo('branches.view');
