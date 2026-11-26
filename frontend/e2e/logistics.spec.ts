@@ -24,7 +24,8 @@ test("a branch manager sees their service zone and sets up a weekly window", asy
   await dialog.getByLabel("ظرفیت").fill("3");
   await dialog.getByRole("button", { name: "ذخیره" }).click();
   await expect(dialog).toBeHidden();
-  await expect(page.getByText("۱۰:۰۰–۱۲:۰۰")).toBeVisible();
+  // The window shows in the weekly plan and, as dated slots, in the table below it.
+  await expect(page.getByText("۱۰:۰۰–۱۲:۰۰").first()).toBeVisible();
 
   // Overlapping windows on one day are refused.
   await page.getByRole("button", { name: "افزودن بازه جمعه" }).click();
@@ -42,6 +43,8 @@ test.describe("customer addresses", () => {
     await page.goto("/my/login");
     await page.getByLabel("شماره موبایل").fill("09194445566");
     await page.getByRole("button", { name: "دریافت کد ورود" }).click();
+    // Wait for the code boxes; until then the first textbox is the mobile field.
+    await expect(page.getByText("کد ۵ رقمی به شماره ۰۹۱۹۴۴۴۵۵۶۶ پیامک شد.")).toBeVisible();
     await page.getByRole("textbox").first().click();
     await page.keyboard.type("12345");
     await expect(page).toHaveURL(/\/my$/);

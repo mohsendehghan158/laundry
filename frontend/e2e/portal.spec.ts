@@ -18,7 +18,7 @@ test("a customer signs in with a texted code and follows the order the counter t
   // A wrong code is refused and the boxes empty for another try.
   await page.getByRole("textbox").first().click();
   await page.keyboard.type("54321");
-  await expect(page.getByRole("alert")).toContainText("کد نادرست است");
+  await expect(page.getByRole("alert").filter({ hasText: /./ })).toContainText("کد نادرست است");
 
   await page.getByRole("textbox").first().click();
   await page.keyboard.type(CODE);
