@@ -7,14 +7,6 @@ import type { components, operations } from "./schema";
 
 type Schemas = components["schemas"];
 
-/*
- * Added on the backend after the last export of docs/api/openapi.json
- * (pickup and delivery, phase 4). Remove once the contract is regenerated
- * and the generated types carry them.
- */
-type PendingPermission = "logistics.view" | "logistics.manage";
-type PendingSettings = { logistics: { booking_days: number; lead_minutes: number } };
-
 export type AuthUser = Schemas["AuthUserResource"];
 export type Branch = Schemas["BranchResource"];
 export type BranchType = Schemas["BranchType"];
@@ -58,14 +50,14 @@ export type UpdateBranchInput = Schemas["UpdateBranchRequest"];
 export type StoreUserInput = Schemas["StoreUserRequest"];
 export type UpdateUserInput = Schemas["UpdateUserRequest"];
 export type UpdatePasswordInput = Schemas["UpdatePasswordRequest"];
-export type UpdateSettingsInput = Schemas["UpdateSettingsRequest"] & { logistics?: Partial<PendingSettings["logistics"]> };
-export type Permission = Schemas["UpdateRoleRequest"]["permissions"][number] | PendingPermission;
+export type UpdateSettingsInput = Schemas["UpdateSettingsRequest"];
+export type Permission = Schemas["UpdateRoleRequest"]["permissions"][number];
 
 type Json<O, S extends number = 200> = O extends { responses: Record<S, { content: { "application/json": infer B } }> }
   ? B
   : never;
 
-export type Settings = Json<operations["setting.show"]>["data"] & PendingSettings;
+export type Settings = Json<operations["setting.show"]>["data"];
 export type PermissionGroup = Json<operations["role.permissions"]>["data"][number];
 export type CounterCatalog = Json<operations["catalog.catalog"]>["data"];
 export type PriceCell = Json<operations["price.index"]>["data"][number];
@@ -113,3 +105,17 @@ export type Paginated<T> = {
 
 /** `{ data: T }` wrapper used by single-resource responses. */
 export type Wrapped<T> = { data: T };
+
+export type Zone = Schemas["ZoneResource"];
+export type SaveZoneInput = Schemas["SaveZoneRequest"];
+export type SlotTemplate = Schemas["SlotTemplateResource"];
+export type Slot = Schemas["SlotResource"];
+
+export type PortalSettings = Json<operations["customerAuth.settings"]>["data"];
+export type OtpSent = Json<operations["customerAuth.otp"]>["data"];
+export type PortalCustomer = Json<operations["customerAuth.me"]>["data"];
+export type PortalOrder = Schemas["PortalOrderResource"];
+export type PortalAddress = Schemas["PortalAddressResource"];
+export type PortalAddressInput = Partial<Schemas["AddressRequest"]>;
+export type ZoneCheck = Json<operations["portal.zoneCheck"]>["data"];
+export type CustomerSlots = Json<operations["portal.customerSlot"]>["data"];

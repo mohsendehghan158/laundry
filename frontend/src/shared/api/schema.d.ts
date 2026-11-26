@@ -505,6 +505,206 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/customer/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My addresses */
+        get: operations["customerAddress.index"];
+        put?: never;
+        /**
+         * Add an address
+         * @description The first address, or one marked default, becomes the default.
+         */
+        post: operations["customerAddress.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/addresses/{address}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an address */
+        put: operations["customerAddress.update"];
+        post?: never;
+        /** Delete an address */
+        delete: operations["customerAddress.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portal/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Portal settings
+         * @description What the portal shows before sign-in: the business's name and how
+         *     amounts are displayed.
+         */
+        get: operations["customerAuth.settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/auth/otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Text a sign-in code
+         * @description Five digits, valid for five minutes; one a minute and five an hour
+         *     per number (429 `otp_too_soon` / `otp_too_many`).
+         */
+        post: operations["customerAuth.otp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/auth/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign in with the code
+         * @description Starts the customer's portal session (a separate sign-in from staff);
+         *     a customer is created on first sign-in. Fails with 422 `otp_wrong`
+         *     or `otp_expired`.
+         */
+        post: operations["customer.auth.verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The signed-in customer */
+        get: operations["customerAuth.me"];
+        /** Update the customer's name */
+        put: operations["customerAuth.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign out of the portal */
+        post: operations["customerAuth.logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My orders
+         * @description Newest first, the last 100.
+         */
+        get: operations["customerOrder.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/orders/{publicId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of my orders
+         * @description With its lines, status timeline and payments.
+         */
+        get: operations["customerOrder.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pickup windows for an address
+         * @description The windows the customer can book for one of their addresses: those
+         *     of the branch serving its zone, with room left, from the lead time
+         *     on. Fails with 422 `address_not_served` outside every zone.
+         */
+        get: operations["portal.customerSlot"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/defect-types": {
         parameters: {
             query?: never;
@@ -1602,6 +1802,98 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a branch's upcoming slots
+         * @description Every slot from today through the bookable days, with its bookings,
+         *     closed ones included.
+         */
+        get: operations["slot.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/slots/{slot}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change one slot
+         * @description Close it (a holiday, a driver off sick) or change its capacity, but
+         *     never below the places already booked.
+         */
+        put: operations["slot.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/slot-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List weekly slot templates
+         * @description The weekly pickup and delivery windows of the user's branches, by
+         *     weekday and start time.
+         */
+        get: operations["slotTemplate.index"];
+        put?: never;
+        /**
+         * Add a weekly window
+         * @description Its slots for the bookable days are made right away.
+         */
+        post: operations["slotTemplate.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/slot-templates/{template}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change a weekly window
+         * @description Future slots made from it that nobody booked follow the change;
+         *     booked ones keep their time and capacity.
+         */
+        put: operations["slotTemplate.update"];
+        post?: never;
+        /**
+         * Remove a weekly window
+         * @description Its future slots go too, except those already booked.
+         */
+        delete: operations["slotTemplate.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stations": {
         parameters: {
             query?: never;
@@ -2003,6 +2295,69 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/zones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List service zones
+         * @description Zones served by the branches the user works in, inactive ones included.
+         */
+        get: operations["zones.index"];
+        put?: never;
+        /**
+         * Create a service zone
+         * @description Where zones overlap, an address belongs to the one created first.
+         */
+        post: operations["zones.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/zones/{zone}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a service zone */
+        put: operations["zones.update"];
+        post?: never;
+        /** Delete a service zone */
+        delete: operations["zones.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/zones/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check a point for pickup and delivery
+         * @description Whether the business picks up and delivers at a point on the map,
+         *     and what delivery costs there.
+         */
+        get: operations["portal.zoneCheck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2036,6 +2391,15 @@ export interface components {
             } | null;
             /** Format: date-time */
             created_at: string | null;
+        };
+        /** AddressRequest */
+        AddressRequest: {
+            title?: string | null;
+            address: string;
+            /** @description The point on the map, for pickups and deliveries. */
+            latitude: number;
+            longitude: number;
+            is_default?: boolean;
         };
         /** AssemblyScanRequest */
         AssemblyScanRequest: {
@@ -2505,6 +2869,12 @@ export interface components {
             id: number;
             name: string;
         };
+        /** OtpRequest */
+        OtpRequest: {
+            mobile: string;
+            /** @description Only when verifying. */
+            code?: string | null;
+        };
         /**
          * PaymentKind
          * @description | |
@@ -2711,6 +3081,65 @@ export interface components {
          * @enum {string}
          */
         PieceStatus: "received" | "in_process" | "assembled" | "ready" | "handed_over";
+        /** PortalAddressResource */
+        PortalAddressResource: {
+            id: number;
+            title: string | null;
+            address: string;
+            latitude: number | null;
+            longitude: number | null;
+            is_default: boolean;
+            /** @description The service zone the point is in; null = no pickup or delivery there. */
+            zone: {
+                id: number;
+                name: string;
+                branch_name: string | null;
+                delivery_fee: number;
+                free_delivery_over: number | null;
+                min_order: number | null;
+            } | null;
+        };
+        /** PortalOrderResource */
+        PortalOrderResource: {
+            /** @description Used in the order's address: /orders/{public_id}. */
+            public_id: string;
+            ticket_number: string;
+            status: components["schemas"]["OrderStatus"];
+            payment_status: components["schemas"]["PaymentStatus"];
+            branch_name: string;
+            /** Format: date-time */
+            received_at: string;
+            /** Format: date-time */
+            due_at: string;
+            /** Format: date-time */
+            ready_at: string | null;
+            /** Format: date-time */
+            completed_at: string | null;
+            total: number;
+            paid_amount: number;
+            balance: number;
+            piece_count: number;
+            lines?: {
+                item_name: string;
+                service_name: string;
+                quantity: string;
+                unit: components["schemas"]["PriceUnit"];
+                line_total: number;
+            }[];
+            timeline?: {
+                status: components["schemas"]["OrderStatus"];
+                at: string;
+            }[];
+            payments?: {
+                method: components["schemas"]["PaymentMethod"];
+                kind: components["schemas"]["PaymentKind"];
+                amount: number;
+                at: string;
+            }[];
+            subtotal: number;
+            discount_amount: number;
+            tax_amount: number;
+        };
         /** PreviewOrderRequest */
         PreviewOrderRequest: {
             /** @description Lets the preview check customer-specific promo code rules. */
@@ -2905,6 +3334,19 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /** SaveSlotTemplateRequest */
+        SaveSlotTemplateRequest: {
+            /** @description A template stays with the branch it was made for. */
+            branch_id?: string;
+            /** @description 0 = Sunday … 6 = Saturday. */
+            weekday?: number;
+            /** @description Local times, "09:00". */
+            starts_at?: string;
+            ends_at?: string;
+            /** @description Pickups and deliveries the window takes. */
+            capacity?: number;
+            is_active?: boolean;
+        };
         /** SaveStationRequest */
         SaveStationRequest: {
             /** @description A station stays in the branch it was made for. */
@@ -2941,6 +3383,21 @@ export interface components {
             name: string;
             phone?: string | null;
             services?: string | null;
+            is_active?: boolean;
+        };
+        /** SaveZoneRequest */
+        SaveZoneRequest: {
+            /** @description The branch whose drivers serve the zone. */
+            branch_id?: number;
+            name?: string;
+            /** @description Corners as [[latitude, longitude], …], 3 to 200 of them. */
+            polygon?: string[];
+            /** @description Rials. */
+            delivery_fee?: number;
+            /** @description Orders from this total (rials) get free delivery; null = never. */
+            free_delivery_over?: number | null;
+            /** @description Smallest online order (rials); null = no minimum. */
+            min_order?: number | null;
             is_active?: boolean;
         };
         /** ScanRequest */
@@ -3017,6 +3474,34 @@ export interface components {
          * @enum {string}
          */
         ShipmentStatus: "sent" | "closed";
+        /** SlotResource */
+        SlotResource: {
+            id: number;
+            branch_id: number;
+            /** @description Local date, "2026-12-05". */
+            date: string;
+            /** @description Local times, "09:00". */
+            starts_at: string;
+            ends_at: string;
+            capacity: number;
+            booked: number;
+            remaining: number;
+            is_closed: boolean;
+            /** @description Made from a weekly template (false once that template is gone). */
+            from_template: boolean;
+        };
+        /** SlotTemplateResource */
+        SlotTemplateResource: {
+            id: number;
+            branch_id: number;
+            /** @description 0 = Sunday … 6 = Saturday. */
+            weekday: number;
+            /** @description Local time, "09:00". */
+            starts_at: string;
+            ends_at: string;
+            capacity: number;
+            is_active: boolean;
+        };
         /**
          * StationKind
          * @description | |
@@ -3276,7 +3761,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -3304,6 +3789,17 @@ export interface components {
             orders?: {
                 max_discount_percent?: number;
             };
+            logistics?: {
+                booking_days?: number;
+                lead_minutes?: number;
+            };
+        };
+        /** UpdateSlotRequest */
+        UpdateSlotRequest: {
+            /** @description Never below the places already booked. */
+            capacity?: number;
+            /** @description A closed slot takes no new bookings; existing ones stay. */
+            is_closed?: boolean;
         };
         /** UpdateTemplateRequest */
         UpdateTemplateRequest: {
@@ -3354,6 +3850,23 @@ export interface components {
             name: string;
             phone: string | null;
             services: string | null;
+            is_active: boolean;
+        };
+        /** ZoneResource */
+        ZoneResource: {
+            id: number;
+            branch_id: number;
+            branch_name: string;
+            name: string;
+            /** @description Corners as [latitude, longitude]. */
+            polygon: [
+                number,
+                number
+            ][];
+            /** @description Rials. */
+            delivery_fee: number;
+            free_delivery_over: number | null;
+            min_order: number | null;
             is_active: boolean;
         };
     };
@@ -4671,6 +5184,400 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "customerAddress.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `PortalAddressResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PortalAddressResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "customerAddress.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressRequest"];
+            };
+        };
+        responses: {
+            /** @description `PortalAddressResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PortalAddressResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "customerAddress.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                address: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressRequest"];
+            };
+        };
+        responses: {
+            /** @description `PortalAddressResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PortalAddressResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "customerAddress.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                address: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "customerAuth.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            organization_name: string;
+                            /** @enum {string} */
+                            currency_unit: "toman" | "rial";
+                        };
+                    };
+                };
+            };
+            404: components["responses"]["ModelNotFoundException"];
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "customerAuth.otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OtpRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            mobile: string;
+                            expires_in: number;
+                            resend_in: number;
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "customer.auth.verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OtpRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            name: string;
+                            mobile: string;
+                            needs_name: boolean;
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "customerAuth.me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            name: string;
+                            mobile: string;
+                            needs_name: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "customerAuth.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            name: string;
+                            mobile: string;
+                            needs_name: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "customerAuth.logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "customerOrder.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `PortalOrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PortalOrderResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "customerOrder.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `PortalOrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PortalOrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.customerSlot": {
+        parameters: {
+            query: {
+                address_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            zone: {
+                                id: number;
+                                name: string;
+                                branch_name: string | null;
+                                delivery_fee: number;
+                                free_delivery_over: number | null;
+                                min_order: number | null;
+                            };
+                            slots: {
+                                id: number;
+                                date: string;
+                                starts_at: string;
+                                ends_at: string;
+                                remaining: number;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "defect-types.index": {
@@ -6815,6 +7722,10 @@ export interface operations {
                             orders: {
                                 max_discount_percent: number;
                             };
+                            logistics: {
+                                booking_days: number;
+                                lead_minutes: number;
+                            };
                         };
                     };
                 };
@@ -6866,6 +7777,10 @@ export interface operations {
                             };
                             orders: {
                                 max_discount_percent: number;
+                            };
+                            logistics: {
+                                booking_days: number;
+                                lead_minutes: number;
                             };
                         };
                     };
@@ -7046,6 +7961,181 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             404: components["responses"]["ModelNotFoundException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "slot.index": {
+        parameters: {
+            query: {
+                /** @description Required: the branch whose slots to list. */
+                branch_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `SlotResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SlotResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "slot.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The slot ID */
+                slot: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateSlotRequest"];
+            };
+        };
+        responses: {
+            /** @description `SlotResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SlotResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "slotTemplate.index": {
+        parameters: {
+            query?: {
+                /** @description Only this branch's windows. */
+                branch_id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `SlotTemplateResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SlotTemplateResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "slotTemplate.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveSlotTemplateRequest"];
+            };
+        };
+        responses: {
+            /** @description `SlotTemplateResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SlotTemplateResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "slotTemplate.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The template ID */
+                template: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveSlotTemplateRequest"];
+            };
+        };
+        responses: {
+            /** @description `SlotTemplateResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SlotTemplateResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "slotTemplate.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The template ID */
+                template: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
         };
     };
     "stations.index": {
@@ -8024,6 +9114,166 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "zones.index": {
+        parameters: {
+            query?: {
+                /** @description Only zones served by this branch. */
+                branch_id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ZoneResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ZoneResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "zones.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveZoneRequest"];
+            };
+        };
+        responses: {
+            /** @description `ZoneResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ZoneResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "zones.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The zone ID */
+                zone: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveZoneRequest"];
+            };
+        };
+        responses: {
+            /** @description `ZoneResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ZoneResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "zones.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The zone ID */
+                zone: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "portal.zoneCheck": {
+        parameters: {
+            query: {
+                latitude: number;
+                longitude: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            served: boolean;
+                            zone: {
+                                id: number;
+                                name: string;
+                                branch_name: string | null;
+                                delivery_fee: number;
+                                free_delivery_over: number | null;
+                                min_order: number | null;
+                            } | null;
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
         };
     };
 }

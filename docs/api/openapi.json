@@ -3170,6 +3170,747 @@
                 }
             }
         },
+        "/customer/addresses": {
+            "get": {
+                "operationId": "customerAddress.index",
+                "summary": "My addresses",
+                "tags": [
+                    "CustomerAddress"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `PortalAddressResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PortalAddressResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "customerAddress.store",
+                "description": "The first address, or one marked default, becomes the default.",
+                "summary": "Add an address",
+                "tags": [
+                    "CustomerAddress"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddressRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`PortalAddressResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PortalAddressResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/customer/addresses/{address}": {
+            "put": {
+                "operationId": "customerAddress.update",
+                "summary": "Update an address",
+                "tags": [
+                    "CustomerAddress"
+                ],
+                "parameters": [
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddressRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`PortalAddressResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PortalAddressResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "customerAddress.destroy",
+                "summary": "Delete an address",
+                "tags": [
+                    "CustomerAddress"
+                ],
+                "parameters": [
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/portal/settings": {
+            "get": {
+                "operationId": "customerAuth.settings",
+                "description": "What the portal shows before sign-in: the business's name and how\namounts are displayed.",
+                "summary": "Portal settings",
+                "tags": [
+                    "CustomerAuth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "organization_name": {
+                                                    "type": "string"
+                                                },
+                                                "currency_unit": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "toman",
+                                                        "rial"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "organization_name",
+                                                "currency_unit"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
+        "/customer/auth/otp": {
+            "post": {
+                "operationId": "customerAuth.otp",
+                "description": "Five digits, valid for five minutes; one a minute and five an hour\nper number (429 `otp_too_soon` / `otp_too_many`).",
+                "summary": "Text a sign-in code",
+                "tags": [
+                    "CustomerAuth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "mobile": {
+                                                    "type": "string"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer"
+                                                },
+                                                "resend_in": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "mobile",
+                                                "expires_in",
+                                                "resend_in"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/customer/auth/verify": {
+            "post": {
+                "operationId": "customer.auth.verify",
+                "description": "Starts the customer's portal session (a separate sign-in from staff);\na customer is created on first sign-in. Fails with 422 `otp_wrong`\nor `otp_expired`.",
+                "summary": "Sign in with the code",
+                "tags": [
+                    "CustomerAuth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "mobile": {
+                                                    "type": "string"
+                                                },
+                                                "needs_name": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "mobile",
+                                                "needs_name"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/customer/me": {
+            "get": {
+                "operationId": "customerAuth.me",
+                "summary": "The signed-in customer",
+                "tags": [
+                    "CustomerAuth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "mobile": {
+                                                    "type": "string"
+                                                },
+                                                "needs_name": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "mobile",
+                                                "needs_name"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "customerAuth.update",
+                "summary": "Update the customer's name",
+                "tags": [
+                    "CustomerAuth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "mobile": {
+                                                    "type": "string"
+                                                },
+                                                "needs_name": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "mobile",
+                                                "needs_name"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/customer/auth/logout": {
+            "post": {
+                "operationId": "customerAuth.logout",
+                "summary": "Sign out of the portal",
+                "tags": [
+                    "CustomerAuth"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/customer/orders": {
+            "get": {
+                "operationId": "customerOrder.index",
+                "description": "Newest first, the last 100.",
+                "summary": "My orders",
+                "tags": [
+                    "CustomerOrder"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `PortalOrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PortalOrderResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/customer/orders/{publicId}": {
+            "get": {
+                "operationId": "customerOrder.show",
+                "description": "With its lines, status timeline and payments.",
+                "summary": "One of my orders",
+                "tags": [
+                    "CustomerOrder"
+                ],
+                "parameters": [
+                    {
+                        "name": "publicId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`PortalOrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/PortalOrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines",
+                                                        "timeline",
+                                                        "payments"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/customer/slots": {
+            "get": {
+                "operationId": "portal.customerSlot",
+                "description": "The windows the customer can book for one of their addresses: those\nof the branch serving its zone, with room left, from the lead time\non. Fails with 422 `address_not_served` outside every zone.",
+                "summary": "Pickup windows for an address",
+                "tags": [
+                    "CustomerSlot"
+                ],
+                "parameters": [
+                    {
+                        "name": "address_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "zone": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "branch_name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "delivery_fee": {
+                                                            "type": "integer"
+                                                        },
+                                                        "free_delivery_over": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "min_order": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "branch_name",
+                                                        "delivery_fee",
+                                                        "free_delivery_over",
+                                                        "min_order"
+                                                    ]
+                                                },
+                                                "slots": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "date": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "remaining": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "date",
+                                                            "starts_at",
+                                                            "ends_at",
+                                                            "remaining"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "zone",
+                                                "slots"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/defect-types": {
             "get": {
                 "operationId": "defect-types.index",
@@ -7905,6 +8646,21 @@
                                                     "required": [
                                                         "max_discount_percent"
                                                     ]
+                                                },
+                                                "logistics": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "booking_days": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lead_minutes": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "booking_days",
+                                                        "lead_minutes"
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -7913,7 +8669,8 @@
                                                 "receipt",
                                                 "hours",
                                                 "production",
-                                                "orders"
+                                                "orders",
+                                                "logistics"
                                             ]
                                         }
                                     },
@@ -8057,6 +8814,21 @@
                                                     "required": [
                                                         "max_discount_percent"
                                                     ]
+                                                },
+                                                "logistics": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "booking_days": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lead_minutes": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "booking_days",
+                                                        "lead_minutes"
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -8065,7 +8837,8 @@
                                                 "receipt",
                                                 "hours",
                                                 "production",
-                                                "orders"
+                                                "orders",
+                                                "logistics"
                                             ]
                                         }
                                     },
@@ -8417,6 +9190,314 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/slots": {
+            "get": {
+                "operationId": "slot.index",
+                "description": "Every slot from today through the bookable days, with its bookings,\nclosed ones included.",
+                "summary": "List a branch's upcoming slots",
+                "tags": [
+                    "Slot"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "required": true,
+                        "description": "Required: the branch whose slots to list.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `SlotResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SlotResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/slots/{slot}": {
+            "put": {
+                "operationId": "slot.update",
+                "description": "Close it (a holiday, a driver off sick) or change its capacity, but\nnever below the places already booked.",
+                "summary": "Change one slot",
+                "tags": [
+                    "Slot"
+                ],
+                "parameters": [
+                    {
+                        "name": "slot",
+                        "in": "path",
+                        "required": true,
+                        "description": "The slot ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateSlotRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`SlotResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SlotResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/slot-templates": {
+            "get": {
+                "operationId": "slotTemplate.index",
+                "description": "The weekly pickup and delivery windows of the user's branches, by\nweekday and start time.",
+                "summary": "List weekly slot templates",
+                "tags": [
+                    "SlotTemplate"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "Only this branch's windows.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `SlotTemplateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SlotTemplateResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "slotTemplate.store",
+                "description": "Its slots for the bookable days are made right away.",
+                "summary": "Add a weekly window",
+                "tags": [
+                    "SlotTemplate"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveSlotTemplateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`SlotTemplateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SlotTemplateResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/slot-templates/{template}": {
+            "put": {
+                "operationId": "slotTemplate.update",
+                "description": "Future slots made from it that nobody booked follow the change;\nbooked ones keep their time and capacity.",
+                "summary": "Change a weekly window",
+                "tags": [
+                    "SlotTemplate"
+                ],
+                "parameters": [
+                    {
+                        "name": "template",
+                        "in": "path",
+                        "required": true,
+                        "description": "The template ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveSlotTemplateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`SlotTemplateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SlotTemplateResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "slotTemplate.destroy",
+                "description": "Its future slots go too, except those already booked.",
+                "summary": "Remove a weekly window",
+                "tags": [
+                    "SlotTemplate"
+                ],
+                "parameters": [
+                    {
+                        "name": "template",
+                        "in": "path",
+                        "required": true,
+                        "description": "The template ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -10332,6 +11413,321 @@
                     }
                 }
             }
+        },
+        "/zones": {
+            "get": {
+                "operationId": "zones.index",
+                "description": "Zones served by the branches the user works in, inactive ones included.",
+                "summary": "List service zones",
+                "tags": [
+                    "Zone"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "Only zones served by this branch.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ZoneResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "zones.store",
+                "description": "Where zones overlap, an address belongs to the one created first.",
+                "summary": "Create a service zone",
+                "tags": [
+                    "Zone"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveZoneRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ZoneResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/zones/{zone}": {
+            "put": {
+                "operationId": "zones.update",
+                "summary": "Update a service zone",
+                "tags": [
+                    "Zone"
+                ],
+                "parameters": [
+                    {
+                        "name": "zone",
+                        "in": "path",
+                        "required": true,
+                        "description": "The zone ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveZoneRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ZoneResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ZoneResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "zones.destroy",
+                "summary": "Delete a service zone",
+                "tags": [
+                    "Zone"
+                ],
+                "parameters": [
+                    {
+                        "name": "zone",
+                        "in": "path",
+                        "required": true,
+                        "description": "The zone ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/public/zones/check": {
+            "get": {
+                "operationId": "portal.zoneCheck",
+                "description": "Whether the business picks up and delivers at a point on the map,\nand what delivery costs there.",
+                "summary": "Check a point for pickup and delivery",
+                "tags": [
+                    "ZoneCheck"
+                ],
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "minimum": -90,
+                            "maximum": 90
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "minimum": -180,
+                            "maximum": 180
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "served": {
+                                                    "type": "boolean"
+                                                },
+                                                "zone": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "branch_name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "delivery_fee": {
+                                                            "type": "integer"
+                                                        },
+                                                        "free_delivery_over": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "min_order": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "branch_name",
+                                                        "delivery_fee",
+                                                        "free_delivery_over",
+                                                        "min_order"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "served",
+                                                "zone"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
         }
     },
     "components": {
@@ -10439,6 +11835,42 @@
                     "created_at"
                 ],
                 "title": "ActivityResource"
+            },
+            "AddressRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 50
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "description": "The point on the map, for pickups and deliveries.",
+                        "minimum": -90,
+                        "maximum": 90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                    },
+                    "is_default": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "address",
+                    "latitude",
+                    "longitude"
+                ],
+                "title": "AddressRequest"
             },
             "AssemblyScanRequest": {
                 "type": "object",
@@ -12138,6 +13570,26 @@
                 ],
                 "title": "OrganizationResource"
             },
+            "OtpRequest": {
+                "type": "object",
+                "properties": {
+                    "mobile": {
+                        "type": "string",
+                        "pattern": "^09\\d{9}$"
+                    },
+                    "code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Only when verifying."
+                    }
+                },
+                "required": [
+                    "mobile"
+                ],
+                "title": "OtpRequest"
+            },
             "PaymentKind": {
                 "type": "string",
                 "description": "| |\n|---|\n| `payment` <br/> Money received. |\n| `refund` <br/> Money given back. |",
@@ -12875,6 +14327,249 @@
                 ],
                 "title": "PieceStatus"
             },
+            "PortalAddressResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "longitude": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "is_default": {
+                        "type": "boolean"
+                    },
+                    "zone": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The service zone the point is in; null = no pickup or delivery there.",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "branch_name": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "delivery_fee": {
+                                "type": "integer"
+                            },
+                            "free_delivery_over": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "min_order": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "branch_name",
+                            "delivery_fee",
+                            "free_delivery_over",
+                            "min_order"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "title",
+                    "address",
+                    "latitude",
+                    "longitude",
+                    "is_default",
+                    "zone"
+                ],
+                "title": "PortalAddressResource"
+            },
+            "PortalOrderResource": {
+                "type": "object",
+                "properties": {
+                    "public_id": {
+                        "type": "string",
+                        "description": "Used in the order's address: /orders/{public_id}."
+                    },
+                    "ticket_number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    },
+                    "payment_status": {
+                        "$ref": "#/components/schemas/PaymentStatus"
+                    },
+                    "branch_name": {
+                        "type": "string"
+                    },
+                    "received_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "due_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ready_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "completed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "paid_amount": {
+                        "type": "integer"
+                    },
+                    "balance": {
+                        "type": "integer"
+                    },
+                    "piece_count": {
+                        "type": "integer"
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "item_name": {
+                                    "type": "string"
+                                },
+                                "service_name": {
+                                    "type": "string"
+                                },
+                                "quantity": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "$ref": "#/components/schemas/PriceUnit"
+                                },
+                                "line_total": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "item_name",
+                                "service_name",
+                                "quantity",
+                                "unit",
+                                "line_total"
+                            ]
+                        }
+                    },
+                    "timeline": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "$ref": "#/components/schemas/OrderStatus"
+                                },
+                                "at": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "status",
+                                "at"
+                            ]
+                        }
+                    },
+                    "payments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "method": {
+                                    "$ref": "#/components/schemas/PaymentMethod"
+                                },
+                                "kind": {
+                                    "$ref": "#/components/schemas/PaymentKind"
+                                },
+                                "amount": {
+                                    "type": "integer"
+                                },
+                                "at": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "method",
+                                "kind",
+                                "amount",
+                                "at"
+                            ]
+                        }
+                    },
+                    "subtotal": {
+                        "type": "integer"
+                    },
+                    "discount_amount": {
+                        "type": "integer"
+                    },
+                    "tax_amount": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "public_id",
+                    "ticket_number",
+                    "status",
+                    "payment_status",
+                    "branch_name",
+                    "received_at",
+                    "due_at",
+                    "ready_at",
+                    "completed_at",
+                    "total",
+                    "paid_amount",
+                    "balance",
+                    "piece_count",
+                    "subtotal",
+                    "discount_amount",
+                    "tax_amount"
+                ],
+                "title": "PortalOrderResource"
+            },
             "PreviewOrderRequest": {
                 "type": "object",
                 "properties": {
@@ -13566,6 +15261,38 @@
                 },
                 "title": "SaveServiceTypeRequest"
             },
+            "SaveSlotTemplateRequest": {
+                "type": "object",
+                "properties": {
+                    "branch_id": {
+                        "type": "string",
+                        "description": "A template stays with the branch it was made for."
+                    },
+                    "weekday": {
+                        "type": "integer",
+                        "description": "0 = Sunday \u2026 6 = Saturday.",
+                        "minimum": 0,
+                        "maximum": 6
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "description": "Local times, \"09:00\"."
+                    },
+                    "ends_at": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "description": "Pickups and deliveries the window takes.",
+                        "minimum": 1,
+                        "maximum": 1000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveSlotTemplateRequest"
+            },
             "SaveStationRequest": {
                 "type": "object",
                 "properties": {
@@ -13694,6 +15421,54 @@
                     "name"
                 ],
                 "title": "SaveVendorRequest"
+            },
+            "SaveZoneRequest": {
+                "type": "object",
+                "properties": {
+                    "branch_id": {
+                        "type": "integer",
+                        "description": "The branch whose drivers serve the zone."
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "polygon": {
+                        "type": "array",
+                        "description": "Corners as [[latitude, longitude], \u2026], 3 to 200 of them.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "delivery_fee": {
+                        "type": "integer",
+                        "description": "Rials.",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    },
+                    "free_delivery_over": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Orders from this total (rials) get free delivery; null = never.",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    },
+                    "min_order": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Smallest online order (rials); null = no minimum.",
+                        "minimum": 0,
+                        "maximum": 100000000000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveZoneRequest"
             },
             "ScanRequest": {
                 "type": "object",
@@ -13965,6 +15740,95 @@
                     "closed"
                 ],
                 "title": "ShipmentStatus"
+            },
+            "SlotResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "date": {
+                        "type": "string",
+                        "description": "Local date, \"2026-12-05\"."
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "description": "Local times, \"09:00\"."
+                    },
+                    "ends_at": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": "integer"
+                    },
+                    "booked": {
+                        "type": "integer"
+                    },
+                    "remaining": {
+                        "type": "integer"
+                    },
+                    "is_closed": {
+                        "type": "boolean"
+                    },
+                    "from_template": {
+                        "type": "boolean",
+                        "description": "Made from a weekly template (false once that template is gone)."
+                    }
+                },
+                "required": [
+                    "id",
+                    "branch_id",
+                    "date",
+                    "starts_at",
+                    "ends_at",
+                    "capacity",
+                    "booked",
+                    "remaining",
+                    "is_closed",
+                    "from_template"
+                ],
+                "title": "SlotResource"
+            },
+            "SlotTemplateResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "weekday": {
+                        "type": "integer",
+                        "description": "0 = Sunday \u2026 6 = Saturday."
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "description": "Local time, \"09:00\"."
+                    },
+                    "ends_at": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": "integer"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "branch_id",
+                    "weekday",
+                    "starts_at",
+                    "ends_at",
+                    "capacity",
+                    "is_active"
+                ],
+                "title": "SlotTemplateResource"
             },
             "StationKind": {
                 "type": "string",
@@ -14955,7 +16819,9 @@
                                 "claims.view",
                                 "claims.manage",
                                 "reports.view",
-                                "reports.production"
+                                "reports.production",
+                                "logistics.view",
+                                "logistics.manage"
                             ]
                         },
                         "uniqueItems": true
@@ -15051,9 +16917,39 @@
                                 "maximum": 100
                             }
                         }
+                    },
+                    "logistics": {
+                        "type": "object",
+                        "properties": {
+                            "booking_days": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 30
+                            },
+                            "lead_minutes": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2880
+                            }
+                        }
                     }
                 },
                 "title": "UpdateSettingsRequest"
+            },
+            "UpdateSlotRequest": {
+                "type": "object",
+                "properties": {
+                    "capacity": {
+                        "type": "integer",
+                        "description": "Never below the places already booked.",
+                        "maximum": 1000
+                    },
+                    "is_closed": {
+                        "type": "boolean",
+                        "description": "A closed slot takes no new bookings; existing ones stay."
+                    }
+                },
+                "title": "UpdateSlotRequest"
             },
             "UpdateTemplateRequest": {
                 "type": "object",
@@ -15257,6 +17153,71 @@
                     "is_active"
                 ],
                 "title": "VendorResource"
+            },
+            "ZoneResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "branch_name": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "polygon": {
+                        "type": "array",
+                        "description": "Corners as [latitude, longitude].",
+                        "items": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "number"
+                                }
+                            ],
+                            "minItems": 2,
+                            "maxItems": 2
+                        }
+                    },
+                    "delivery_fee": {
+                        "type": "integer",
+                        "description": "Rials."
+                    },
+                    "free_delivery_over": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "min_order": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "branch_id",
+                    "branch_name",
+                    "name",
+                    "polygon",
+                    "delivery_fee",
+                    "free_delivery_over",
+                    "min_order",
+                    "is_active"
+                ],
+                "title": "ZoneResource"
             }
         },
         "responses": {

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Portal\Http\Resources;
 
+use App\Modules\Billing\Enums\PaymentKind;
+use App\Modules\Billing\Enums\PaymentMethod;
 use App\Modules\Billing\Models\Payment;
+use App\Modules\Catalog\Enums\PriceUnit;
+use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderLine;
 use App\Modules\Orders\Models\OrderStatusChange;
@@ -38,23 +42,23 @@ class PortalOrderResource extends JsonResource
             'paid_amount' => $this->paid_amount,
             'balance' => $this->balance(),
             'piece_count' => (int) ($this->pieces_count ?? 0),
-            /** @var list<array{item_name: string, service_name: string, quantity: string, unit: string, line_total: int}> */
+            /** @var list<array{item_name: string, service_name: string, quantity: string, unit: PriceUnit, line_total: int}> */
             'lines' => $this->whenLoaded('lines', fn (): array => $this->lines->map(fn (OrderLine $line): array => [
                 'item_name' => $line->item_name,
                 'service_name' => $line->service_name,
                 'quantity' => (string) $line->quantity,
-                'unit' => $line->unit->value,
+                'unit' => $line->unit,
                 'line_total' => $line->line_total,
             ])->values()->all()),
-            /** @var list<array{status: string, at: string}> */
+            /** @var list<array{status: OrderStatus, at: string}> */
             'timeline' => $this->whenLoaded('history', fn (): array => $this->history->map(fn (OrderStatusChange $change): array => [
-                'status' => $change->to_status->value,
+                'status' => $change->to_status,
                 'at' => $change->created_at->toIso8601String(),
             ])->values()->all()),
-            /** @var list<array{method: string, kind: string, amount: int, at: string}> */
+            /** @var list<array{method: PaymentMethod, kind: PaymentKind, amount: int, at: string}> */
             'payments' => $this->whenLoaded('payments', fn (): array => $this->payments->map(fn (Payment $payment): array => [
-                'method' => $payment->method->value,
-                'kind' => $payment->kind->value,
+                'method' => $payment->method,
+                'kind' => $payment->kind,
                 'amount' => $payment->amount,
                 'at' => $payment->created_at->toIso8601String(),
             ])->values()->all()),
