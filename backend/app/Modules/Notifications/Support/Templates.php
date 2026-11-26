@@ -10,6 +10,7 @@ use App\Modules\Orders\Models\Order;
 use App\Modules\Organization\Support\Settings;
 use App\Support\Text\Digits;
 use App\Support\Text\Jalali;
+use Carbon\CarbonInterface;
 
 /**
  * The wording of each message (an organization's own or the built-in
@@ -52,8 +53,17 @@ final class Templates
             'organization' => $order->organization()->firstOrFail()->name,
             'branch' => $order->branch->name,
             'rack' => (string) $order->rack_location,
+            'pickup' => $order->pickup_starts_at === null ? '' : $this->pickup($order->pickup_starts_at, $order->pickup_ends_at, $timezone),
         ];
 
         return strtr($body, array_combine(array_map(fn (string $key): string => '{'.$key.'}', array_keys($values)), $values));
+    }
+
+    /** "۱۴۰۵/۰۹/۱۴ ۱۴:۰۰ تا ۱۶:۰۰": the day and the window. */
+    private function pickup(CarbonInterface $from, ?CarbonInterface $to, string $timezone): string
+    {
+        $window = Jalali::format($from, $timezone);
+
+        return $to === null ? $window : $window.' تا '.Digits::toPersian($to->copy()->setTimezone($timezone)->format('H:i'));
     }
 }

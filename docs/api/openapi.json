@@ -3698,6 +3698,113 @@
                 }
             }
         },
+        "/customer/catalog": {
+            "get": {
+                "operationId": "portal.customerCatalog",
+                "description": "Active items by category, each with the services it has a price for\n(whole rials per unit, before tax). Items with no price are left out.",
+                "summary": "What I can order",
+                "tags": [
+                    "CustomerCatalog"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "items": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "unit": {
+                                                                            "type": "string",
+                                                                            "enum": [
+                                                                                "piece",
+                                                                                "kg",
+                                                                                "sqm"
+                                                                            ]
+                                                                        },
+                                                                        "prices": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "service_type_id": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "service_name": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "price": {
+                                                                                        "type": "integer"
+                                                                                    }
+                                                                                },
+                                                                                "required": [
+                                                                                    "service_type_id",
+                                                                                    "service_name",
+                                                                                    "price"
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "name",
+                                                                        "unit",
+                                                                        "prices"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "items"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "categories"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/customer/orders": {
             "get": {
                 "operationId": "customerOrder.index",
@@ -3732,6 +3839,215 @@
                         "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
+            },
+            "post": {
+                "operationId": "customerOrder.store",
+                "description": "Books a place in the pickup window and creates the order as\n\"pending pickup\" at the branch serving the address; the customer is\ntexted a confirmation. Send an `Idempotency-Key` header to make\nretries safe: a repeated key returns the first order with 200.\nFails with 409 `slot_unavailable` or `slot_full` when the window\ncannot be booked, and 422 `order_below_minimum` under the zone's\nminimum order.",
+                "summary": "Place an online order",
+                "tags": [
+                    "CustomerOrder"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OnlineOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/customer/orders/quote": {
+            "post": {
+                "operationId": "portal.orders.quote",
+                "description": "What the order would cost before it is placed: the items at the\nshop's prices, the zone's delivery fee and minimum order. Fails with\n422 `address_not_served` or `address_without_point`.",
+                "summary": "Price an online order",
+                "tags": [
+                    "CustomerOrder"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OnlineOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "zone": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "branch_name": {
+                                                            "type": "string"
+                                                        },
+                                                        "delivery_fee": {
+                                                            "type": "integer"
+                                                        },
+                                                        "free_delivery_over": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "min_order": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "branch_name",
+                                                        "delivery_fee",
+                                                        "free_delivery_over",
+                                                        "min_order"
+                                                    ]
+                                                },
+                                                "items_by_driver": {
+                                                    "type": "boolean"
+                                                },
+                                                "lines": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "item_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "service_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "quantity": {
+                                                                "type": "string"
+                                                            },
+                                                            "line_total": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "item_name",
+                                                            "service_name",
+                                                            "quantity",
+                                                            "line_total"
+                                                        ]
+                                                    }
+                                                },
+                                                "subtotal": {
+                                                    "type": "integer"
+                                                },
+                                                "discount_amount": {
+                                                    "type": "integer"
+                                                },
+                                                "tax_amount": {
+                                                    "type": "integer"
+                                                },
+                                                "items_total": {
+                                                    "type": "integer"
+                                                },
+                                                "delivery_fee": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "min_order": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "below_minimum": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "zone",
+                                                "items_by_driver",
+                                                "lines",
+                                                "subtotal",
+                                                "discount_amount",
+                                                "tax_amount",
+                                                "items_total",
+                                                "delivery_fee",
+                                                "total",
+                                                "min_order",
+                                                "below_minimum"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
             }
         },
         "/customer/orders/{publicId}": {
@@ -3739,6 +4055,61 @@
                 "operationId": "customerOrder.show",
                 "description": "With its lines, status timeline and payments.",
                 "summary": "One of my orders",
+                "tags": [
+                    "CustomerOrder"
+                ],
+                "parameters": [
+                    {
+                        "name": "publicId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`PortalOrderResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/PortalOrderResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "lines",
+                                                        "timeline",
+                                                        "payments"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/customer/orders/{publicId}/cancel": {
+            "post": {
+                "operationId": "customerOrder.cancel",
+                "description": "Only while it waits for pickup; the window's place is freed. Fails\nwith 409 `order_not_cancellable` afterwards.",
+                "summary": "Cancel my online order",
                 "tags": [
                     "CustomerOrder"
                 ],
@@ -4776,6 +5147,7 @@
                                                     "event": {
                                                         "type": "string",
                                                         "enum": [
+                                                            "order_placed",
                                                             "order_received",
                                                             "order_ready",
                                                             "order_completed",
@@ -4870,6 +5242,7 @@
                                                 "event": {
                                                     "type": "string",
                                                     "enum": [
+                                                        "order_placed",
                                                         "order_received",
                                                         "order_ready",
                                                         "order_completed",
@@ -6936,7 +7309,10 @@
                                                     ]
                                                 },
                                                 "received_at": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 },
                                                 "due_at": {
                                                     "type": "string"
@@ -12866,8 +13242,9 @@
             },
             "NotificationEvent": {
                 "type": "string",
-                "description": "Moments the customer is told about, each with built-in wording that an organization may replace. Placeholders: {customer} {ticket} {total} {balance} {due} {link} {organization} {branch} {rack}.\n",
+                "description": "Moments the customer is told about, each with built-in wording that an organization may replace. Placeholders: {customer} {ticket} {total} {balance} {due} {link} {organization} {branch} {rack} {pickup}.\n| |\n|---|\n| `order_placed` <br/> Placed online, waiting for pickup. |\n| `order_received` <br/>  |\n| `order_ready` <br/>  |\n| `order_completed` <br/>  |\n| `order_cancelled` <br/>  |",
                 "enum": [
+                    "order_placed",
                     "order_received",
                     "order_ready",
                     "order_completed",
@@ -12964,6 +13341,60 @@
                     "created_at"
                 ],
                 "title": "NotificationLogResource"
+            },
+            "OnlineOrderRequest": {
+                "type": "object",
+                "description": "An online order as the customer puts it together: the pickup address\nand window, and either the items or \"the driver lists them\". The quote\ntakes the same fields without the window.",
+                "properties": {
+                    "address_id": {
+                        "type": "integer",
+                        "description": "One of the customer's addresses, inside a service zone."
+                    },
+                    "slot_id": {
+                        "type": "integer",
+                        "description": "A window from GET /customer/slots for that address."
+                    },
+                    "items_by_driver": {
+                        "type": "boolean",
+                        "description": "Leave the items for the driver to list at the door."
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "item_id": {
+                                    "type": "integer"
+                                },
+                                "service_type_id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "number",
+                                    "maximum": 1000
+                                }
+                            },
+                            "required": [
+                                "item_id",
+                                "service_type_id",
+                                "quantity"
+                            ]
+                        },
+                        "maxItems": 50
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "address_id",
+                    "slot_id"
+                ],
+                "title": "OnlineOrderRequest"
             },
             "OpenClaimRequest": {
                 "type": "object",
@@ -13220,9 +13651,64 @@
                             "surcharge_percent"
                         ]
                     },
+                    "source": {
+                        "$ref": "#/components/schemas/OrderSource"
+                    },
+                    "pickup": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The booked pickup, for online orders.",
+                        "properties": {
+                            "slot_id": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "starts_at": {
+                                "type": "string"
+                            },
+                            "ends_at": {
+                                "type": "string"
+                            },
+                            "address": {
+                                "type": "string"
+                            },
+                            "latitude": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "longitude": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "slot_id",
+                            "starts_at",
+                            "ends_at",
+                            "address",
+                            "latitude",
+                            "longitude"
+                        ]
+                    },
+                    "items_by_driver": {
+                        "type": "boolean",
+                        "description": "The driver lists the items at pickup; until then there are no lines."
+                    },
                     "received_at": {
-                        "type": "string",
-                        "format": "date-time"
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Empty until an online order reaches the shop."
                     },
                     "due_at": {
                         "type": "string",
@@ -13324,6 +13810,10 @@
                     },
                     "tax_amount": {
                         "type": "integer"
+                    },
+                    "delivery_fee": {
+                        "type": "integer",
+                        "description": "Pickup and delivery, part of the total."
                     },
                     "total": {
                         "type": "integer"
@@ -13517,6 +14007,9 @@
                     "branch",
                     "customer",
                     "turnaround",
+                    "source",
+                    "pickup",
+                    "items_by_driver",
                     "received_at",
                     "due_at",
                     "ready_at",
@@ -13528,6 +14021,7 @@
                     "subtotal",
                     "discount",
                     "tax_amount",
+                    "delivery_fee",
                     "total",
                     "paid_amount",
                     "balance",
@@ -13536,6 +14030,15 @@
                     "created_at"
                 ],
                 "title": "OrderResource"
+            },
+            "OrderSource": {
+                "type": "string",
+                "description": "Where an order was taken.\n| |\n|---|\n| `counter` <br/> Brought in to a branch. |\n| `online` <br/> Placed by the customer in the portal, for pickup. |",
+                "enum": [
+                    "counter",
+                    "online"
+                ],
+                "title": "OrderSource"
             },
             "OrderStatus": {
                 "type": "string",
@@ -14432,9 +14935,43 @@
                     "branch_name": {
                         "type": "string"
                     },
+                    "source": {
+                        "$ref": "#/components/schemas/OrderSource"
+                    },
+                    "pickup": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The booked pickup, for online orders.",
+                        "properties": {
+                            "starts_at": {
+                                "type": "string"
+                            },
+                            "ends_at": {
+                                "type": "string"
+                            },
+                            "address": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "starts_at",
+                            "ends_at",
+                            "address"
+                        ]
+                    },
+                    "items_by_driver": {
+                        "type": "boolean",
+                        "description": "The driver lists the items at pickup; until then there are no lines."
+                    },
                     "received_at": {
-                        "type": "string",
-                        "format": "date-time"
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Empty until the order reaches the shop."
                     },
                     "due_at": {
                         "type": "string",
@@ -14548,6 +15085,14 @@
                     },
                     "tax_amount": {
                         "type": "integer"
+                    },
+                    "delivery_fee": {
+                        "type": "integer",
+                        "description": "Part of the total."
+                    },
+                    "can_cancel": {
+                        "type": "boolean",
+                        "description": "The customer may still call it off (POST \u2026/cancel)."
                     }
                 },
                 "required": [
@@ -14556,6 +15101,9 @@
                     "status",
                     "payment_status",
                     "branch_name",
+                    "source",
+                    "pickup",
+                    "items_by_driver",
                     "received_at",
                     "due_at",
                     "ready_at",
@@ -14566,7 +15114,9 @@
                     "piece_count",
                     "subtotal",
                     "discount_amount",
-                    "tax_amount"
+                    "tax_amount",
+                    "delivery_fee",
+                    "can_cancel"
                 ],
                 "title": "PortalOrderResource"
             },

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Portal\Http\Controllers\CustomerAddressController;
 use App\Modules\Portal\Http\Controllers\CustomerAuthController;
+use App\Modules\Portal\Http\Controllers\CustomerCatalogController;
 use App\Modules\Portal\Http\Controllers\CustomerOrderController;
 use App\Modules\Portal\Http\Controllers\CustomerSlotController;
 use App\Modules\Portal\Http\Controllers\ZoneCheckController;
@@ -30,6 +31,11 @@ Route::middleware(['auth:customer', 'customer.context'])->prefix('customer')->gr
 
     Route::get('slots', CustomerSlotController::class);
 
+    Route::get('catalog', CustomerCatalogController::class);
+
     Route::get('orders', [CustomerOrderController::class, 'index']);
+    Route::post('orders/quote', [CustomerOrderController::class, 'quote'])->name('portal.orders.quote');
+    Route::post('orders', [CustomerOrderController::class, 'store'])->middleware('throttle:portal-orders');
     Route::get('orders/{publicId}', [CustomerOrderController::class, 'show'])->where('publicId', '[0-9A-Za-z]{26}');
+    Route::post('orders/{publicId}/cancel', [CustomerOrderController::class, 'cancel'])->where('publicId', '[0-9A-Za-z]{26}');
 });

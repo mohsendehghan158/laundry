@@ -19,7 +19,7 @@ class NotificationTemplateController
      * One per event, with the organization's wording or the built-in one,
      * and the placeholders that can be used.
      *
-     * @response array{data: list<array{event: 'order_received'|'order_ready'|'order_completed'|'order_cancelled', body: string, default_body: string, is_active: bool, customized: bool}>, placeholders: list<string>}
+     * @response array{data: list<array{event: 'order_placed'|'order_received'|'order_ready'|'order_completed'|'order_cancelled', body: string, default_body: string, is_active: bool, customized: bool}>, placeholders: list<string>}
      */
     public function index(Templates $templates): JsonResponse
     {
@@ -34,7 +34,7 @@ class NotificationTemplateController
     /**
      * Change a message template
      *
-     * @response array{data: array{event: 'order_received'|'order_ready'|'order_completed'|'order_cancelled', body: string, default_body: string, is_active: bool, customized: bool}}
+     * @response array{data: array{event: 'order_placed'|'order_received'|'order_ready'|'order_completed'|'order_cancelled', body: string, default_body: string, is_active: bool, customized: bool}}
      */
     public function update(UpdateTemplateRequest $request, NotificationEvent $event, Templates $templates): JsonResponse
     {

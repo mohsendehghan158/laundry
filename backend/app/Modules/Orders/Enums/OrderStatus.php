@@ -39,6 +39,8 @@ enum OrderStatus: string
     public function transitions(): array
     {
         return match ($this) {
+            // Received at pickup (a later step); until then it can be called off.
+            self::PendingPickup => [self::Cancelled],
             self::Received => [self::InProcess, self::Cancelled],
             self::InProcess => [self::Cancelled],
             self::PartiallyReady, self::Ready => [self::InProcess],

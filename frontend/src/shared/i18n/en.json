@@ -768,6 +768,7 @@
     },
     "templatesHelp": "Change the text of each message or switch it off. Words in braces are filled in with the order's details when sending.",
     "events": {
+      "order_placed": "Online order placed",
       "order_received": "Order received",
       "order_ready": "Ready for collection",
       "order_completed": "Order collected",
@@ -782,7 +783,8 @@
       "link": "Tracking link",
       "organization": "Business name",
       "branch": "Branch name",
-      "rack": "Rack location"
+      "rack": "Rack location",
+      "pickup": "Pickup window"
     },
     "sample": {
       "customer": "Sara Mohammadi",

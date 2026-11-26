@@ -22,7 +22,7 @@ class PublicTrackingController
      *
      * @unauthenticated
      *
-     * @response array{data: array{ticket_number: string, status: string, organization: string, branch: array{name: string, phone: string|null, address: string|null}, received_at: string, due_at: string, ready_at: string|null, completed_at: string|null, piece_count: int, total: int, paid_amount: int, balance: int, currency_unit: 'toman'|'rial', history: list<array{status: string, at: string}>}}
+     * @response array{data: array{ticket_number: string, status: string, organization: string, branch: array{name: string, phone: string|null, address: string|null}, received_at: string|null, due_at: string, ready_at: string|null, completed_at: string|null, piece_count: int, total: int, paid_amount: int, balance: int, currency_unit: 'toman'|'rial', history: list<array{status: string, at: string}>}}
      */
     public function __invoke(string $publicId, OrganizationContext $context, Settings $settings): JsonResponse
     {
@@ -43,7 +43,7 @@ class PublicTrackingController
             'status' => $order->status->value,
             'organization' => $order->organization->name,
             'branch' => ['name' => $order->branch->name, 'phone' => $order->branch->phone, 'address' => $order->branch->address],
-            'received_at' => $order->received_at->toIso8601String(),
+            'received_at' => $order->received_at?->toIso8601String(),
             'due_at' => $order->due_at->toIso8601String(),
             'ready_at' => $order->ready_at?->toIso8601String(),
             'completed_at' => $order->completed_at?->toIso8601String(),

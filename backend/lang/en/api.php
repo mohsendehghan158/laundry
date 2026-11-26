@@ -76,6 +76,9 @@ return [
         'slot_full' => 'This window is full or closed; pick another one.',
         'address_not_served' => 'This address is outside the pickup and delivery area.',
         'address_without_point' => 'This address has no point on the map.',
+        'slot_unavailable' => 'This window can no longer be booked; pick another one.',
+        'order_below_minimum' => 'The order is below the minimum for online orders in this area.',
+        'order_not_cancellable' => 'This order can no longer be cancelled; please call the branch.',
 
         'notification_not_failed' => 'Only failed messages can be sent again.',
     ],

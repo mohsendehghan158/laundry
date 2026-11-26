@@ -38,6 +38,7 @@ function TemplateCard({ template, placeholders }: { template: NotificationTempla
     organization: t("sample.organization"),
     branch: t("sample.branch"),
     rack: "A-12",
+    pickup: "۱۴۰۵/۰۹/۱۴ ۱۴:۰۰ تا ۱۶:۰۰",
   };
 
   return (

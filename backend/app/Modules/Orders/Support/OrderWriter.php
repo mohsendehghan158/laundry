@@ -81,10 +81,12 @@ final class OrderWriter
      * Creates the lines, their upcharges and one tagged piece per physical
      * item. Tags are the ticket number and the piece's position, e.g.
      * T1-04217-03; orders of 100 pieces or more use three digits.
+     * Without $tagPieces only the lines are written: an online order's
+     * pieces are tagged when they reach the shop.
      *
      * @param  Priced  $priced
      */
-    public function writeLines(Order $order, array $priced): void
+    public function writeLines(Order $order, array $priced, bool $tagPieces = true): void
     {
         $pieceCount = array_sum(array_column($priced['lines'], 'piece_count'));
         $width = max(2, strlen((string) $pieceCount));
@@ -112,7 +114,7 @@ final class OrderWriter
                 $orderLine->upcharges()->create($upcharge);
             }
 
-            for ($i = 0; $i < $line['piece_count']; $i++) {
+            for ($i = 0; $tagPieces && $i < $line['piece_count']; $i++) {
                 $number++;
                 $description = $line['pieces'][$i] ?? null;
 

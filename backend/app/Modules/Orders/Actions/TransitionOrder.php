@@ -18,9 +18,10 @@ final class TransitionOrder
 {
     /**
      * Moves an order to another status if the state machine allows it,
-     * keeps its pieces in step and appends to the status history.
+     * keeps its pieces in step and appends to the status history. The
+     * actor is null when the customer does it in the portal.
      */
-    public function handle(User $actor, Order $order, OrderStatus $to, ?string $reason = null): Order
+    public function handle(?User $actor, Order $order, OrderStatus $to, ?string $reason = null): Order
     {
         if (! $order->status->canMoveTo($to)) {
             throw ApiException::conflict('order_transition_not_allowed', [
@@ -54,7 +55,7 @@ final class TransitionOrder
             }
 
             $order->update($changes);
-            $order->history()->create(['from_status' => $from, 'to_status' => $to, 'user_id' => $actor->id, 'reason' => $reason]);
+            $order->history()->create(['from_status' => $from, 'to_status' => $to, 'user_id' => $actor?->id, 'reason' => $reason]);
             OrderStatusChanged::dispatch($order, $from, $to);
 
             if ($to === OrderStatus::Cancelled) {

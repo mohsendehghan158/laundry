@@ -10,6 +10,7 @@ use App\Modules\Customers\Models\Customer;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Database\Factories\OrderFactory;
 use App\Modules\Orders\Enums\DiscountType;
+use App\Modules\Orders\Enums\OrderSource;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Policies\OrderPolicy;
@@ -35,10 +36,18 @@ use Illuminate\Support\Carbon;
  * @property string $ticket_number
  * @property OrderStatus $status
  * @property PaymentStatus $payment_status
+ * @property OrderSource $source
+ * @property int|null $pickup_slot_id
+ * @property Carbon|null $pickup_starts_at
+ * @property Carbon|null $pickup_ends_at
+ * @property string|null $pickup_address
+ * @property string|null $pickup_latitude
+ * @property string|null $pickup_longitude
+ * @property bool $items_by_driver
  * @property int|null $turnaround_tier_id
  * @property string|null $turnaround_name
  * @property int $surcharge_percent
- * @property Carbon $received_at
+ * @property Carbon|null $received_at empty until an online order is picked up
  * @property Carbon $due_at
  * @property Carbon|null $ready_at
  * @property Carbon|null $completed_at
@@ -53,6 +62,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $discount_reason
  * @property int|null $promo_code_id
  * @property int $tax_amount
+ * @property int $delivery_fee part of the total
  * @property int $total
  * @property int $paid_amount
  * @property string|null $idempotency_key
@@ -78,6 +88,13 @@ class Order extends Model
 
     protected $guarded = ['id'];
 
+    /** @var array<string, mixed> */
+    protected $attributes = [
+        'source' => 'counter',
+        'items_by_driver' => false,
+        'delivery_fee' => 0,
+    ];
+
     /**
      * The ULID goes into public_id; the primary key stays numeric.
      *
@@ -96,6 +113,11 @@ class Order extends Model
         return [
             'status' => OrderStatus::class,
             'payment_status' => PaymentStatus::class,
+            'source' => OrderSource::class,
+            'pickup_starts_at' => 'datetime',
+            'pickup_ends_at' => 'datetime',
+            'items_by_driver' => 'boolean',
+            'delivery_fee' => 'integer',
             'discount_type' => DiscountType::class,
             'received_at' => 'datetime',
             'due_at' => 'datetime',

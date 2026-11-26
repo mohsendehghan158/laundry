@@ -643,6 +643,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/customer/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What I can order
+         * @description Active items by category, each with the services it has a price for
+         *     (whole rials per unit, before tax). Items with no price are left out.
+         */
+        get: operations["portal.customerCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/customer/orders": {
         parameters: {
             query?: never;
@@ -656,7 +677,39 @@ export interface paths {
          */
         get: operations["customerOrder.index"];
         put?: never;
-        post?: never;
+        /**
+         * Place an online order
+         * @description Books a place in the pickup window and creates the order as
+         *     "pending pickup" at the branch serving the address; the customer is
+         *     texted a confirmation. Send an `Idempotency-Key` header to make
+         *     retries safe: a repeated key returns the first order with 200.
+         *     Fails with 409 `slot_unavailable` or `slot_full` when the window
+         *     cannot be booked, and 422 `order_below_minimum` under the zone's
+         *     minimum order.
+         */
+        post: operations["customerOrder.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/orders/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Price an online order
+         * @description What the order would cost before it is placed: the items at the
+         *     shop's prices, the zone's delivery fee and minimum order. Fails with
+         *     422 `address_not_served` or `address_without_point`.
+         */
+        post: operations["portal.orders.quote"];
         delete?: never;
         options?: never;
         head?: never;
@@ -677,6 +730,27 @@ export interface paths {
         get: operations["customerOrder.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customer/orders/{publicId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel my online order
+         * @description Only while it waits for pickup; the window's place is freed. Fails
+         *     with 409 `order_not_cancellable` afterwards.
+         */
+        post: operations["customerOrder.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2699,10 +2773,17 @@ export interface components {
         };
         /**
          * NotificationEvent
-         * @description Moments the customer is told about, each with built-in wording that an organization may replace. Placeholders: {customer} {ticket} {total} {balance} {due} {link} {organization} {branch} {rack}.
+         * @description Moments the customer is told about, each with built-in wording that an organization may replace. Placeholders: {customer} {ticket} {total} {balance} {due} {link} {organization} {branch} {rack} {pickup}.
+         *     | |
+         *     |---|
+         *     | `order_placed` <br/> Placed online, waiting for pickup. |
+         *     | `order_received` <br/>  |
+         *     | `order_ready` <br/>  |
+         *     | `order_completed` <br/>  |
+         *     | `order_cancelled` <br/>  |
          * @enum {string}
          */
-        NotificationEvent: "order_received" | "order_ready" | "order_completed" | "order_cancelled";
+        NotificationEvent: "order_placed" | "order_received" | "order_ready" | "order_completed" | "order_cancelled";
         /** NotificationLogResource */
         NotificationLogResource: {
             id: number;
@@ -2723,6 +2804,26 @@ export interface components {
             sent_at: string | null;
             /** Format: date-time */
             created_at: string | null;
+        };
+        /**
+         * OnlineOrderRequest
+         * @description An online order as the customer puts it together: the pickup address
+         *     and window, and either the items or "the driver lists them". The quote
+         *     takes the same fields without the window.
+         */
+        OnlineOrderRequest: {
+            /** @description One of the customer's addresses, inside a service zone. */
+            address_id: number;
+            /** @description A window from GET /customer/slots for that address. */
+            slot_id: number;
+            /** @description Leave the items for the driver to list at the door. */
+            items_by_driver?: boolean;
+            lines?: {
+                item_id: number;
+                service_type_id: number;
+                quantity: number;
+            }[];
+            notes?: string | null;
         };
         /** OpenClaimRequest */
         OpenClaimRequest: {
@@ -2789,8 +2890,23 @@ export interface components {
                 name: string | null;
                 surcharge_percent: number;
             };
-            /** Format: date-time */
-            received_at: string;
+            source: components["schemas"]["OrderSource"];
+            /** @description The booked pickup, for online orders. */
+            pickup: {
+                slot_id: number | null;
+                starts_at: string;
+                ends_at: string;
+                address: string;
+                latitude: number | null;
+                longitude: number | null;
+            } | null;
+            /** @description The driver lists the items at pickup; until then there are no lines. */
+            items_by_driver: boolean;
+            /**
+             * Format: date-time
+             * @description Empty until an online order reaches the shop.
+             */
+            received_at: string | null;
             /** Format: date-time */
             due_at: string;
             /** Format: date-time */
@@ -2816,6 +2932,8 @@ export interface components {
                 code: string;
             } | null;
             tax_amount: number;
+            /** @description Pickup and delivery, part of the total. */
+            delivery_fee: number;
             total: number;
             paid_amount: number;
             /** @description Still to be paid. */
@@ -2858,6 +2976,16 @@ export interface components {
                 created_at: string;
             }[];
         };
+        /**
+         * OrderSource
+         * @description Where an order was taken.
+         *     | |
+         *     |---|
+         *     | `counter` <br/> Brought in to a branch. |
+         *     | `online` <br/> Placed by the customer in the portal, for pickup. |
+         * @enum {string}
+         */
+        OrderSource: "counter" | "online";
         /**
          * OrderStatus
          * @description The coarse state of an order. Pickup and delivery states are used from phase 4 (online orders); counter orders start at "received".
@@ -3107,8 +3235,20 @@ export interface components {
             status: components["schemas"]["OrderStatus"];
             payment_status: components["schemas"]["PaymentStatus"];
             branch_name: string;
-            /** Format: date-time */
-            received_at: string;
+            source: components["schemas"]["OrderSource"];
+            /** @description The booked pickup, for online orders. */
+            pickup: {
+                starts_at: string;
+                ends_at: string;
+                address: string;
+            } | null;
+            /** @description The driver lists the items at pickup; until then there are no lines. */
+            items_by_driver: boolean;
+            /**
+             * Format: date-time
+             * @description Empty until the order reaches the shop.
+             */
+            received_at: string | null;
             /** Format: date-time */
             due_at: string;
             /** Format: date-time */
@@ -3139,6 +3279,10 @@ export interface components {
             subtotal: number;
             discount_amount: number;
             tax_amount: number;
+            /** @description Part of the total. */
+            delivery_fee: number;
+            /** @description The customer may still call it off (POST …/cancel). */
+            can_cancel: boolean;
         };
         /** PreviewOrderRequest */
         PreviewOrderRequest: {
@@ -5491,6 +5635,44 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "portal.customerCatalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            categories: {
+                                id: number;
+                                name: string;
+                                items: {
+                                    id: number;
+                                    name: string;
+                                    /** @enum {string} */
+                                    unit: "piece" | "kg" | "sqm";
+                                    prices: {
+                                        service_type_id: number;
+                                        service_name: string;
+                                        price: number;
+                                    }[];
+                                }[];
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "customerOrder.index": {
         parameters: {
             query?: never;
@@ -5514,7 +5696,120 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "customerOrder.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OnlineOrderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "portal.orders.quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OnlineOrderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            zone: {
+                                id: number;
+                                name: string;
+                                branch_name: string;
+                                delivery_fee: number;
+                                free_delivery_over: number | null;
+                                min_order: number | null;
+                            };
+                            items_by_driver: boolean;
+                            lines: {
+                                item_name: string;
+                                service_name: string;
+                                quantity: string;
+                                line_total: number;
+                            }[];
+                            subtotal: number;
+                            discount_amount: number;
+                            tax_amount: number;
+                            items_total: number;
+                            delivery_fee: number;
+                            total: number;
+                            min_order: number | null;
+                            below_minimum: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "customerOrder.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `PortalOrderResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PortalOrderResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "customerOrder.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -6058,7 +6353,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             /** @enum {string} */
-                            event: "order_received" | "order_ready" | "order_completed" | "order_cancelled";
+                            event: "order_placed" | "order_received" | "order_ready" | "order_completed" | "order_cancelled";
                             body: string;
                             default_body: string;
                             is_active: boolean;
@@ -6096,7 +6391,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             /** @enum {string} */
-                            event: "order_received" | "order_ready" | "order_completed" | "order_cancelled";
+                            event: "order_placed" | "order_received" | "order_ready" | "order_completed" | "order_cancelled";
                             body: string;
                             default_body: string;
                             is_active: boolean;
@@ -7046,7 +7341,7 @@ export interface operations {
                                 phone: string | null;
                                 address: string | null;
                             };
-                            received_at: string;
+                            received_at: string | null;
                             due_at: string;
                             ready_at: string | null;
                             completed_at: string | null;

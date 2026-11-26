@@ -44,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
         // Pages anyone can open without signing in.
         RateLimiter::for('public', fn (Request $request) => Limit::perMinute(60)->by((string) $request->ip()));
 
+        // Online orders a signed-in customer may place, to keep a script from booking every window.
+        RateLimiter::for('portal-orders', fn (Request $request) => Limit::perHour(20)->by('customer:'.(string) $request->user('customer')?->getAuthIdentifier()));
+
         Scramble::configure()->withDocumentTransformers(function (OpenApi $openApi): void {
             $openApi->secure(SecurityScheme::apiKey('cookie', 'laundry_session'));
         });

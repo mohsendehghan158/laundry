@@ -34,6 +34,16 @@ class PortalOrderResource extends JsonResource
             'status' => $this->status,
             'payment_status' => $this->payment_status,
             'branch_name' => $this->branch->name,
+            'source' => $this->source,
+            /** @var array{starts_at: string, ends_at: string, address: string}|null The booked pickup, for online orders. */
+            'pickup' => $this->pickup_starts_at === null ? null : [
+                'starts_at' => $this->pickup_starts_at->toIso8601String(),
+                'ends_at' => $this->pickup_ends_at?->toIso8601String() ?? $this->pickup_starts_at->toIso8601String(),
+                'address' => (string) $this->pickup_address,
+            ],
+            /** The driver lists the items at pickup; until then there are no lines. */
+            'items_by_driver' => $this->items_by_driver,
+            /** Empty until the order reaches the shop. */
             'received_at' => $this->received_at,
             'due_at' => $this->due_at,
             'ready_at' => $this->ready_at,
@@ -65,6 +75,10 @@ class PortalOrderResource extends JsonResource
             'subtotal' => $this->subtotal,
             'discount_amount' => $this->discount_amount,
             'tax_amount' => $this->tax_amount,
+            /** Part of the total. */
+            'delivery_fee' => $this->delivery_fee,
+            /** The customer may still call it off (POST …/cancel). */
+            'can_cancel' => $this->status === OrderStatus::PendingPickup,
         ];
     }
 }

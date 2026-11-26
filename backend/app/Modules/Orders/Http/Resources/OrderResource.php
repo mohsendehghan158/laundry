@@ -42,6 +42,19 @@ class OrderResource extends JsonResource
             ],
             /** @var array{id: int|null, name: string|null, surcharge_percent: int} */
             'turnaround' => ['id' => $this->turnaround_tier_id, 'name' => $this->turnaround_name, 'surcharge_percent' => $this->surcharge_percent],
+            'source' => $this->source,
+            /** @var array{slot_id: int|null, starts_at: string, ends_at: string, address: string, latitude: float|null, longitude: float|null}|null The booked pickup, for online orders. */
+            'pickup' => $this->pickup_starts_at === null ? null : [
+                'slot_id' => $this->pickup_slot_id,
+                'starts_at' => $this->pickup_starts_at->toIso8601String(),
+                'ends_at' => $this->pickup_ends_at?->toIso8601String() ?? $this->pickup_starts_at->toIso8601String(),
+                'address' => (string) $this->pickup_address,
+                'latitude' => $this->pickup_latitude === null ? null : (float) $this->pickup_latitude,
+                'longitude' => $this->pickup_longitude === null ? null : (float) $this->pickup_longitude,
+            ],
+            /** The driver lists the items at pickup; until then there are no lines. */
+            'items_by_driver' => $this->items_by_driver,
+            /** Empty until an online order reaches the shop. */
             'received_at' => $this->received_at,
             'due_at' => $this->due_at,
             'ready_at' => $this->ready_at,
@@ -61,6 +74,8 @@ class OrderResource extends JsonResource
             /** @var array{id: int, code: string}|null The promo code the discount came from. */
             'promo_code' => $this->whenLoaded('promoCode', fn (): ?array => $this->promoCode === null ? null : ['id' => $this->promoCode->id, 'code' => $this->promoCode->code]),
             'tax_amount' => $this->tax_amount,
+            /** Pickup and delivery, part of the total. */
+            'delivery_fee' => $this->delivery_fee,
             'total' => $this->total,
             'paid_amount' => $this->paid_amount,
             /** Still to be paid. */

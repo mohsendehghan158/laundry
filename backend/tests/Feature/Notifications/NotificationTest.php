@@ -56,9 +56,9 @@ it('uses the organization\'s own wording and respects switched-off messages', fu
 
     $this->getJson('/api/v1/notification-templates')
         ->assertOk()
-        ->assertJsonPath('data.0.event', 'order_received')
-        ->assertJsonPath('data.0.customized', false)
-        ->assertJsonPath('data.2.is_active', false)
+        ->assertJsonPath('data.*.event', ['order_placed', 'order_received', 'order_ready', 'order_completed', 'order_cancelled'])
+        ->assertJsonPath('data.1.customized', false)
+        ->assertJsonPath('data.3.is_active', false)
         ->assertJsonPath('placeholders.0', 'customer');
 
     $this->putJson('/api/v1/notification-templates/order_received', ['body' => 'قبض {ticket} — {branch}', 'is_active' => true])
