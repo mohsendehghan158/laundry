@@ -173,7 +173,7 @@ final class MoveTransfer
         $results = [];
         foreach (array_unique(array_filter(array_map(Tags::normalize(...), $tags))) as $tag) {
             $piece = Piece::query()->where('tag_code', $tag)->first();
-            $message = $piece === null ? __('production.errors.piece_not_found') : DB::transaction(fn (): ?string => $step($piece));
+            $message = $piece === null ? (string) __('production.errors.piece_not_found') : DB::transaction(fn (): ?string => $step($piece));
             $results[] = ['tag' => $tag, 'ok' => $message === null, 'message' => $message];
         }
 

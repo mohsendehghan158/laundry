@@ -29,6 +29,10 @@ use Illuminate\Support\Carbon;
  * @property int|null $resolved_by
  * @property Carbon|null $resolved_at
  * @property Carbon|null $created_at
+ * @property-read Order $order
+ * @property-read Piece $piece
+ * @property-read User|null $creator
+ * @property-read User|null $resolver
  */
 class Claim extends Model
 {

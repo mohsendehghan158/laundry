@@ -32,8 +32,8 @@ final class ZoneLocator
             ->get();
 
         foreach ($candidates as $zone) {
-            // A zone whose branch was closed or deleted serves nobody.
-            if ($zone->branch === null || $zone->branch->trashed() || ! $zone->branch->is_active) {
+            // A zone whose branch was closed or deleted (loaded with trashed) serves nobody.
+            if ($zone->branch->trashed() || ! $zone->branch->is_active) {
                 continue;
             }
             if ($zone->shape()->contains($lat, $lng)) {

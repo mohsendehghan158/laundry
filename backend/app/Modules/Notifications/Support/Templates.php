@@ -10,7 +10,6 @@ use App\Modules\Orders\Models\Order;
 use App\Modules\Organization\Support\Settings;
 use App\Support\Text\Digits;
 use App\Support\Text\Jalali;
-use Carbon\CarbonInterface;
 
 /**
  * The wording of each message (an organization's own or the built-in
@@ -48,7 +47,7 @@ final class Templates
             'ticket' => $order->ticket_number,
             'total' => $money($order->total),
             'balance' => $money($order->balance()),
-            'due' => $order->due_at instanceof CarbonInterface ? Jalali::format($order->due_at, $timezone) : '',
+            'due' => Jalali::format($order->due_at, $timezone),
             'link' => rtrim((string) config('app.url'), '/').'/track/'.$order->public_id,
             'organization' => $order->organization()->firstOrFail()->name,
             'branch' => $order->branch->name,

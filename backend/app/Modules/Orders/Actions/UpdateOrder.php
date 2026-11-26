@@ -38,8 +38,9 @@ final class UpdateOrder
             throw ApiException::conflict('order_version_conflict');
         }
 
-        /** @var array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null} $data */
-        $priced = $this->pricer->price([...$data, 'customer_id' => $order->customer_id], $order->id);
+        /** @var array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null} $pricing */
+        $pricing = $data;
+        $priced = $this->pricer->price([...$pricing, 'customer_id' => $order->customer_id], $order->id);
         $this->writer->authorizeDiscount($actor, $priced);
 
         if ($priced['total'] < $order->paid_amount) {

@@ -27,7 +27,7 @@ final class OrderFactory extends Factory
     {
         return [
             'branch_id' => Branch::factory(),
-            'organization_id' => fn (array $attributes): int => Branch::query()->withoutGlobalScopes()->findOrFail($attributes['branch_id'])->organization_id,
+            'organization_id' => fn (array $attributes): int => Branch::query()->withoutGlobalScopes()->findOrFail((int) $attributes['branch_id'])->organization_id,
             'customer_id' => fn (array $attributes): int => Customer::factory()->create(['organization_id' => $attributes['organization_id']])->id,
             'ticket_number' => 'X-'.fake()->unique()->numerify('#####'),
             'status' => OrderStatus::Received,

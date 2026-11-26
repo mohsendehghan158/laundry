@@ -25,7 +25,7 @@ final class ItemFactory extends Factory
             'item_category_id' => ItemCategory::factory(),
             'organization_id' => fn (array $attributes): int => ItemCategory::query()
                 ->withoutGlobalScopes()
-                ->findOrFail($attributes['item_category_id'])
+                ->findOrFail((int) $attributes['item_category_id'])
                 ->organization_id,
             'name' => 'قلم '.fake()->unique()->numberBetween(1, 99999),
             'unit' => PriceUnit::Piece,

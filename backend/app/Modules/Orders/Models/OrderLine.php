@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $line_total
  * @property string|null $notes
  * @property int $position
+ * @property-read Order $order
  */
 class OrderLine extends Model
 {

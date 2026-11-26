@@ -40,7 +40,7 @@ final class PriceSheet
         }
 
         $rows = $this->items()->map(function (Item $item) use ($services, $prices, $categories): array {
-            $row = [$item->id, (string) ($categories[$item->item_category_id] ?? ''), $item->name, __("catalog.units.{$item->unit->value}")];
+            $row = [$item->id, (string) ($categories[$item->item_category_id] ?? ''), $item->name, (string) __("catalog.units.{$item->unit->value}")];
             foreach ($services as $service) {
                 $price = $prices["{$item->id}:{$service->id}"] ?? null;
                 $row[] = $price === null ? null : $this->display($price);

@@ -37,7 +37,10 @@ class CustomerController
 
         $customers = QueryBuilder::for(Customer::class)
             ->allowedFilters(
-                AllowedFilter::callback('q', fn (Builder $query, mixed $value) => $query->search(is_array($value) ? implode(',', $value) : (string) $value)),
+                AllowedFilter::callback('q', function (Builder $query, mixed $value): void {
+                    /** @var Builder<Customer> $query */
+                    $query->search(is_array($value) ? implode(',', $value) : (string) $value);
+                }),
             )
             ->allowedSorts('name', 'created_at')
             ->defaultSort('-created_at')

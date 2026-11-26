@@ -147,10 +147,18 @@ final class ProductionReport
         return $value === null ? null : round((float) $value, 1);
     }
 
+    /**
+     * @param  literal-string  $column
+     * @return literal-string
+     */
     private function localDate(string $column): string
     {
         $tz = DB::getPdo()->quote($this->reports->timezone());
 
-        return "to_char(({$column} at time zone 'UTC') at time zone {$tz}, 'YYYY-MM-DD')";
+        // The zone is quoted by PDO, so the expression is safe to embed.
+        /** @var literal-string $sql */
+        $sql = "to_char(({$column} at time zone 'UTC') at time zone {$tz}, 'YYYY-MM-DD')";
+
+        return $sql;
     }
 }

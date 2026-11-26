@@ -27,8 +27,8 @@ final class Assembly
     public static function blocker(Piece $piece, Order $order): ?string
     {
         return match (true) {
-            $piece->flag !== null && in_array($piece->flag, [PieceFlag::OnHold, PieceFlag::Outsourced, PieceFlag::InTransit, PieceFlag::Lost, PieceFlag::Rework], true) => __("production.blockers.{$piece->flag->value}", ['note' => $piece->flag_note ?? '—']),
-            $piece->branch_id !== null && $piece->branch_id !== $order->branch_id => __('production.blockers.elsewhere', ['branch' => $piece->branch->name ?? '—']),
+            $piece->flag !== null && in_array($piece->flag, [PieceFlag::OnHold, PieceFlag::Outsourced, PieceFlag::InTransit, PieceFlag::Lost, PieceFlag::Rework], true) => (string) __("production.blockers.{$piece->flag->value}", ['note' => $piece->flag_note ?? '—']),
+            $piece->branch_id !== null && $piece->branch_id !== $order->branch_id => (string) __('production.blockers.elsewhere', ['branch' => $piece->branch->name ?? '—']),
             default => null,
         };
     }
@@ -58,7 +58,7 @@ final class Assembly
                 'notes' => $order->notes,
                 'rack_location' => $order->rack_location,
             ],
-            'pieces' => $pieces->map(fn (Piece $piece): array => [
+            'pieces' => array_values($pieces->map(fn (Piece $piece): array => [
                 'id' => $piece->id,
                 'tag_code' => $piece->tag_code,
                 'item_name' => $piece->line->item_name,
@@ -69,7 +69,7 @@ final class Assembly
                 'branch' => $piece->branch === null ? null : ['id' => $piece->branch->id, 'name' => $piece->branch->name],
                 'slot' => $piece->rackSlot?->code,
                 'blocker' => $piece->status->inWork() ? self::blocker($piece, $order) : null,
-            ])->values()->all(),
+            ])->all()),
             'counts' => [
                 'total' => $pieces->count(),
                 'assembled' => $assembled->count(),

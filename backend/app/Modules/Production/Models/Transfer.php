@@ -30,6 +30,11 @@ use Illuminate\Support\Carbon;
  * @property int|null $received_by
  * @property Carbon|null $received_at
  * @property Carbon|null $created_at
+ * @property-read Branch $fromBranch
+ * @property-read Branch $toBranch
+ * @property-read User|null $creator
+ * @property-read User|null $sender
+ * @property-read User|null $receiver
  */
 class Transfer extends Model
 {

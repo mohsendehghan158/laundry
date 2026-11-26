@@ -27,6 +27,9 @@ use Illuminate\Support\Carbon;
  * @property int|null $sent_by
  * @property Carbon $sent_at
  * @property Carbon|null $closed_at
+ * @property-read Vendor $vendor
+ * @property-read Branch $branch
+ * @property-read User|null $sender
  */
 class OutsourcingShipment extends Model
 {

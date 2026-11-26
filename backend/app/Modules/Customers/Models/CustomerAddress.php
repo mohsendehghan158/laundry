@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $latitude
  * @property string|null $longitude
  * @property bool $is_default
+ * @property-read Customer|null $customer archived customers are not loaded
  */
 #[Fillable(['title', 'address', 'latitude', 'longitude', 'is_default'])]
 class CustomerAddress extends Model

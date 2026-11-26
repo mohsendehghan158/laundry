@@ -18,7 +18,7 @@ trait ReachesBranches
      */
     protected function branchIds(User $actor): ?array
     {
-        return $actor->hasAllBranchAccess() ? null : array_map('intval', $actor->branches()->pluck('branches.id')->all());
+        return $actor->hasAllBranchAccess() ? null : array_values(array_map(intval(...), $actor->branches()->pluck('branches.id')->all()));
     }
 
     protected function inBranches(User $actor, int ...$branchIds): bool

@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $code
  * @property int $sort_order
  * @property bool $is_active
+ * @property-read Branch|null $branch archived branches are not loaded
  */
 #[Fillable(['branch_id', 'name', 'code', 'sort_order', 'is_active'])]
 class Rack extends Model

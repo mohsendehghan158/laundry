@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $item_id
  * @property int $service_type_id
  * @property int $price whole rials per unit
+ * @property-read PriceList $priceList
  */
 #[Fillable(['price_list_id', 'item_id', 'service_type_id', 'price'])]
 class Price extends Model

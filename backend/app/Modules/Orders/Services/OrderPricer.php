@@ -82,7 +82,7 @@ final class OrderPricer
             }
 
             if ($service === null || ! $service->is_active || $price === null) {
-                $errors["lines.{$index}.service_type_id"] = __('orders.no_price', ['item' => $item->name, 'service' => $service?->name ?? '']);
+                $errors["lines.{$index}.service_type_id"] = __('orders.no_price', ['item' => $item->name, 'service' => $service->name ?? '']);
 
                 continue;
             }
@@ -99,7 +99,7 @@ final class OrderPricer
                 'unit_price' => (int) $price,
                 'quantity_milli' => PriceCalculator::milli($quantity),
                 'upcharges' => array_values(array_filter(array_map(
-                    fn (int $id): ?array => $upcharges->has($id) ? ['type' => $upcharges[$id]->type, 'value' => $upcharges[$id]->value] : null,
+                    fn (int $id): ?array => ($upcharge = $upcharges->get($id)) === null ? null : ['type' => $upcharge->type, 'value' => $upcharge->value],
                     $line['upcharge_ids'] ?? [],
                 ))),
             ];
@@ -128,14 +128,14 @@ final class OrderPricer
 
         $priced = [];
 
-        foreach (array_values(array_keys($engineLines)) as $position => $index) {
+        foreach (array_keys($engineLines) as $position => $index) {
             $line = $lines[$index];
             /** @var Item $item */
             $item = $items[$line['item_id']];
             /** @var ServiceType $service */
             $service = $services[$line['service_type_id']];
             $lineQuote = $quote['lines'][$position];
-            $applied = array_values(array_filter($line['upcharge_ids'] ?? [], fn (int $id): bool => $upcharges->has($id)));
+            $applied = array_values(array_filter(array_map(fn (int $id): ?Upcharge => $upcharges->get($id), $line['upcharge_ids'] ?? [])));
             $quantity = (float) $line['quantity'];
             $pieceCount = $item->unit === PriceUnit::Piece ? (int) $quantity * $item->pieces_per_unit : 1;
 
@@ -153,24 +153,24 @@ final class OrderPricer
                 'surcharge_amount' => $lineQuote['surcharge'],
                 'line_total' => $lineQuote['total'],
                 'notes' => $line['notes'] ?? null,
-                'upcharges' => array_map(fn (int $id, int $amount): array => [
-                    'upcharge_id' => $id,
-                    'name' => $upcharges[$id]->name,
-                    'type' => $upcharges[$id]->type->value,
-                    'value' => $upcharges[$id]->value,
+                'upcharges' => array_map(fn (Upcharge $upcharge, int $amount): array => [
+                    'upcharge_id' => $upcharge->id,
+                    'name' => $upcharge->name,
+                    'type' => $upcharge->type->value,
+                    'value' => $upcharge->value,
                     'amount' => $amount,
                 ], $applied, $lineQuote['upcharges']),
                 'piece_count' => $pieceCount,
-                'pieces' => array_map(fn (array $piece): array => [
+                'pieces' => array_values(array_map(fn (array $piece): array => [
                     'color_id' => $piece['color_id'] ?? null,
                     'color_name' => isset($piece['color_id']) ? $colors->get($piece['color_id']) : null,
                     'brand' => $piece['brand'] ?? null,
                     'notes' => $piece['notes'] ?? null,
                     'defects' => array_values(array_filter(array_map(
-                        fn (int $id): ?array => $defects->has($id) ? ['defect_type_id' => $id, 'name' => $defects[$id]->name, 'kind' => $defects[$id]->kind->value] : null,
+                        fn (int $id): ?array => ($defect = $defects->get($id)) === null ? null : ['defect_type_id' => $id, 'name' => $defect->name, 'kind' => $defect->kind->value],
                         $piece['defect_type_ids'] ?? [],
                     ))),
-                ], array_slice($line['pieces'] ?? [], 0, $pieceCount)),
+                ], array_slice($line['pieces'] ?? [], 0, $pieceCount))),
             ];
         }
 
@@ -184,7 +184,7 @@ final class OrderPricer
             'discount_value' => match (true) {
                 $discount === null => '0',
                 $promo !== null => (string) $quote['discount'],
-                default => (string) $input['discount']['value'],
+                default => (string) ($input['discount']['value'] ?? '0'),
             },
             'discount_amount' => $quote['discount'],
             'promo' => $promo,

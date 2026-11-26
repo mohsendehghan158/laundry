@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property int $attempts
  * @property Carbon|null $sent_at
  * @property Carbon|null $created_at
+ * @property-read Order|null $order
  */
 class NotificationLog extends Model
 {

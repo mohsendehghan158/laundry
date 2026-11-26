@@ -50,9 +50,12 @@ final class SaveCustomer
             $attributes = [...Arr::only($address, ['title', 'address', 'latitude', 'longitude']), 'is_default' => $index === $defaultIndex];
             $id = $address['id'] ?? null;
 
-            $model = $id === null
-                ? $customer->addresses()->create($attributes)
-                : tap($customer->addresses()->findOrFail($id))->update($attributes);
+            if ($id === null) {
+                $model = $customer->addresses()->create($attributes);
+            } else {
+                $model = $customer->addresses()->findOrFail((int) $id);
+                $model->update($attributes);
+            }
 
             $keep[] = $model->id;
         }

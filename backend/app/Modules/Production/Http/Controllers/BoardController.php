@@ -71,9 +71,9 @@ class BoardController
             'counters' => [
                 'pieces' => $pieces->count(),
                 'orders' => $orders->count(),
-                'due_today' => $orders->filter(fn (Collection $group): bool => $group->first()->order->due_at->lte($today) && ! $group->first()->order->due_at->isPast())->count(),
-                'overdue' => $orders->filter(fn (Collection $group): bool => $group->first()->order->due_at->isPast())->count(),
-                'express' => $orders->filter(fn (Collection $group): bool => $group->first()->order->surcharge_percent > 0)->count(),
+                'due_today' => $orders->filter(fn (Collection $group): bool => $group->firstOrFail()->order->due_at->lte($today) && ! $group->firstOrFail()->order->due_at->isPast())->count(),
+                'overdue' => $orders->filter(fn (Collection $group): bool => $group->firstOrFail()->order->due_at->isPast())->count(),
+                'express' => $orders->filter(fn (Collection $group): bool => $group->firstOrFail()->order->surcharge_percent > 0)->count(),
                 'rework' => $pieces->where('flag', PieceFlag::Rework)->count(),
                 'on_hold' => $pieces->where('flag', PieceFlag::OnHold)->count(),
             ],
@@ -93,9 +93,9 @@ class BoardController
      */
     private function cards(Collection $pieces, Collection $totals): array
     {
-        return $pieces->groupBy('order_id')
+        return array_values($pieces->groupBy('order_id')
             ->map(function (Collection $group) use ($totals): array {
-                $order = $group->first()->order;
+                $order = $group->firstOrFail()->order;
 
                 return [
                     'id' => $order->id,
@@ -111,7 +111,6 @@ class BoardController
                 ];
             })
             ->sortBy([['is_overdue', 'desc'], ['is_express', 'desc'], ['due_at', 'asc']])
-            ->values()
-            ->all();
+            ->all());
     }
 }

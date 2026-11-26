@@ -26,6 +26,10 @@ use Illuminate\Support\Carbon;
  * @property int|null $user_id
  * @property string|null $note
  * @property Carbon $created_at
+ * @property-read Piece $piece
+ * @property-read Station|null $station
+ * @property-read Branch|null $branch
+ * @property-read User|null $user
  */
 class PieceScan extends Model
 {

@@ -24,7 +24,7 @@ class PortalZoneResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'branch_name' => $this->branch?->name,
+            'branch_name' => $this->branch->name,
             /** Rials. */
             'delivery_fee' => $this->delivery_fee,
             'free_delivery_over' => $this->free_delivery_over,

@@ -12,6 +12,7 @@ use App\Modules\Organization\Support\Settings;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 /**
  * Figures for the dashboard and the sales report. Days are the
@@ -38,7 +39,7 @@ final class Reports
      */
     public function branches(User $actor, ?int $branchId): array
     {
-        $ids = Branch::query()->visibleTo($actor)->pluck('id')->all();
+        $ids = array_values(array_map(intval(...), Branch::query()->visibleTo($actor)->pluck('id')->all()));
 
         return $branchId === null ? $ids : array_values(array_intersect($ids, [$branchId]));
     }
@@ -128,6 +129,7 @@ final class Reports
                 ->get()
                 ->map(fn (object $row): array => $this->row((string) $row->id, (string) $row->label, (int) $row->orders, null, (int) $row->discount, (int) $row->tax, (int) $row->total, null))
                 ->all(),
+            default => throw new InvalidArgumentException("Unknown sales grouping: {$group}"),
         };
 
         $byLine = in_array($group, ['service', 'item'], true);
@@ -203,12 +205,21 @@ final class Reports
             ->value('collected');
     }
 
-    /** SQL for the local calendar date of a UTC timestamp column. */
+    /**
+     * SQL for the local calendar date of a UTC timestamp column.
+     *
+     * @param  literal-string  $column
+     * @return literal-string
+     */
     private function localDate(string $column): string
     {
         $tz = DB::getPdo()->quote($this->timezone());
 
-        return "to_char(({$column} at time zone 'UTC') at time zone {$tz}, 'YYYY-MM-DD')";
+        // The zone is quoted by PDO, so the expression is safe to embed.
+        /** @var literal-string $sql */
+        $sql = "to_char(({$column} at time zone 'UTC') at time zone {$tz}, 'YYYY-MM-DD')";
+
+        return $sql;
     }
 
     /**

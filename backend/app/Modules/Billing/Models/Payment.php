@@ -29,6 +29,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property int|null $user_id
  * @property Carbon $created_at
+ * @property-read Order $order
+ * @property-read User|null $user
  */
 class Payment extends Model
 {

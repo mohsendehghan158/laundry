@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $rack_id
  * @property int $position
  * @property string $code
+ * @property-read Rack $rack
  */
 class RackSlot extends Model
 {

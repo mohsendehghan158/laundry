@@ -93,7 +93,7 @@ final class XlsxWriter
     {
         $xml = '<row r="'.$number.'">';
 
-        foreach (array_values($cells) as $column => $value) {
+        foreach ($cells as $column => $value) {
             $ref = self::column($column).$number;
 
             if ($value === null || $value === '') {

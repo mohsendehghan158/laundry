@@ -23,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property int $size
  * @property int|null $uploaded_by
  * @property Carbon $created_at
+ * @property-read Piece $piece
+ * @property-read User|null $uploader
  */
 class Media extends Model
 {

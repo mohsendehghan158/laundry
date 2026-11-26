@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Http\Controllers;
 
+use App\Modules\Customers\Models\Customer;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Actions\CreateOrder;
 use App\Modules\Orders\Actions\UpdateOrder;
@@ -54,7 +55,10 @@ class OrderController
                     $query->where(fn (Builder $query) => $query
                         ->whereLike('ticket_number', '%'.mb_strtoupper($term).'%')
                         ->orWhere('rack_location', mb_strtoupper($term))
-                        ->orWhereHas('customer', fn (Builder $customers) => $customers->search($term)));
+                        ->orWhereHas('customer', function (Builder $customers) use ($term): void {
+                            /** @var Builder<Customer> $customers */
+                            $customers->search($term);
+                        }));
                 }),
                 AllowedFilter::callback('status', fn (Builder $query, mixed $value) => $query->whereIn('status', (array) $value)),
                 AllowedFilter::exact('branch_id'),

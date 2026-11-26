@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $user_id
  * @property string|null $reason
  * @property Carbon $created_at
+ * @property-read User|null $user
  */
 class OrderStatusChange extends Model
 {

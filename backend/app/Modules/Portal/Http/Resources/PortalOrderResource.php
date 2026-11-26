@@ -56,7 +56,7 @@ class PortalOrderResource extends JsonResource
                 'method' => $payment->method->value,
                 'kind' => $payment->kind->value,
                 'amount' => $payment->amount,
-                'at' => $payment->created_at?->toIso8601String() ?? '',
+                'at' => $payment->created_at->toIso8601String(),
             ])->values()->all()),
             'subtotal' => $this->subtotal,
             'discount_amount' => $this->discount_amount,

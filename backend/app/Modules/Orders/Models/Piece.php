@@ -40,6 +40,11 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property Carbon|null $ready_at
  * @property Carbon|null $handed_over_at
+ * @property-read Order $order
+ * @property-read OrderLine $line
+ * @property-read Branch|null $branch
+ * @property-read Station|null $station
+ * @property-read RackSlot|null $rackSlot
  */
 class Piece extends Model
 {

@@ -60,6 +60,10 @@ use Illuminate\Support\Carbon;
  * @property int $version
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Branch $branch
+ * @property-read Customer $customer
+ * @property-read User|null $creator
+ * @property-read PromoCode|null $promoCode
  */
 #[UseFactory(OrderFactory::class)]
 #[UsePolicy(OrderPolicy::class)]

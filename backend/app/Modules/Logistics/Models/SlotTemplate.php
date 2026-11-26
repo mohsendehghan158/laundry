@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $ends_at H:i:s
  * @property int $capacity
  * @property bool $is_active
+ * @property-read Branch $branch
  */
 #[Fillable(['branch_id', 'weekday', 'starts_at', 'ends_at', 'capacity', 'is_active'])]
 class SlotTemplate extends Model

@@ -54,7 +54,7 @@ class SlotController
      */
     public function update(UpdateSlotRequest $request, Slot $slot): SlotResource
     {
-        abort_unless($slot->branch !== null && $request->actor()->canAccessBranch($slot->branch), 404);
+        abort_unless($request->actor()->canAccessBranch($slot->branch), 404);
 
         $slot->update($request->validated());
 

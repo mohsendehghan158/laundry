@@ -13,7 +13,7 @@ final class RefreshBoards
     public function handle(OrderStatusChanged $event): void
     {
         $order = $event->order;
-        $branches = $order->pieces()->reorder()->distinct()->pluck('branch_id')->all();
+        $branches = array_values($order->pieces()->reorder()->distinct()->pluck('branch_id')->map(fn (mixed $id): ?int => $id === null ? null : (int) $id)->all());
 
         Board::changed([$order->branch_id, ...$branches], 'order', $order->id);
     }

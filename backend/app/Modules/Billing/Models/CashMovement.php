@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $reason
  * @property int|null $user_id
  * @property Carbon $created_at
+ * @property-read User|null $user
  */
 class CashMovement extends Model
 {

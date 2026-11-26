@@ -18,7 +18,7 @@ final readonly class Polygon
     public const int MAX_POINTS = 200;
 
     /**
-     * @param  list<array{0: float, 1: float}>  $points
+     * @param  non-empty-list<array{0: float, 1: float}>  $points  at least MIN_POINTS, checked in from()
      */
     private function __construct(public array $points) {}
 

@@ -114,7 +114,7 @@ class PriceController
      */
     private function matrix(): array
     {
-        return Price::query()
+        return array_values(Price::query()
             ->where('price_list_id', PriceList::default()->id)
             ->orderBy('item_id')
             ->orderBy('service_type_id')
@@ -124,7 +124,6 @@ class PriceController
                 'service_type_id' => $price->service_type_id,
                 'price' => $price->price,
             ])
-            ->values()
-            ->all();
+            ->all());
     }
 }

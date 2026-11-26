@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Keeps a model inside its organization: reads are filtered by the
  * current organization and new rows are stamped with it.
  *
+ * @property-read Organization $organization
+ *
  * @mixin Model
  */
 trait BelongsToOrganization

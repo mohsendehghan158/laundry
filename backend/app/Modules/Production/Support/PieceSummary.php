@@ -28,7 +28,7 @@ final class PieceSummary
             'service_name' => $piece->line->service_name,
             'color_name' => $piece->color_name,
             'notes' => $piece->notes,
-            'defects' => $piece->defects->map(fn (PieceDefect $defect): string => $defect->name)->values()->all(),
+            'defects' => array_values($piece->defects->map(fn (PieceDefect $defect): string => $defect->name)->all()),
             'status' => $piece->status->value,
             'flag' => $piece->flag?->value,
             'flag_note' => $piece->flag_note,

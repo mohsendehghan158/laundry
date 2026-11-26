@@ -146,6 +146,6 @@ class CashShiftController
      */
     private function visibleBranches(User $actor): array
     {
-        return Branch::query()->visibleTo($actor)->pluck('id')->all();
+        return array_values(array_map(intval(...), Branch::query()->visibleTo($actor)->pluck('id')->all()));
     }
 }

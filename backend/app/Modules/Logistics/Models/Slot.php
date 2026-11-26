@@ -25,6 +25,8 @@ use Illuminate\Support\Carbon;
  * @property int $capacity
  * @property int $booked
  * @property bool $is_closed
+ * @property-read Branch $branch
+ * @property-read SlotTemplate|null $template
  */
 #[Fillable(['branch_id', 'slot_template_id', 'date', 'starts_at', 'ends_at', 'capacity', 'is_closed'])]
 class Slot extends Model

@@ -84,7 +84,7 @@ final class XlsxReader
             return [];
         }
 
-        return array_map(self::text(...), $xml->xpath('/*/*[local-name()="si"]') ?: []);
+        return array_values(array_map(self::text(...), $xml->xpath('/*/*[local-name()="si"]') ?: []));
     }
 
     /**
@@ -144,7 +144,7 @@ final class XlsxReader
             foreach ($cells[$i] ?? [] as $column => $value) {
                 $line[$column] = $value;
             }
-            $rows[] = $line;
+            $rows[] = array_values($line);
         }
 
         return $rows;

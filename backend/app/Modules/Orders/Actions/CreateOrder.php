@@ -45,7 +45,7 @@ final class CreateOrder
             return [$existing, false];
         }
 
-        $branch = Branch::query()->findOrFail($data['branch_id']);
+        $branch = Branch::query()->findOrFail((int) $data['branch_id']);
 
         if (! $actor->canAccessBranch($branch) || ! $branch->is_active) {
             throw ApiException::conflict('order_branch_unavailable');
@@ -55,8 +55,9 @@ final class CreateOrder
             throw ApiException::conflict('order_branch_not_counter');
         }
 
-        /** @var array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null} $data */
-        $priced = $this->pricer->price($data);
+        /** @var array{lines: list<array<string, mixed>>, turnaround_tier_id?: int|null, discount?: array{type: string, value: int|float|string}|null} $pricing */
+        $pricing = $data;
+        $priced = $this->pricer->price($pricing);
         $this->writer->authorizeDiscount($actor, $priced);
 
         try {

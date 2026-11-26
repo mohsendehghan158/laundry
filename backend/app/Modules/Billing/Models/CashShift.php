@@ -30,6 +30,9 @@ use Illuminate\Support\Carbon;
  * @property int|null $counted_cash
  * @property int|null $difference
  * @property string|null $notes
+ * @property-read Branch $branch
+ * @property-read User|null $opener
+ * @property-read User|null $closer
  */
 class CashShift extends Model
 {

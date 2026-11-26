@@ -43,7 +43,7 @@ class OrderCounterController
 
         $code = mb_strtoupper(trim(Digits::toLatin((string) $request->query('code', ''))));
         $piece = $code === '' ? null : Piece::query()->where('tag_code', $code)->first();
-        $order = $piece?->order ?? ($code === '' ? null : Order::query()->where('ticket_number', $code)->first());
+        $order = $piece->order ?? ($code === '' ? null : Order::query()->where('ticket_number', $code)->first());
 
         abort_if($order === null || ! $actor->can('view', $order), 404);
 

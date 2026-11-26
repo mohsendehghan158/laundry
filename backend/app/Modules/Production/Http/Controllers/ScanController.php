@@ -50,14 +50,14 @@ class ScanController
         /** @var list<string> $tags */
         $tags = $request->validated('tags');
         // Boards of the branches the pieces come from change too.
-        $from = Piece::query()->whereIn('tag_code', array_map(Tags::normalize(...), $tags))->distinct()->pluck('branch_id')->all();
+        $from = array_values(Piece::query()->whereIn('tag_code', array_map(Tags::normalize(...), $tags))->distinct()->pluck('branch_id')->map(fn (mixed $id): ?int => $id === null ? null : (int) $id)->all());
         $results = $scanPieces->handle(
             $request->actor(),
             $station,
             $tags,
             $station->kind === StationKind::Qc ? (bool) $passed : null,
             $request->validated('reason'),
-            array_map(strval(...), $defects),
+            array_values(array_map(strval(...), $defects)),
         );
 
         Board::changed([$station->branch_id, ...$from], 'scan');

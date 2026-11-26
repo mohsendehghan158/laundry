@@ -21,7 +21,7 @@ class ZoneResource extends JsonResource
         return [
             'id' => $this->id,
             'branch_id' => $this->branch_id,
-            'branch_name' => $this->branch?->name,
+            'branch_name' => $this->branch->name,
             'name' => $this->name,
             /** @var list<array{0: float, 1: float}> Corners as [latitude, longitude]. */
             'polygon' => $this->polygon,

@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Branch $branch
  */
 #[Fillable(['branch_id', 'name', 'delivery_fee', 'free_delivery_over', 'min_order', 'is_active'])]
 #[UseFactory(ZoneFactory::class)]

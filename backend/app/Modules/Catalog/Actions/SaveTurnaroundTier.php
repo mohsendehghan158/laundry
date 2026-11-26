@@ -21,7 +21,7 @@ final class SaveTurnaroundTier
             if (($data['is_default'] ?? false) === true) {
                 TurnaroundTier::query()
                     ->where('is_default', true)
-                    ->when($tier, fn ($query) => $query->whereKeyNot($tier->getKey()))
+                    ->when($tier !== null, fn ($query) => $query->whereKeyNot($tier?->getKey()))
                     ->update(['is_default' => false]);
             }
 

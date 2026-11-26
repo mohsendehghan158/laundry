@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property StationKind $kind
  * @property int $sort_order
  * @property bool $is_active
+ * @property-read Branch|null $branch archived branches are not loaded
  */
 #[Fillable(['branch_id', 'name', 'code', 'kind', 'sort_order', 'is_active'])]
 #[UseFactory(StationFactory::class)]

@@ -42,7 +42,7 @@ final class Outsource
             $problems = [];
             foreach (array_unique(array_filter(array_map(Tags::normalize(...), $tags))) as $tag) {
                 $piece = Piece::query()->where('tag_code', $tag)->lockForUpdate()->first();
-                $blocker = $piece === null ? __('production.errors.piece_not_found') : Movable::blocker($piece, $branch->id);
+                $blocker = $piece === null ? (string) __('production.errors.piece_not_found') : Movable::blocker($piece, $branch->id);
                 if ($blocker !== null) {
                     $problems[] = "{$tag}: {$blocker}";
                 } else {

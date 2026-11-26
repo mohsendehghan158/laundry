@@ -21,7 +21,7 @@ final class StationFactory extends Factory
     public function definition(): array
     {
         return [
-            'organization_id' => fn (array $attributes) => Branch::query()->withoutGlobalScopes()->findOrFail($attributes['branch_id'])->organization_id,
+            'organization_id' => fn (array $attributes) => Branch::query()->withoutGlobalScopes()->findOrFail((int) $attributes['branch_id'])->organization_id,
             'name' => 'ایستگاه '.fake()->unique()->numberBetween(1, 99999),
             'code' => strtoupper(fake()->unique()->bothify('??#')),
             'kind' => 'process',

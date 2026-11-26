@@ -22,16 +22,16 @@ final class Movable
         $piece->loadMissing(['order', 'branch']);
 
         if (! in_array($piece->order->status, [OrderStatus::Received, OrderStatus::InProcess, OrderStatus::PartiallyReady], true)) {
-            return __('production.move.order_closed');
+            return (string) __('production.move.order_closed');
         }
         if (! $piece->status->inWork()) {
-            return __('production.move.done');
+            return (string) __('production.move.done');
         }
         if ($piece->branch_id !== $branchId) {
-            return __('production.move.elsewhere', ['branch' => $piece->branch->name ?? '—']);
+            return (string) __('production.move.elsewhere', ['branch' => $piece->branch->name ?? '—']);
         }
         if ($piece->flag !== null && $piece->flag !== PieceFlag::Damaged) {
-            return __('production.move.flagged', ['flag' => __("production.flags.{$piece->flag->value}")]);
+            return (string) __('production.move.flagged', ['flag' => __("production.flags.{$piece->flag->value}")]);
         }
 
         $open = DB::table('transfer_pieces')
@@ -40,7 +40,7 @@ final class Movable
             ->where('transfers.status', TransferStatus::Open->value)
             ->value('transfers.number');
 
-        return $open === null ? null : __('production.move.in_transfer', ['number' => $open]);
+        return $open === null ? null : (string) __('production.move.in_transfer', ['number' => $open]);
     }
 
     /** The flag a piece returns to once back: damaged while a damage claim is open, else none. */

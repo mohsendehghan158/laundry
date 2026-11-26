@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $icon
  * @property int $sort_order
  * @property bool $is_active
+ * @property-read ItemCategory|null $category archived categories are not loaded
  */
 #[Fillable(['item_category_id', 'name', 'unit', 'pieces_per_unit', 'icon', 'sort_order', 'is_active'])]
 #[UseFactory(ItemFactory::class)]

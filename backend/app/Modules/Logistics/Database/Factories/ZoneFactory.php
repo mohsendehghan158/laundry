@@ -27,7 +27,7 @@ final class ZoneFactory extends Factory
         $polygon = Polygon::from(self::VANAK);
 
         return [
-            'organization_id' => fn (array $attributes) => Branch::query()->withoutGlobalScopes()->findOrFail($attributes['branch_id'])->organization_id,
+            'organization_id' => fn (array $attributes) => Branch::query()->withoutGlobalScopes()->findOrFail((int) $attributes['branch_id'])->organization_id,
             'name' => 'محدوده '.fake()->unique()->numberBetween(1, 99999),
             'polygon' => $polygon->points,
             ...$polygon->bounds(),
