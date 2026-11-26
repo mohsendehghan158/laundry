@@ -19,7 +19,7 @@ import { PageHeader } from "@/shared/ui/PageHeader";
 import { useOrders } from "../api";
 import { OPEN_STATUSES, ORDER_STATUS_COLOR, PAYMENT_STATUS_COLOR } from "../status";
 
-const STATUSES: OrderStatus[] = ["received", "in_process", "ready", "completed", "cancelled"];
+const STATUSES: OrderStatus[] = ["pending_pickup", "received", "in_process", "ready", "completed", "cancelled"];
 const DUE = ["today", "overdue"] as const;
 
 export function OrdersPage() {
@@ -50,9 +50,12 @@ export function OrdersPage() {
       title: t("orders.columns.ticket"),
       sorter: true,
       render: (value: string, order) => (
-        <Link href={`/orders/${order.id}`} className="ltr">
-          {value}
-        </Link>
+        <Flex gap={6} align="center" wrap>
+          <Link href={`/orders/${order.id}`} className="ltr">
+            {value}
+          </Link>
+          {order.source === "online" && <Tag color="purple">{t("orders.online")}</Tag>}
+        </Flex>
       ),
     },
     {

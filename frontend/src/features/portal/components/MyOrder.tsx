@@ -1,17 +1,19 @@
 "use client";
 
 import { RightOutlined } from "@ant-design/icons";
-import { Alert, Card, Descriptions, Divider, Flex, Result, Skeleton, Steps, Tag, Typography } from "antd";
+import { Alert, App, Button, Card, Descriptions, Divider, Flex, Popconfirm, Result, Skeleton, Steps, Tag, Typography } from "antd";
 import { Fragment, type ReactNode } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { isApiError } from "@/shared/api/client";
-import { formatDateTime } from "@/shared/lib/date";
+import { errorMessage } from "@/shared/api/formErrors";
+import { dayjs, formatDateTime } from "@/shared/lib/date";
 import { formatNumber } from "@/shared/lib/digits";
 import { formatMoney } from "@/shared/lib/money";
-import { useMyOrder, usePortalSettings } from "../api";
-import { currentStep, ORDER_STEPS, statusColor } from "../status";
+import { useCancelOrder, useMyOrder, usePortalSettings } from "../api";
+import { currentStep, statusColor, stepsFor } from "../status";
+import { windowLabel } from "../onlineOrder";
 
 function Row({ first, title, description, amount }: { first: boolean; title: string; description: string; amount: ReactNode }) {
   return (
@@ -30,6 +32,11 @@ function Row({ first, title, description, amount }: { first: boolean; title: str
   );
 }
 
+/** "14:00" in the viewer's time zone. */
+function formatTime(value: string): string {
+  return dayjs(value).format("HH:mm");
+}
+
 /** One of the customer's orders: where it is, what is in it and what is owed. */
 export function MyOrder() {
   const t = useTranslations("portal.order");
@@ -40,6 +47,8 @@ export function MyOrder() {
   const publicId = useParams<{ publicId: string }>().publicId;
   const unit = usePortalSettings().data?.currency_unit ?? "toman";
   const order = useMyOrder(publicId);
+  const cancel = useCancelOrder();
+  const { message } = App.useApp();
 
   const back = (
     <Link href="/my">
@@ -57,7 +66,9 @@ export function MyOrder() {
   const data = order.data;
   const money = (rial: number) => `${formatMoney(rial, unit)} ${tm(unit)}`;
   const cancelled = data.status === "cancelled";
-  const step = currentStep(data.status);
+  const steps = stepsFor(data.source);
+  const step = currentStep(data.status, steps);
+  const readyStep = steps.indexOf("ready");
   const at = (status: string) => data.timeline?.find((entry) => entry.status === status)?.at;
 
   return (
@@ -79,19 +90,48 @@ export function MyOrder() {
             orientation="vertical"
             size="small"
             current={step}
-            items={ORDER_STEPS.map((status) => ({
+            items={steps.map((status) => ({
               title: tm(`statuses.${status}`),
-              content: at(status) ? formatDateTime(at(status)) : status === "ready" && step < 2 && data.due_at ? `${tm("expected")} ${formatDateTime(data.due_at)}` : undefined,
+              content: at(status) ? formatDateTime(at(status)) : status === "ready" && step < readyStep && data.due_at ? `${tm("expected")} ${formatDateTime(data.due_at)}` : undefined,
             }))}
           />
         )}
         {data.status === "ready" && <Alert type="success" showIcon title={t("readyNotice")} style={{ marginTop: 16 }} />}
       </Card>
 
+      {data.pickup && (
+        <Card size="small" title={t("pickup")}>
+          <Descriptions column={1} size="small">
+            <Descriptions.Item label={t("pickupWindow")}>
+              {formatDateTime(data.pickup.starts_at, false)} <span className="ltr">{windowLabel(formatTime(data.pickup.starts_at), formatTime(data.pickup.ends_at))}</span>
+            </Descriptions.Item>
+            <Descriptions.Item label={t("pickupAddress")}>{data.pickup.address}</Descriptions.Item>
+          </Descriptions>
+          {data.items_by_driver && data.lines?.length === 0 && <Alert type="info" showIcon title={t("byDriver")} style={{ marginTop: 8 }} />}
+          {data.can_cancel && (
+            <Popconfirm
+              title={t("cancelConfirm")}
+              okText={t("cancel")}
+              okButtonProps={{ danger: true }}
+              onConfirm={() =>
+                cancel.mutateAsync(data.public_id).then(
+                  () => message.success(t("cancelled")),
+                  (error: unknown) => message.error(errorMessage(error, t("cancelFailed"))),
+                )
+              }
+            >
+              <Button danger block loading={cancel.isPending} style={{ marginTop: 12 }}>
+                {t("cancel")}
+              </Button>
+            </Popconfirm>
+          )}
+        </Card>
+      )}
+
       <Card size="small">
         <Descriptions column={1} size="small">
           <Descriptions.Item label={t("branch")}>{data.branch_name}</Descriptions.Item>
-          <Descriptions.Item label={t("receivedAt")}>{formatDateTime(data.received_at)}</Descriptions.Item>
+          {data.received_at && <Descriptions.Item label={t("receivedAt")}>{formatDateTime(data.received_at)}</Descriptions.Item>}
           {data.due_at && <Descriptions.Item label={t("dueAt")}>{formatDateTime(data.due_at)}</Descriptions.Item>}
         </Descriptions>
       </Card>
@@ -115,6 +155,7 @@ export function MyOrder() {
           <Descriptions.Item label={t("subtotal")}>{money(data.subtotal)}</Descriptions.Item>
           {data.discount_amount > 0 && <Descriptions.Item label={t("discount")}>{money(data.discount_amount)}</Descriptions.Item>}
           {data.tax_amount > 0 && <Descriptions.Item label={t("tax")}>{money(data.tax_amount)}</Descriptions.Item>}
+          {data.delivery_fee > 0 && <Descriptions.Item label={t("deliveryFee")}>{money(data.delivery_fee)}</Descriptions.Item>}
           <Descriptions.Item label={t("total")}>
             <Typography.Text strong>{money(data.total)}</Typography.Text>
           </Descriptions.Item>

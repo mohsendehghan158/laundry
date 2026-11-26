@@ -7,6 +7,9 @@ import type { PortalOrder } from "@/shared/api/types";
 
 export type {
   CustomerSlots,
+  OnlineOrderInput,
+  OnlineOrderQuote,
+  PortalCatalog,
   OtpSent,
   PortalAddress,
   PortalAddressInput,

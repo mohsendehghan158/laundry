@@ -610,7 +610,12 @@
       "createdBy": "Taken by",
       "cancelReason": "Cancellation reason",
       "system": "System",
-      "overdue": "Overdue"
+      "overdue": "Overdue",
+      "deliveryFee": "Delivery fee",
+      "pickup": "Pickup from the door",
+      "pickupWindow": "Pickup time",
+      "pickupAddress": "Address",
+      "itemsByDriver": "The customer left the items for the driver to list."
     },
     "actions": {
       "in_process": "Start work",
@@ -620,7 +625,8 @@
       "cancelPrompt": "Why is the order cancelled?",
       "cancelReason": "Reason",
       "confirm": "Confirm"
-    }
+    },
+    "online": "Online"
   },
   "pieces": {
     "statuses": {
@@ -1263,12 +1269,13 @@
     },
     "orders": {
       "empty": "You have no orders yet.",
-      "emptyHint": "Orders you place at a branch show up here.",
+      "emptyHint": "Orders you place at a branch or here show up here.",
       "error": "Your orders could not be loaded.",
       "due": "Due",
       "pieces": "{count, number} pieces",
       "balance": "Balance",
-      "settled": "Settled"
+      "settled": "Settled",
+      "pickup": "Pickup"
     },
     "order": {
       "back": "Back to orders",
@@ -1284,7 +1291,16 @@
       "total": "Total",
       "paid": "Paid",
       "balance": "Balance",
-      "readyNotice": "Your order is ready; you can pick it up at the branch."
+      "readyNotice": "Your order is ready; you can pick it up at the branch.",
+      "pickup": "Pickup",
+      "pickupWindow": "Pickup time",
+      "pickupAddress": "Address",
+      "byDriver": "The driver lists the items at pickup.",
+      "deliveryFee": "Delivery fee",
+      "cancel": "Cancel order",
+      "cancelConfirm": "Cancel this order? Your place in the window is given up.",
+      "cancelled": "Order cancelled.",
+      "cancelFailed": "The order could not be cancelled."
     },
     "addresses": {
       "title": "My addresses",
@@ -1314,6 +1330,37 @@
       "freeOver": "free for orders from {amount}",
       "minOrder": "Minimum order: {amount}",
       "notServed": "This point is outside the pickup and delivery area. You can save the address, but door-to-door orders are not possible there."
+    },
+    "newOrder": {
+      "title": "Order a pickup from your door",
+      "back": "Back to orders",
+      "start": "New order",
+      "address": "Pickup address",
+      "notServed": "Outside the pickup area",
+      "manageAddresses": "Add or edit addresses",
+      "noAddress": "To order a pickup, first save an address inside the service area.",
+      "window": "Pickup time",
+      "noWindows": "There are no free windows for this address right now; check back later.",
+      "windowsError": "The windows could not be loaded.",
+      "items": "Items",
+      "byDriver": "Let the driver list the items at pickup",
+      "byDriverHelp": "Not sure what you are sending? Tick this; the price is set once the items are listed.",
+      "summary": "Summary",
+      "pickItems": "Pick the items, or leave them for the driver to list.",
+      "quoteError": "The price could not be worked out.",
+      "itemsTotal": "Items, tax included",
+      "deliveryFee": "Delivery fee",
+      "free": "Free",
+      "total": "Total",
+      "byDriverTotal": "The items are added to the price once the driver has listed them.",
+      "belowMinimum": "The minimum online order in this area is {amount}.",
+      "notes": "Notes for the driver",
+      "notesPlaceholder": "For example: second bell, or call before arriving",
+      "pickWindow": "Pick a pickup time.",
+      "submit": "Place order",
+      "payLater": "You pay on delivery.",
+      "placed": "Order {ticket} placed.",
+      "failed": "The order could not be placed."
     }
   },
   "logistics": {

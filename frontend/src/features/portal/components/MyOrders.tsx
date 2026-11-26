@@ -1,6 +1,6 @@
 "use client";
 
-import { LeftOutlined } from "@ant-design/icons";
+import { LeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Empty, Flex, Skeleton, Tag, Typography } from "antd";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -37,9 +37,16 @@ export function MyOrders() {
 
   return (
     <Flex vertical gap={12}>
-      <Typography.Title level={4} style={{ margin: 0 }}>
-        {t("nav.orders")}
-      </Typography.Title>
+      <Flex justify="space-between" align="center" gap={12} wrap>
+        <Typography.Title level={4} style={{ margin: 0 }}>
+          {t("nav.orders")}
+        </Typography.Title>
+        <Link href="/my/orders/new">
+          <Button type="primary" icon={<PlusOutlined />}>
+            {t("newOrder.start")}
+          </Button>
+        </Link>
+      </Flex>
       {orders.data?.length === 0 && <Empty description={t("orders.empty")}>{t("orders.emptyHint")}</Empty>}
       {orders.data?.map((order) => (
         <Link key={order.public_id} href={`/my/orders/${order.public_id}`} aria-label={order.ticket_number}>
@@ -55,7 +62,11 @@ export function MyOrders() {
                 <Typography.Text type="secondary" style={{ fontSize: 13 }}>
                   {order.branch_name}، {t("orders.pieces", { count: order.piece_count })}
                 </Typography.Text>
-                {order.due_at && order.status !== "completed" && order.status !== "cancelled" && (
+                {order.status === "pending_pickup" && order.pickup ? (
+                  <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                    {t("orders.pickup")}: {formatDateTime(order.pickup.starts_at)}
+                  </Typography.Text>
+                ) : order.due_at && order.status !== "completed" && order.status !== "cancelled" && (
                   <Typography.Text type="secondary" style={{ fontSize: 13 }}>
                     {t("orders.due")}: {formatDateTime(order.due_at)}
                   </Typography.Text>

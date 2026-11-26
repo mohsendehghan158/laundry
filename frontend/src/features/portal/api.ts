@@ -1,10 +1,23 @@
 "use client";
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, isApiError } from "@/shared/api/client";
+import { api, apiFetch, isApiError } from "@/shared/api/client";
 import type { Wrapped } from "@/shared/api/types";
 import { toLatinDigits } from "@/shared/lib/digits";
-import type { LatLng, OtpSent, PortalAddress, PortalAddressInput, PortalCustomer, PortalOrder, PortalSettings, ZoneCheck } from "./types";
+import type {
+  CustomerSlots,
+  LatLng,
+  OnlineOrderInput,
+  OnlineOrderQuote,
+  OtpSent,
+  PortalAddress,
+  PortalAddressInput,
+  PortalCatalog,
+  PortalCustomer,
+  PortalOrder,
+  PortalSettings,
+  ZoneCheck,
+} from "./types";
 
 export const portalKeys = {
   settings: ["portal", "settings"] as const,
@@ -13,12 +26,17 @@ export const portalKeys = {
   order: (publicId: string) => ["portal", "orders", publicId] as const,
   addresses: ["portal", "addresses"] as const,
   zoneCheck: (point: LatLng | null) => ["portal", "zone-check", point?.join(",") ?? ""] as const,
+  catalog: ["portal", "catalog"] as const,
+  slots: (addressId: number | null) => ["portal", "slots", addressId] as const,
+  quote: (input: Omit<OnlineOrderInput, "slot_id">) => ["portal", "quote", input] as const,
 };
 
 /** What belongs to one customer must not be shown to the next one on this device. */
 function forgetCustomerData(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.removeQueries({ queryKey: portalKeys.orders });
   queryClient.removeQueries({ queryKey: portalKeys.addresses });
+  queryClient.removeQueries({ queryKey: ["portal", "slots"] });
+  queryClient.removeQueries({ queryKey: ["portal", "quote"] });
 }
 
 /** The business's name and display unit; public, needed before sign-in. */
@@ -153,5 +171,59 @@ export function useZoneCheck(point: LatLng | null) {
     enabled: point !== null,
     staleTime: 10 * 60_000,
     placeholderData: keepPreviousData,
+  });
+}
+
+/** What can be ordered online, with prices. */
+export function usePortalCatalog() {
+  return useQuery({
+    queryKey: portalKeys.catalog,
+    queryFn: async () => (await api.get<Wrapped<PortalCatalog>>("/customer/catalog")).data,
+    staleTime: 10 * 60_000,
+  });
+}
+
+/** The pickup windows that can still be booked for an address. */
+export function useCustomerSlots(addressId: number | null) {
+  return useQuery({
+    queryKey: portalKeys.slots(addressId),
+    queryFn: async () => (await api.get<Wrapped<CustomerSlots>>("/customer/slots", { address_id: addressId! })).data,
+    enabled: addressId !== null,
+    refetchInterval: 60_000,
+  });
+}
+
+/** The price of an order being put together; null input = nothing to price yet. */
+export function useOrderQuote(input: Omit<OnlineOrderInput, "slot_id"> | null) {
+  return useQuery({
+    queryKey: portalKeys.quote(input ?? { address_id: 0 }),
+    queryFn: async () => (await api.post<Wrapped<OnlineOrderQuote>>("/customer/orders/quote", input)).data,
+    enabled: input !== null,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function usePlaceOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ input, key }: { input: OnlineOrderInput; key: string }) =>
+      (await apiFetch<Wrapped<PortalOrder>>("/customer/orders", { method: "POST", body: input, headers: { "Idempotency-Key": key } })).data,
+    onSuccess: (order) => {
+      queryClient.setQueryData(portalKeys.order(order.public_id), order);
+      void queryClient.invalidateQueries({ queryKey: portalKeys.orders });
+      void queryClient.invalidateQueries({ queryKey: ["portal", "slots"] });
+    },
+  });
+}
+
+export function useCancelOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (publicId: string) => (await api.post<Wrapped<PortalOrder>>(`/customer/orders/${publicId}/cancel`)).data,
+    onSuccess: (order) => {
+      queryClient.setQueryData(portalKeys.order(order.public_id), order);
+      void queryClient.invalidateQueries({ queryKey: portalKeys.orders });
+      void queryClient.invalidateQueries({ queryKey: ["portal", "slots"] });
+    },
   });
 }

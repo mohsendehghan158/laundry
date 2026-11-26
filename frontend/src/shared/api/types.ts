@@ -119,3 +119,6 @@ export type PortalAddress = Schemas["PortalAddressResource"];
 export type PortalAddressInput = Partial<Schemas["AddressRequest"]>;
 export type ZoneCheck = Json<operations["portal.zoneCheck"]>["data"];
 export type CustomerSlots = Json<operations["portal.customerSlot"]>["data"];
+export type PortalCatalog = Json<operations["portal.customerCatalog"]>["data"];
+export type OnlineOrderInput = Schemas["OnlineOrderRequest"];
+export type OnlineOrderQuote = Json<operations["portal.orders.quote"]>["data"];

@@ -27,7 +27,7 @@ test("a customer signs in with a texted code and follows the order the counter t
   // A customer the counter already knows is not asked for a name.
   await expect(page.getByRole("heading", { name: "سفارش‌های من" })).toBeVisible();
   await expect(page.getByText("محمد حسینی")).toBeVisible();
-  const newest = page.locator('a[href^="/my/orders/"]').first();
+  const newest = page.locator('a[href^="/my/orders/"]:not([href="/my/orders/new"])').first();
   await expect(newest).toContainText("پذیرش شد");
   await newest.click();
 

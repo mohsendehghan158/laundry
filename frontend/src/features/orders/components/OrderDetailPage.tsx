@@ -13,7 +13,7 @@ import type { OrderLine, OrderStatus, Piece } from "@/shared/api/types";
 import { useCurrencyUnit } from "@/shared/hooks/useCurrencyUnit";
 import { usePermission } from "@/shared/hooks/usePermission";
 import { dayjs, formatDateTime } from "@/shared/lib/date";
-import { formatNumber } from "@/shared/lib/digits";
+import { formatNumber, toPersianDigits } from "@/shared/lib/digits";
 import { formatMoney } from "@/shared/lib/money";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { AssemblyDialog } from "@/features/production/components/AssemblyDialog";
@@ -184,6 +184,7 @@ export function OrderDetailPage() {
                   </Descriptions.Item>
                 )}
                 <Descriptions.Item label={t("orders.detail.tax")}>{money(data.tax_amount)}</Descriptions.Item>
+                {data.delivery_fee > 0 && <Descriptions.Item label={t("orders.detail.deliveryFee")}>{money(data.delivery_fee)}</Descriptions.Item>}
                 <Descriptions.Item label={t("orders.detail.total")}>
                   <strong>{money(data.total)}</strong>
                 </Descriptions.Item>
@@ -234,9 +235,20 @@ export function OrderDetailPage() {
                 </Flex>
               )}
             </Card>
+            {data.pickup && (
+              <Card title={t("orders.detail.pickup")}>
+                <Descriptions column={1} size="small">
+                  <Descriptions.Item label={t("orders.detail.pickupWindow")}>
+                    {formatDateTime(data.pickup.starts_at)} – <span className="ltr">{toPersianDigits(dayjs(data.pickup.ends_at).format("HH:mm"))}</span>
+                  </Descriptions.Item>
+                  <Descriptions.Item label={t("orders.detail.pickupAddress")}>{data.pickup.address}</Descriptions.Item>
+                </Descriptions>
+                {data.items_by_driver && <Alert type="info" showIcon title={t("orders.detail.itemsByDriver")} style={{ marginTop: 8 }} />}
+              </Card>
+            )}
             <Card>
               <Descriptions column={1} size="small">
-                <Descriptions.Item label={t("orders.detail.received")}>{formatDateTime(data.received_at)}</Descriptions.Item>
+                {data.received_at && <Descriptions.Item label={t("orders.detail.received")}>{formatDateTime(data.received_at)}</Descriptions.Item>}
                 <Descriptions.Item label={t("orders.detail.due")}>
                   <Typography.Text type={overdue ? "danger" : undefined}>
                     {formatDateTime(data.due_at)} {overdue && <Tag color="red">{t("orders.detail.overdue")}</Tag>}
