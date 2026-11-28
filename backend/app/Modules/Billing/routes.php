@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Modules\Billing\Http\Controllers\CashShiftController;
+use App\Modules\Billing\Http\Controllers\ExpenseCategoryController;
+use App\Modules\Billing\Http\Controllers\ExpenseController;
 use App\Modules\Billing\Http\Controllers\InvoiceController;
 use App\Modules\Billing\Http\Controllers\OrderPaymentController;
 use App\Modules\Billing\Http\Controllers\PromoCodeController;
@@ -23,6 +25,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('invoices', [InvoiceController::class, 'store']);
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show']);
     Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void']);
+
+    Route::apiResource('expense-categories', ExpenseCategoryController::class)->except('show');
+    Route::apiResource('expenses', ExpenseController::class)->except('show');
 
     Route::apiResource('promo-codes', PromoCodeController::class)->except('show');
 });

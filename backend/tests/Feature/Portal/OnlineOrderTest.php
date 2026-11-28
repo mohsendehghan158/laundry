@@ -196,7 +196,7 @@ it('lets the customer cancel before pickup and frees the window', function () {
 
     expect(Slot::query()->findOrFail($slot)->booked)->toBe(0)
         ->and(Order::query()->sole()->cancel_reason)->toBe('لغو به درخواست مشتری در پرتال')
-        ->and(NotificationLog::query()->pluck('event')->map->value->all())->toBe(['order_placed', 'order_cancelled']);
+        ->and(NotificationLog::query()->orderBy('id')->pluck('event')->map->value->all())->toBe(['order_placed', 'order_cancelled']);
 
     // Once cancelled (or picked up) it stays as it is, and the place is not given back twice.
     $this->postJson("/api/v1/customer/orders/{$order}/cancel", [], fromSpa())->assertConflict()->assertJsonPath('code', 'order_not_cancellable');

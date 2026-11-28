@@ -4462,6 +4462,642 @@
                 }
             }
         },
+        "/expenses": {
+            "get": {
+                "operationId": "expenses.index",
+                "description": "Newest first, for the branches the user works in. `summary` has the\ntotal and the total per category of every matching expense, not\njust this page.",
+                "summary": "List expenses",
+                "tags": [
+                    "Expense"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[branch_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[category_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[from]",
+                        "in": "query",
+                        "description": "Spent on or after this local date (Y-m-d).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[to]",
+                        "in": "query",
+                        "description": "Spent on or before this local date (Y-m-d).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[q]",
+                        "in": "query",
+                        "description": "Part of the description or reference.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ExpenseResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "allOf": [
+                                                    {
+                                                        "$ref": "#/components/schemas/ExpenseResource"
+                                                    },
+                                                    {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "created_by"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        },
+                                        "summary": {
+                                            "type": "object",
+                                            "properties": {
+                                                "total": {
+                                                    "type": "number"
+                                                },
+                                                "by_category": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "total": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "total"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "total",
+                                                "by_category"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta",
+                                        "summary"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "expenses.store",
+                "description": "With `from_register` the cash also leaves the branch's open shift;\nfails with 409 `shift_not_open`, `shift_cash_insufficient` or\n`expense_register_needs_cash`.",
+                "summary": "Record an expense",
+                "tags": [
+                    "Expense"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveExpenseRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ExpenseResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ExpenseResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/expenses/{expense}": {
+            "put": {
+                "operationId": "expenses.update",
+                "description": "An expense paid from the register keeps its branch, amount and\nmethod (409 `expense_from_register`).",
+                "summary": "Update an expense",
+                "tags": [
+                    "Expense"
+                ],
+                "parameters": [
+                    {
+                        "name": "expense",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveExpenseRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ExpenseResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ExpenseResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "expenses.destroy",
+                "description": "One paid from the register puts the cash back into its shift, which\nmust still be open (409 `expense_shift_closed`).",
+                "summary": "Delete an expense",
+                "tags": [
+                    "Expense"
+                ],
+                "parameters": [
+                    {
+                        "name": "expense",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/expense-categories": {
+            "get": {
+                "operationId": "expense-categories.index",
+                "description": "Inactive ones included. A new organization starts with a default set.",
+                "summary": "List expense categories",
+                "tags": [
+                    "ExpenseCategory"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ExpenseCategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ExpenseCategoryResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "expense-categories.store",
+                "summary": "Create an expense category",
+                "tags": [
+                    "ExpenseCategory"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveExpenseCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ExpenseCategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ExpenseCategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/expense-categories/{expenseCategory}": {
+            "put": {
+                "operationId": "expense-categories.update",
+                "summary": "Update an expense category",
+                "tags": [
+                    "ExpenseCategory"
+                ],
+                "parameters": [
+                    {
+                        "name": "expenseCategory",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveExpenseCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ExpenseCategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ExpenseCategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "expense-categories.destroy",
+                "description": "Expenses already recorded keep it.",
+                "summary": "Delete an expense category",
+                "tags": [
+                    "ExpenseCategory"
+                ],
+                "parameters": [
+                    {
+                        "name": "expenseCategory",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/invoices": {
             "get": {
                 "operationId": "invoice.index",
@@ -8230,7 +8866,7 @@
         "/reports/sales": {
             "get": {
                 "operationId": "report.sales",
-                "description": "Orders taken in between two dates (cancelled ones excluded),\ngrouped by day, service, item, branch or the user who took them\nin, with totals. \"collected\" is money received minus refunds in the\nsame period. At most one year at a time.",
+                "description": "Orders taken in between two dates (cancelled ones excluded),\ngrouped by day, service, item, branch or the user who took them\nin, with totals. \"collected\" is money received minus refunds in the\nsame period. Branch expenses of the period are alongside: per day or\nbranch row, per category, and \"net\" = sales without VAT \u2212 expenses.\nAt most one year at a time.",
                 "summary": "Sales report",
                 "tags": [
                     "Report"
@@ -8335,6 +8971,12 @@
                                                                     "integer",
                                                                     "null"
                                                                 ]
+                                                            },
+                                                            "expenses": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
                                                             }
                                                         },
                                                         "required": [
@@ -8345,7 +8987,8 @@
                                                             "discount",
                                                             "tax",
                                                             "total",
-                                                            "collected"
+                                                            "collected",
+                                                            "expenses"
                                                         ]
                                                     }
                                                 },
@@ -8378,6 +9021,12 @@
                                                         },
                                                         "collected": {
                                                             "type": "integer"
+                                                        },
+                                                        "expenses": {
+                                                            "type": "integer"
+                                                        },
+                                                        "net": {
+                                                            "type": "integer"
                                                         }
                                                     },
                                                     "required": [
@@ -8387,13 +9036,38 @@
                                                         "discount",
                                                         "tax",
                                                         "total",
-                                                        "collected"
+                                                        "collected",
+                                                        "expenses",
+                                                        "net"
                                                     ]
+                                                },
+                                                "expenses_by_category": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "total": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "total"
+                                                        ]
+                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "rows",
-                                                "totals"
+                                                "totals",
+                                                "expenses_by_category"
                                             ]
                                         }
                                     },
@@ -13702,6 +14376,125 @@
                 ],
                 "title": "DiscountType"
             },
+            "ExpenseCategoryResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "is_active"
+                ],
+                "title": "ExpenseCategoryResource"
+            },
+            "ExpenseResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "category": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "spent_on": {
+                        "type": "string",
+                        "description": "Local date, Y-m-d."
+                    },
+                    "amount": {
+                        "type": "integer"
+                    },
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "from_register": {
+                        "type": "boolean",
+                        "description": "The cash came out of the register; branch, amount and method are then fixed."
+                    },
+                    "created_by": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "branch",
+                    "category",
+                    "spent_on",
+                    "amount",
+                    "method",
+                    "description",
+                    "reference",
+                    "from_register",
+                    "created_at"
+                ],
+                "title": "ExpenseResource"
+            },
             "HandOverOrderRequest": {
                 "type": "object",
                 "properties": {
@@ -16664,6 +17457,61 @@
                 ],
                 "title": "SaveDefectTypeRequest"
             },
+            "SaveExpenseCategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveExpenseCategoryRequest"
+            },
+            "SaveExpenseRequest": {
+                "type": "object",
+                "description": "Records (POST) or changes (PUT) an expense.",
+                "properties": {
+                    "branch_id": {
+                        "type": "integer"
+                    },
+                    "expense_category_id": {
+                        "type": "integer"
+                    },
+                    "spent_on": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "The local day the money was spent."
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Whole rials.",
+                        "minimum": 1,
+                        "maximum": 1000000000000
+                    },
+                    "method": {
+                        "$ref": "#/components/schemas/PaymentMethod"
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 100
+                    },
+                    "from_register": {
+                        "type": "boolean",
+                        "description": "Cash taken from the branch's open register (new expenses only)."
+                    }
+                },
+                "title": "SaveExpenseRequest"
+            },
             "SaveItemCategoryRequest": {
                 "type": "object",
                 "properties": {
@@ -18423,6 +19271,9 @@
                                 "invoices.view",
                                 "invoices.issue",
                                 "invoices.void",
+                                "expenses.view",
+                                "expenses.manage",
+                                "expenses.categories",
                                 "promotions.manage",
                                 "notifications.manage",
                                 "notifications.view",

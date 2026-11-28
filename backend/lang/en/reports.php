@@ -17,6 +17,8 @@ return [
     'tax' => 'Tax',
     'total' => 'Sales',
     'collected' => 'Collected',
+    'expenses' => 'Expenses',
+    'net' => 'Sales without VAT less expenses',
     'totals' => 'Total',
     'toman' => 'toman',
     'from' => 'from',

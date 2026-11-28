@@ -20,7 +20,7 @@ use InvalidArgumentException;
  * works in are counted. Amounts are whole rials. Cancelled orders do not
  * count as sales.
  *
- * @phpstan-type SalesRow array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null}
+ * @phpstan-type SalesRow array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null, expenses: int|null}
  */
 final class Reports
 {
@@ -91,10 +91,12 @@ final class Reports
 
     /**
      * Sales between two local dates (inclusive), grouped by day, service,
-     * item, branch or the user who took the order in.
+     * item, branch or the user who took the order in. Branch expenses of
+     * the same days sit next to the sales: per row by day and by branch,
+     * per category, and as a net figure (sales without VAT − expenses).
      *
      * @param  list<int>  $branches
-     * @return array{rows: list<SalesRow>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int}}
+     * @return array{rows: list<SalesRow>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int, expenses: int, net: int}, expenses_by_category: list<array{id: int, name: string, total: int}>}
      */
     public function sales(array $branches, string $from, string $to, string $group): array
     {
@@ -102,9 +104,10 @@ final class Reports
         $start = CarbonImmutable::parse($from, $tz)->startOfDay()->utc();
         $end = CarbonImmutable::parse($to, $tz)->endOfDay()->utc();
         $sold = fn (): Builder => $this->orders($branches)->whereBetween('o.received_at', [$start, $end])->where('o.status', '!=', OrderStatus::Cancelled->value);
+        $spent = fn (): Builder => DB::table('expenses as e')->whereIn('e.branch_id', $branches)->whereNull('e.deleted_at')->whereBetween('e.spent_on', [$from, $to]);
 
         $rows = match ($group) {
-            'day' => $this->byDay($sold(), $branches, $start, $end),
+            'day' => $this->byDay($sold(), $branches, $start, $end, $spent()),
             'service', 'item' => $sold()
                 ->join('order_lines as l', 'l.order_id', '=', 'o.id')
                 ->selectRaw(($group === 'service' ? 'l.service_name' : 'l.item_name').' as label, count(distinct o.id) as orders, sum(l.quantity) as quantity, sum(l.line_total) as total')
@@ -113,14 +116,14 @@ final class Reports
                 ->get()
                 ->map(fn (object $row): array => $this->row((string) $row->label, (string) $row->label, (int) $row->orders, (float) $row->quantity, null, null, (int) $row->total, null))
                 ->all(),
-            'branch' => $sold()
+            'branch' => $this->withBranchExpenses(array_values($sold()
                 ->join('branches as b', 'b.id', '=', 'o.branch_id')
                 ->selectRaw('b.id, b.name as label, count(*) as orders, sum(o.discount_amount) as discount, sum(o.tax_amount) as tax, sum(o.total) as total')
                 ->groupBy('b.id', 'b.name')
                 ->orderByDesc('total')
                 ->get()
                 ->map(fn (object $row): array => $this->row((string) $row->id, (string) $row->label, (int) $row->orders, null, (int) $row->discount, (int) $row->tax, (int) $row->total, null))
-                ->all(),
+                ->all()), $spent()),
             'user' => $sold()
                 ->leftJoin('users as u', 'u.id', '=', 'o.created_by')
                 ->selectRaw("coalesce(u.id, 0) as id, coalesce(u.name, '—') as label, count(*) as orders, sum(o.discount_amount) as discount, sum(o.tax_amount) as tax, sum(o.total) as total")
@@ -135,8 +138,19 @@ final class Reports
         $byLine = in_array($group, ['service', 'item'], true);
         $totals = $sold()->selectRaw('count(*) as orders, coalesce(sum(o.discount_amount), 0) as discount, coalesce(sum(o.tax_amount), 0) as tax, coalesce(sum(o.total), 0) as total')->first();
 
+        $byCategory = $spent()
+            ->join('expense_categories as c', 'c.id', '=', 'e.expense_category_id')
+            ->selectRaw('c.id, c.name, sum(e.amount) as total')
+            ->groupBy('c.id', 'c.name')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn (object $row): array => ['id' => (int) $row->id, 'name' => (string) $row->name, 'total' => (int) $row->total])
+            ->all();
+        $expenses = array_sum(array_column($byCategory, 'total'));
+
         return [
             'rows' => array_values($rows),
+            'expenses_by_category' => array_values($byCategory),
             'totals' => [
                 'orders' => (int) ($totals->orders ?? 0),
                 'quantity' => $byLine ? array_sum(array_map(fn (array $row): float => (float) $row['quantity'], $rows)) : null,
@@ -146,16 +160,52 @@ final class Reports
                 'tax' => (int) ($totals->tax ?? 0),
                 'total' => (int) ($totals->total ?? 0),
                 'collected' => $this->collected($branches, $start, $end),
+                'expenses' => $expenses,
+                // Sales without VAT, less expenses.
+                'net' => (int) ($totals->total ?? 0) - (int) ($totals->tax ?? 0) - $expenses,
             ],
         ];
+    }
+
+    /**
+     * Adds each branch's expenses to its row, and rows for branches that
+     * only spent money.
+     *
+     * @param  list<SalesRow>  $rows
+     * @return list<SalesRow>
+     */
+    private function withBranchExpenses(array $rows, Builder $spent): array
+    {
+        $byBranch = $spent
+            ->join('branches as b', 'b.id', '=', 'e.branch_id')
+            ->selectRaw('b.id, b.name, sum(e.amount) as total')
+            ->groupBy('b.id', 'b.name')
+            ->get()
+            ->keyBy('id');
+
+        foreach ($rows as $i => $row) {
+            $rows[$i]['expenses'] = (int) ($byBranch[(int) $row['key']]->total ?? 0);
+            unset($byBranch[(int) $row['key']]);
+        }
+
+        foreach ($byBranch as $branch) {
+            $rows[] = $this->row((string) $branch->id, (string) $branch->name, 0, null, 0, 0, 0, null, (int) $branch->total);
+        }
+
+        return $rows;
     }
 
     /**
      * @param  list<int>  $branches
      * @return list<SalesRow>
      */
-    private function byDay(Builder $sold, array $branches, CarbonImmutable $start, CarbonImmutable $end): array
+    private function byDay(Builder $sold, array $branches, CarbonImmutable $start, CarbonImmutable $end, Builder $spent): array
     {
+        $expenses = $spent
+            ->selectRaw("to_char(e.spent_on, 'YYYY-MM-DD') as day, sum(e.amount) as total")
+            ->groupBy('day')
+            ->pluck('total', 'day');
+
         $orders = $sold
             ->selectRaw($this->localDate('o.received_at').' as day, count(*) as orders, sum(o.discount_amount) as discount, sum(o.tax_amount) as tax, sum(o.total) as total')
             ->groupBy('day')
@@ -175,11 +225,11 @@ final class Reports
             $key = $day->format('Y-m-d');
             $order = $orders[$key] ?? null;
 
-            if ($order === null && ! isset($collected[$key])) {
+            if ($order === null && ! isset($collected[$key]) && ! isset($expenses[$key])) {
                 continue;
             }
 
-            $rows[] = $this->row($key, $key, (int) ($order->orders ?? 0), null, (int) ($order->discount ?? 0), (int) ($order->tax ?? 0), (int) ($order->total ?? 0), (int) ($collected[$key] ?? 0));
+            $rows[] = $this->row($key, $key, (int) ($order->orders ?? 0), null, (int) ($order->discount ?? 0), (int) ($order->tax ?? 0), (int) ($order->total ?? 0), (int) ($collected[$key] ?? 0), (int) ($expenses[$key] ?? 0));
         }
 
         return $rows;
@@ -225,8 +275,8 @@ final class Reports
     /**
      * @return SalesRow
      */
-    private function row(string $key, string $label, ?int $orders, ?float $quantity, ?int $discount, ?int $tax, int $total, ?int $collected): array
+    private function row(string $key, string $label, ?int $orders, ?float $quantity, ?int $discount, ?int $tax, int $total, ?int $collected, ?int $expenses = null): array
     {
-        return compact('key', 'label', 'orders', 'quantity', 'discount', 'tax', 'total', 'collected');
+        return compact('key', 'label', 'orders', 'quantity', 'discount', 'tax', 'total', 'collected', 'expenses');
     }
 }

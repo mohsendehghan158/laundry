@@ -47,9 +47,11 @@ class ReportController
      * Orders taken in between two dates (cancelled ones excluded),
      * grouped by day, service, item, branch or the user who took them
      * in, with totals. "collected" is money received minus refunds in the
-     * same period. At most one year at a time.
+     * same period. Branch expenses of the period are alongside: per day or
+     * branch row, per category, and "net" = sales without VAT − expenses.
+     * At most one year at a time.
      *
-     * @response array{data: array{rows: list<array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null}>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int}}}
+     * @response array{data: array{rows: list<array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null, expenses: int|null}>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int, expenses: int, net: int}, expenses_by_category: list<array{id: int, name: string, total: int}>}}
      */
     public function sales(SalesReportRequest $request, Reports $reports): JsonResponse
     {
@@ -84,8 +86,12 @@ class ReportController
         if ($group === 'day') {
             $headers[] = __('reports.collected')." ({$unit})";
         }
+        $withExpenses = in_array($group, ['day', 'branch'], true);
+        if ($withExpenses) {
+            $headers[] = __('reports.expenses')." ({$unit})";
+        }
 
-        $line = function (array $row) use ($group, $money): array {
+        $line = function (array $row) use ($group, $money, $withExpenses): array {
             $cells = [$row['orders']];
             if (in_array($group, ['service', 'item'], true)) {
                 $cells[] = $row['quantity'];
@@ -97,6 +103,9 @@ class ReportController
             if ($group === 'day') {
                 $cells[] = $money($row['collected']);
             }
+            if ($withExpenses) {
+                $cells[] = $money($row['expenses']);
+            }
 
             return $cells;
         };
@@ -104,6 +113,9 @@ class ReportController
         $rows = array_map(fn (array $row): array => [$label($row['label']), ...$line($row)], $report['rows']);
         // By service or item the rows are order lines, so their total is too.
         $rows[] = [__('reports.totals'), ...$line([...$report['totals'], 'total' => $report['totals']['lines'] ?? $report['totals']['total']])];
+        if ($report['totals']['expenses'] > 0 || $withExpenses) {
+            $rows[] = [__('reports.net')." ({$unit})", $money($report['totals']['net'])];
+        }
 
         $from = (string) $request->validated('from');
         $to = (string) $request->validated('to');
@@ -137,7 +149,7 @@ class ReportController
     }
 
     /**
-     * @return array{rows: list<array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null}>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int}}
+     * @return array{rows: list<array{key: string, label: string, orders: int|null, quantity: float|null, discount: int|null, tax: int|null, total: int, collected: int|null, expenses: int|null}>, totals: array{orders: int, quantity: float|null, lines: int|null, discount: int, tax: int, total: int, collected: int, expenses: int, net: int}, expenses_by_category: list<array{id: int, name: string, total: int}>}
      */
     private function report(SalesReportRequest $request, Reports $reports): array
     {

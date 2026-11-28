@@ -37,6 +37,9 @@ return [
         'invoice_customers_differ' => 'All orders on an invoice must belong to one customer.',
         'invoice_already_void' => 'This invoice is already void.',
         'order_invoiced' => 'This order has an official invoice; void it before changing or cancelling the order.',
+        'expense_from_register' => 'This expense was paid from the register; its branch, amount and method cannot change.',
+        'expense_register_needs_cash' => 'Only cash expenses can be paid from the register.',
+        'expense_shift_closed' => 'The register shift this expense was paid from is closed; it cannot be deleted.',
         'order_has_payments' => 'This order has payments; refund them first.',
 
         'shift_already_open' => 'This branch\'s register is already open.',

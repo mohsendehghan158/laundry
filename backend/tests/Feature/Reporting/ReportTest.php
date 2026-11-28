@@ -31,19 +31,6 @@ function salesWeek(object $shop): array
     return [$first, $cancelled];
 }
 
-function sheetXml(string|false $bytes): string
-{
-    $path = (string) tempnam(sys_get_temp_dir(), 'xlsx');
-    file_put_contents($path, (string) $bytes);
-    $zip = new ZipArchive;
-    $zip->open($path);
-    $sheet = (string) $zip->getFromName('xl/worksheets/sheet1.xml');
-    $zip->close();
-    unlink($path);
-
-    return $sheet;
-}
-
 it('summarizes today and the last two weeks for the dashboard', function () {
     $shop = shop();
     $this->actingAs(staff($shop, 'branch_manager'));
@@ -74,7 +61,7 @@ it('reports sales by day with money collected, excluding cancelled orders', func
         ->assertJsonPath('data.rows.0.total', 1_980_000)
         ->assertJsonPath('data.rows.0.collected', 990_000)
         ->assertJsonPath('data.rows.0.tax', 180_000)
-        ->assertJsonPath('data.totals', ['orders' => 3, 'quantity' => null, 'lines' => null, 'discount' => 0, 'tax' => 500_000, 'total' => 5_500_000, 'collected' => 990_000]);
+        ->assertJsonPath('data.totals', ['orders' => 3, 'quantity' => null, 'lines' => null, 'discount' => 0, 'tax' => 500_000, 'total' => 5_500_000, 'collected' => 990_000, 'expenses' => 0, 'net' => 5_000_000]);
 });
 
 it('groups sales by item, service, branch and user', function () {
