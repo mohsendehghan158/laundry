@@ -821,6 +821,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/expenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List expenses
+         * @description Newest first, for the branches the user works in. `summary` has the
+         *     total and the total per category of every matching expense, not
+         *     just this page.
+         */
+        get: operations["expenses.index"];
+        put?: never;
+        /**
+         * Record an expense
+         * @description With `from_register` the cash also leaves the branch's open shift;
+         *     fails with 409 `shift_not_open`, `shift_cash_insufficient` or
+         *     `expense_register_needs_cash`.
+         */
+        post: operations["expenses.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expenses/{expense}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update an expense
+         * @description An expense paid from the register keeps its branch, amount and
+         *     method (409 `expense_from_register`).
+         */
+        put: operations["expenses.update"];
+        post?: never;
+        /**
+         * Delete an expense
+         * @description One paid from the register puts the cash back into its shift, which
+         *     must still be open (409 `expense_shift_closed`).
+         */
+        delete: operations["expenses.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expense-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List expense categories
+         * @description Inactive ones included. A new organization starts with a default set.
+         */
+        get: operations["expense-categories.index"];
+        put?: never;
+        /** Create an expense category */
+        post: operations["expense-categories.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expense-categories/{expenseCategory}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an expense category */
+        put: operations["expense-categories.update"];
+        post?: never;
+        /**
+         * Delete an expense category
+         * @description Expenses already recorded keep it.
+         */
+        delete: operations["expense-categories.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/invoices": {
         parameters: {
             query?: never;
@@ -1673,7 +1769,9 @@ export interface paths {
          * @description Orders taken in between two dates (cancelled ones excluded),
          *     grouped by day, service, item, branch or the user who took them
          *     in, with totals. "collected" is money received minus refunds in the
-         *     same period. At most one year at a time.
+         *     same period. Branch expenses of the period are alongside: per day or
+         *     branch row, per category, and "net" = sales without VAT − expenses.
+         *     At most one year at a time.
          */
         get: operations["report.sales"];
         put?: never;
@@ -2808,6 +2906,38 @@ export interface components {
          * @enum {string}
          */
         DiscountType: "amount" | "percent";
+        /** ExpenseCategoryResource */
+        ExpenseCategoryResource: {
+            id: number;
+            name: string;
+            is_active: boolean;
+        };
+        /** ExpenseResource */
+        ExpenseResource: {
+            id: number;
+            branch: {
+                id: number;
+                name: string;
+            };
+            category: {
+                id: number;
+                name: string;
+            };
+            /** @description Local date, Y-m-d. */
+            spent_on: string;
+            amount: number;
+            method: components["schemas"]["PaymentMethod"];
+            description: string;
+            reference: string | null;
+            /** @description The cash came out of the register; branch, amount and method are then fixed. */
+            from_register: boolean;
+            created_by?: {
+                id: number;
+                name: string;
+            } | null;
+            /** Format: date-time */
+            created_at: string | null;
+        };
         /** HandOverOrderRequest */
         HandOverOrderRequest: {
             /** @description The ready pieces the customer takes now; the others stay on the rack. */
@@ -3606,6 +3736,31 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /** SaveExpenseCategoryRequest */
+        SaveExpenseCategoryRequest: {
+            name?: string;
+            is_active?: boolean;
+        };
+        /**
+         * SaveExpenseRequest
+         * @description Records (POST) or changes (PUT) an expense.
+         */
+        SaveExpenseRequest: {
+            branch_id?: number;
+            expense_category_id?: number;
+            /**
+             * Format: date
+             * @description The local day the money was spent.
+             */
+            spent_on?: string;
+            /** @description Whole rials. */
+            amount?: number;
+            method?: components["schemas"]["PaymentMethod"];
+            description?: string;
+            reference?: string | null;
+            /** @description Cash taken from the branch's open register (new expenses only). */
+            from_register?: boolean;
+        };
         /** SaveItemCategoryRequest */
         SaveItemCategoryRequest: {
             name: string;
@@ -4095,7 +4250,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "expenses.view" | "expenses.manage" | "expenses.categories" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -6189,6 +6344,299 @@ export interface operations {
             404: components["responses"]["ModelNotFoundException"];
         };
     };
+    "expenses.index": {
+        parameters: {
+            query?: {
+                "filter[branch_id]"?: number;
+                "filter[category_id]"?: number;
+                /** @description Spent on or after this local date (Y-m-d). */
+                "filter[from]"?: string;
+                /** @description Spent on or before this local date (Y-m-d). */
+                "filter[to]"?: string;
+                /** @description Part of the description or reference. */
+                "filter[q]"?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `ExpenseResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: (components["schemas"]["ExpenseResource"] & Record<string, never>)[];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                        summary: {
+                            total: number;
+                            by_category: {
+                                id: number;
+                                name: string;
+                                total: number;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "expenses.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description `ExpenseResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExpenseResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "expenses.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The expense ID */
+                expense: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description `ExpenseResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExpenseResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "expenses.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The expense ID */
+                expense: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "expense-categories.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ExpenseCategoryResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExpenseCategoryResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    "expense-categories.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveExpenseCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description `ExpenseCategoryResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExpenseCategoryResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "expense-categories.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The expense category ID */
+                expenseCategory: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveExpenseCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description `ExpenseCategoryResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExpenseCategoryResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "expense-categories.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The expense category ID */
+                expenseCategory: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "invoice.index": {
         parameters: {
             query?: {
@@ -7960,6 +8408,7 @@ export interface operations {
                                 tax: number | null;
                                 total: number;
                                 collected: number | null;
+                                expenses: number | null;
                             }[];
                             totals: {
                                 orders: number;
@@ -7969,7 +8418,14 @@ export interface operations {
                                 tax: number;
                                 total: number;
                                 collected: number;
+                                expenses: number;
+                                net: number;
                             };
+                            expenses_by_category: {
+                                id: number;
+                                name: string;
+                                total: number;
+                            }[];
                         };
                     };
                 };

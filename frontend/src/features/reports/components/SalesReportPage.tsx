@@ -96,6 +96,18 @@ export function SalesReportPage() {
             render: amount,
           } as const,
         ]),
+    ...(params.group === "day" || params.group === "branch"
+      ? [
+          {
+            key: "expenses",
+            dataIndex: "expenses",
+            title: `${t("reports.columns.expenses")} (${money})`,
+            align: "end",
+            sorter: (a: SalesRow, b: SalesRow) => (a.expenses ?? 0) - (b.expenses ?? 0),
+            render: amount,
+          } as const,
+        ]
+      : []),
   ];
 
   const onExport = () =>
@@ -169,6 +181,30 @@ export function SalesReportPage() {
                 />
               )}
             </Col>
+          </Row>
+          <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+            <Col xs={12} lg={6}>
+              <StatTile title={t("reports.summary.expenses")} value={formatMoney(totals?.expenses ?? 0, unit)} suffix={money} loading={report.isLoading} />
+            </Col>
+            <Col xs={12} lg={6}>
+              <StatTile title={t("reports.summary.net")} value={formatMoney(totals?.net ?? 0, unit)} suffix={money} loading={report.isLoading} />
+            </Col>
+            {(report.data?.expenses_by_category.length ?? 0) > 0 && (
+              <Col xs={24} lg={12}>
+                <Card size="small" title={t("reports.expensesByCategory")}>
+                  <Flex vertical gap={4}>
+                    {report.data?.expenses_by_category.map((category) => (
+                      <Flex key={category.id} justify="space-between">
+                        <span>{category.name}</span>
+                        <span>
+                          {formatMoney(category.total, unit)} {money}
+                        </span>
+                      </Flex>
+                    ))}
+                  </Flex>
+                </Card>
+              </Col>
+            )}
           </Row>
           <Card styles={{ body: { padding: 0 } }}>
             <Table<SalesRow>

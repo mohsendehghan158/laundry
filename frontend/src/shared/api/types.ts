@@ -47,6 +47,9 @@ export type Invoice = Schemas["InvoiceResource"];
 export type InvoiceStatus = Schemas["InvoiceStatus"];
 export type BuyerType = Schemas["BuyerType"];
 export type IssueInvoiceInput = Schemas["IssueInvoiceRequest"];
+export type Expense = Schemas["ExpenseResource"];
+export type ExpenseCategory = Schemas["ExpenseCategoryResource"];
+export type SaveExpenseInput = Schemas["SaveExpenseRequest"];
 
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
@@ -99,6 +102,7 @@ export type ProductionReport = Json<operations["report.production"]>["data"];
 export type DashboardReport = Json<operations["report.dashboard"]>["data"];
 export type SalesReport = Json<operations["report.sales"]>["data"];
 export type SalesRow = SalesReport["rows"][number];
+export type ExpenseList = Json<operations["expenses.index"]>;
 export type SalesGroup = operations["report.sales"]["parameters"]["query"]["group"];
 
 /** Laravel's paginated resource collection. */

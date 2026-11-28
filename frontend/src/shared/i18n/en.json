@@ -80,7 +80,8 @@
     "logistics": "Pickup and delivery",
     "zones": "Service zones",
     "slots": "Time windows",
-    "invoices": "Invoices"
+    "invoices": "Invoices",
+    "expenses": "Expenses"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -195,6 +196,7 @@
       "orders": "Orders",
       "billing": "Register & payments",
       "invoices": "Official invoices",
+      "expenses": "Expenses",
       "promotions": "Promotions",
       "notifications": "Messages",
       "reports": "Reports",
@@ -261,6 +263,11 @@
         "view": "View invoices",
         "issue": "Issue official invoices",
         "void": "Void invoices"
+      },
+      "expenses": {
+        "view": "View expenses",
+        "manage": "Record, edit and delete expenses",
+        "categories": "Manage expense categories"
       },
       "promotions": {
         "manage": "Manage promo codes"
@@ -364,6 +371,7 @@
       "cash": "Register",
       "promo": "Promo codes",
       "invoice": "Invoices",
+      "expense": "Expenses",
       "notifications": "Messages"
     },
     "events": {
@@ -791,6 +799,32 @@
     "sellerSignature": "Seller stamp and signature",
     "buyerSignature": "Buyer stamp and signature"
   },
+  "expenses": {
+    "title": "Expenses",
+    "subtitle": "Branch expenses; the sales report shows them next to sales.",
+    "new": "Record expense",
+    "edit": "Edit expense",
+    "categories": "Expense categories",
+    "newCategory": "New category name",
+    "addCategory": "Add",
+    "deleteCategoryConfirm": "Delete category “{name}”? Recorded expenses keep it.",
+    "total": "Total expenses",
+    "byCategory": "By category",
+    "none": "No expenses in this period.",
+    "searchPlaceholder": "Description or document number",
+    "fromRegister": "Paid from the register",
+    "fromRegisterHelp": "The amount is taken out of this branch's open register so the drawer count stays right.",
+    "fromRegisterTag": "From register",
+    "lockedHelp": "This expense was paid from the register; its branch, amount and method are fixed.",
+    "deleteConfirm": "Delete this expense?",
+    "deleteFromRegisterConfirm": "Delete this expense and put the money back into the register?",
+    "fields": {
+      "category": "Category",
+      "spentOn": "Date",
+      "description": "Description",
+      "reference": "Invoice or document number"
+    }
+  },
   "promotions": {
     "title": "Promo codes",
     "subtitle": "Codes customers give at the counter or online.",
@@ -955,14 +989,17 @@
       "discount": "Discount",
       "tax": "Tax",
       "total": "Sales",
-      "collected": "Collected"
+      "collected": "Collected",
+      "expenses": "Expenses"
     },
     "summary": {
       "sales": "Sales",
       "collected": "Collected (net of refunds)",
       "orders": "Orders",
       "average": "Average order",
-      "quantity": "Items"
+      "quantity": "Items",
+      "expenses": "Expenses",
+      "net": "Sales without VAT less expenses"
     },
     "presets": {
       "today": "Today",
@@ -975,7 +1012,8 @@
     "totals": "Total",
     "export": "Export to Excel",
     "empty": "No sales in this period.",
-    "lineNote": "By service or item, each row adds up order lines before the order's discount and tax; the Sales card shows the orders' final totals."
+    "lineNote": "By service or item, each row adds up order lines before the order's discount and tax; the Sales card shows the orders' final totals.",
+    "expensesByCategory": "Expenses by category"
   },
   "pieceFlags": {
     "rework": "Rework",
