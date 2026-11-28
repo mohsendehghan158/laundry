@@ -73,7 +73,7 @@ test("the counter refuses a discount above the cashier's limit", async ({ page }
   await page.locator(".ant-select-dropdown:visible").getByText("فاطمه رحیمی").click();
   await addItem(page, "لباس روزمره", "پیراهن");
 
-  await page.getByRole("button", { name: "تخفیف" }).click();
+  await page.getByRole("button", { name: "تخفیف", exact: true }).click();
   await page.locator(".ant-popover").getByRole("spinbutton").fill("۲۰");
   await page.locator(".ant-popover").getByRole("button", { name: "اعمال" }).click();
 
@@ -81,7 +81,7 @@ test("the counter refuses a discount above the cashier's limit", async ({ page }
   await expect(page.getByText("تخفیف بیشتر از سقف مجاز (10 درصد) است.")).toBeVisible();
 
   // Within the limit it goes through: 90,000 − 10% = 81,000, +10% VAT.
-  await page.getByRole("button", { name: "تخفیف" }).click();
+  await page.getByRole("button", { name: "تخفیف", exact: true }).click();
   await page.locator(".ant-popover").getByRole("spinbutton").fill("10");
   await page.locator(".ant-popover").getByRole("button", { name: "اعمال" }).click();
   await expect(page.getByTestId("pos-total")).toHaveText("۸۹٬۱۰۰ تومان");

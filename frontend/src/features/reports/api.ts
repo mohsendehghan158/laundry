@@ -2,7 +2,7 @@
 
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { api, apiDownload } from "@/shared/api/client";
-import type { DashboardReport, ProductionReport, SalesGroup, SalesReport } from "@/shared/api/types";
+import type { DashboardReport, ProductionReport, ReceivablesReport, SalesGroup, SalesReport } from "@/shared/api/types";
 
 export function useDashboardReport(branchId: number | null, enabled = true) {
   return useQuery({
@@ -37,4 +37,21 @@ export function useProductionReport(filters: ProductionFilters) {
     queryFn: async () => (await api.get<{ data: ProductionReport }>("/reports/production", filters)).data,
     placeholderData: keepPreviousData,
   });
+}
+
+/** Balanced journal lines of the period, for accounting software. */
+export function useExportJournal() {
+  return useMutation({ mutationFn: ({ from, to, branch_id }: Omit<SalesFilters, "group">) => apiDownload("/reports/accounting/export", { from, to, branch_id }) });
+}
+
+export function useReceivables(branchId: number | null) {
+  return useQuery({
+    queryKey: ["reports", "receivables", branchId],
+    queryFn: async () => (await api.get<{ data: ReceivablesReport }>("/reports/receivables", { branch_id: branchId })).data,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useExportReceivables() {
+  return useMutation({ mutationFn: (branchId: number | null) => apiDownload("/reports/receivables/export", { branch_id: branchId }) });
 }

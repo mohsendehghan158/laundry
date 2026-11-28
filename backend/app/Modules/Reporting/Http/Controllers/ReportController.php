@@ -6,9 +6,13 @@ namespace App\Modules\Reporting\Http\Controllers;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Support\Settings;
+use App\Modules\Reporting\Http\Requests\AccountingExportRequest;
 use App\Modules\Reporting\Http\Requests\ProductionReportRequest;
+use App\Modules\Reporting\Http\Requests\ReceivablesRequest;
 use App\Modules\Reporting\Http\Requests\SalesReportRequest;
+use App\Modules\Reporting\Support\AccountingJournal;
 use App\Modules\Reporting\Support\ProductionReport;
+use App\Modules\Reporting\Support\Receivables;
 use App\Modules\Reporting\Support\Reports;
 use App\Support\Export\XlsxWriter;
 use App\Support\Text\Jalali;
@@ -146,6 +150,79 @@ class ReportController
             (string) $request->validated('from'),
             (string) $request->validated('to'),
         )]);
+    }
+
+    /**
+     * Receivables aging
+     *
+     * What every customer, or company for orders charged to one, still
+     * owes, by days past due: current, 1-30, 31-60, 61-90 and over 90.
+     * Orders are due when taken in, or after the company's payment terms.
+     *
+     * @response array{data: array{as_of: string, rows: list<array{key: string, kind: 'company'|'customer', id: int, name: string, mobile: string|null, orders: int, current: int, d30: int, d60: int, d90: int, over90: int, total: int, oldest_days: int}>, totals: array{orders: int, current: int, d30: int, d60: int, d90: int, over90: int, total: int}}}
+     */
+    public function receivables(ReceivablesRequest $request, Reports $reports, Receivables $receivables): JsonResponse
+    {
+        $branchId = $request->validated('branch_id');
+
+        return response()->json(['data' => $receivables->aging($reports->branches($request->actor(), $branchId === null ? null : (int) $branchId))]);
+    }
+
+    /**
+     * Download the receivables aging as Excel
+     *
+     * Amounts in the display unit.
+     */
+    public function receivablesExport(ReceivablesRequest $request, Reports $reports, Receivables $receivables, Settings $settings): Response
+    {
+        $branchId = $request->validated('branch_id');
+        $aging = $receivables->aging($reports->branches($request->actor(), $branchId === null ? null : (int) $branchId));
+        $toman = $settings->get('general.currency_unit') === 'toman';
+        $unit = $toman ? __('reports.toman') : __('reports.rial');
+        $money = fn (int $rial): int => $toman ? intdiv($rial, 10) : $rial;
+
+        $headers = [__('reports.aging.name'), __('reports.aging.mobile'), __('reports.orders')];
+        foreach ([...Receivables::BUCKETS, 'total'] as $column) {
+            $headers[] = __("reports.aging.{$column}")." ({$unit})";
+        }
+        $headers[] = __('reports.aging.oldest_days');
+
+        $rows = array_map(fn (array $row): array => [
+            $row['name'], $row['mobile'], $row['orders'],
+            ...array_map(fn (string $column): int => $money($row[$column]), [...Receivables::BUCKETS, 'total']),
+            $row['oldest_days'],
+        ], $aging['rows']);
+        $rows[] = [__('reports.totals'), null, $aging['totals']['orders'], ...array_map(fn (string $column): int => $money($aging['totals'][$column]), [...Receivables::BUCKETS, 'total']), null];
+
+        return response(XlsxWriter::build(__('reports.aging.sheet'), $headers, $rows), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="receivables-'.$aging['as_of'].'.xlsx"',
+        ]);
+    }
+
+    /**
+     * Download an accounting journal as Excel
+     *
+     * Every order taken in, payment, refund and expense of the period as
+     * balanced journal lines (date, document, description, account code
+     * and name, debit, credit) in rials, for import into accounting
+     * software. Same period rules as the sales report.
+     */
+    public function accountingExport(AccountingExportRequest $request, Reports $reports, AccountingJournal $journal): Response
+    {
+        $branchId = $request->validated('branch_id');
+        $from = (string) $request->validated('from');
+        $to = (string) $request->validated('to');
+        $entries = $journal->entries($reports->branches($request->actor(), $branchId === null ? null : (int) $branchId), $from, $to);
+
+        $headers = [__('reports.journal.date'), __('reports.journal.document'), __('reports.journal.description'), __('reports.journal.code'), __('reports.journal.account'), __('reports.journal.debit'), __('reports.journal.credit')];
+        $rows = array_map(fn (array $entry): array => [$entry['date'], $entry['document'], $entry['description'], $entry['code'], $entry['account'], $entry['debit'], $entry['credit']], $entries);
+        $rows[] = [__('reports.totals'), null, null, null, null, array_sum(array_column($entries, 'debit')), array_sum(array_column($entries, 'credit'))];
+
+        return response(XlsxWriter::build(__('reports.journal.sheet'), $headers, $rows), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="journal-'.$from.'-'.$to.'.xlsx"',
+        ]);
     }
 
     /**

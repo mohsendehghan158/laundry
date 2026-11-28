@@ -675,9 +675,10 @@ erDiagram
 | سفارش | `POST /orders`، `GET /orders`، `GET /orders/{id}`، `PATCH /orders/{id}`، `POST /orders/{id}/transitions`، `POST /orders/{id}/handover`، `POST /orders/price-preview` |
 | قطعه و کارگاه | `POST /scans` (تکی و دسته‌ای)، `GET /pieces/{tag}`، `GET /production/board`، `POST /assembly/scan`، `POST /assembly/{order}/complete`، CRUD روی `stations` و `racks`، `POST /transfers` و `/transfers/{id}/pieces`، `/send`، `/receive`، `/close`، `POST /shipments` و `/shipments/{id}/receive`، CRUD روی `vendors`، `POST /claims` و `/claims/{id}/resolve`، `/reject`، `POST /pieces/{id}/photos` |
 | لجستیک | `GET /slots/available`، `POST /logistics/tasks`، `POST /routes`، `POST /routes/{id}/optimize`، `GET /driver/route/today`، `POST /driver/tasks/{id}/complete` |
-| مالی | `POST /orders/{id}/payments`، `POST /payments/{id}/refund`، `POST /cash-shifts/open`، `POST /cash-shifts/{id}/close`، `GET /invoices/{id}/pdf`، `POST /payments/gateway/callback` |
+| مالی | `POST /orders/{id}/payments` و `/refunds`، `POST /cash-shifts` و `/cash-shifts/{id}/close`، `GET`/`POST /invoices` و `POST /invoices/{id}/void` (PDF با صفحه چاپ مرورگر)، CRUD روی `expenses` و `expense-categories`، `POST /payments/gateway/callback` |
+| سازمانی | CRUD روی `companies`، `/companies/{id}/departments` و `/members`، `GET /companies/{id}/statement` و `POST /companies/{id}/statement/invoice` (فاکتور گروهی)، `POST /delivery-notes` و `/delivery-notes/{id}/confirm`، CRUD روی `price-lists` |
 | اعلان | CRUD روی `notification-templates`، `GET /notification-logs`، `POST /push/subscribe` |
-| گزارش | `GET /reports/dashboard`، `GET /reports/sales`، `GET /reports/sales/export` (اکسل)، `GET /reports/production` (زمان چرخه و تحویل به‌موقع) |
+| گزارش | `GET /reports/dashboard`، `GET /reports/sales` (با هزینه‌ها)، `GET /reports/sales/export` (اکسل)، `GET /reports/production` (زمان چرخه و تحویل به‌موقع)، `GET /reports/receivables` و `/export` (سن مطالبات)، `GET /reports/accounting/export` (دفتر روزنامه برای نرم‌افزار حسابداری) |
 | عمومی | `GET /public/track/{code}`، `GET /public/price-list`، `GET /public/zones/check` |
 
 ---
@@ -959,6 +960,7 @@ gantt
 - حواله ورود و خروج با شمارش، صورت‌حساب دوره‌ای و فاکتور گروهی، سن مطالبات
 - پرتال سازمانی؛ خروجی حسابداری
 - **معیار پذیرش**: صورت‌حساب ماهانه یک هتل با یک کلیک ساخته می‌شود و با حواله‌ها می‌خواند
+- **وضعیت**: انجام‌شده — فاکتور رسمی، هزینه‌ها، مشتری سازمانی و قرارداد، حواله ورود و خروج، صورت‌حساب دوره‌ای و فاکتور گروهی، سن مطالبات، خروجی حسابداری. مانده — پرتال سازمانی.
 
 ### فاز ۶ — وفاداری و بازاریابی (حدود ۳ هفته)
 

@@ -15,7 +15,7 @@ import { formatMoney } from "@/shared/lib/money";
 import { JalaliRangePicker } from "@/shared/ui/JalaliDatePicker";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { StatTile } from "@/shared/ui/StatTile";
-import { useExportSales, useSalesReport, type SalesFilters } from "../api";
+import { useExportJournal, useExportSales, useSalesReport, type SalesFilters } from "../api";
 import { useRangePresets } from "../presets";
 
 const GROUPS: SalesGroup[] = ["day", "service", "item", "branch", "user"];
@@ -38,6 +38,7 @@ export function SalesReportPage() {
   const filters: SalesFilters = { from: params.from, to: params.to, group: params.group, branch_id: params.branch };
   const report = useSalesReport(filters);
   const exporter = useExportSales();
+  const journal = useExportJournal();
   const multiBranch = (me?.branches.length ?? 0) > 1;
   const lines = LINE_GROUPS.includes(params.group);
   const money = t(`money.${unit}`);
@@ -121,9 +122,18 @@ export function SalesReportPage() {
         title={t("reports.title")}
         subtitle={t("reports.subtitle")}
         extra={
-          <Button icon={<DownloadOutlined />} onClick={onExport} loading={exporter.isPending} disabled={!report.data}>
-            {t("reports.export")}
-          </Button>
+          <>
+            <Button
+              icon={<DownloadOutlined />}
+              loading={journal.isPending}
+              onClick={() => journal.mutate(filters, { onError: (error) => message.error(errorMessage(error, t("common.error"))) })}
+            >
+              {t("reports.journalExport")}
+            </Button>
+            <Button icon={<DownloadOutlined />} onClick={onExport} loading={exporter.isPending} disabled={!report.data}>
+              {t("reports.export")}
+            </Button>
+          </>
         }
       />
       <Card style={{ marginBottom: 16 }}>

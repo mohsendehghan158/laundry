@@ -10915,6 +10915,290 @@
                 }
             }
         },
+        "/reports/receivables": {
+            "get": {
+                "operationId": "report.receivables",
+                "description": "What every customer, or company for orders charged to one, still\nowes, by days past due: current, 1-30, 31-60, 61-90 and over 90.\nOrders are due when taken in, or after the company's payment terms.",
+                "summary": "Receivables aging",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "as_of": {
+                                                    "type": "string"
+                                                },
+                                                "rows": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "kind": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "company",
+                                                                    "customer"
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "mobile": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "orders": {
+                                                                "type": "integer"
+                                                            },
+                                                            "current": {
+                                                                "type": "integer"
+                                                            },
+                                                            "d30": {
+                                                                "type": "integer"
+                                                            },
+                                                            "d60": {
+                                                                "type": "integer"
+                                                            },
+                                                            "d90": {
+                                                                "type": "integer"
+                                                            },
+                                                            "over90": {
+                                                                "type": "integer"
+                                                            },
+                                                            "total": {
+                                                                "type": "integer"
+                                                            },
+                                                            "oldest_days": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "key",
+                                                            "kind",
+                                                            "id",
+                                                            "name",
+                                                            "mobile",
+                                                            "orders",
+                                                            "current",
+                                                            "d30",
+                                                            "d60",
+                                                            "d90",
+                                                            "over90",
+                                                            "total",
+                                                            "oldest_days"
+                                                        ]
+                                                    }
+                                                },
+                                                "totals": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "orders": {
+                                                            "type": "integer"
+                                                        },
+                                                        "current": {
+                                                            "type": "integer"
+                                                        },
+                                                        "d30": {
+                                                            "type": "integer"
+                                                        },
+                                                        "d60": {
+                                                            "type": "integer"
+                                                        },
+                                                        "d90": {
+                                                            "type": "integer"
+                                                        },
+                                                        "over90": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "orders",
+                                                        "current",
+                                                        "d30",
+                                                        "d60",
+                                                        "d90",
+                                                        "over90",
+                                                        "total"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "as_of",
+                                                "rows",
+                                                "totals"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/reports/receivables/export": {
+            "get": {
+                "operationId": "report.receivablesExport",
+                "description": "Amounts in the display unit.",
+                "summary": "Download the receivables aging as Excel",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/reports/accounting/export": {
+            "get": {
+                "operationId": "report.accountingExport",
+                "description": "Every order taken in, payment, refund and expense of the period as\nbalanced journal lines (date, document, description, account code\nand name, debit, credit) in rials, for import into accounting\nsoftware. Same period rules as the sales report.",
+                "summary": "Download an accounting journal as Excel",
+                "tags": [
+                    "Report"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "description": "Local dates (the organization's time zone), both included.",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/permissions": {
             "get": {
                 "operationId": "role.permissions",

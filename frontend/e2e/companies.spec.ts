@@ -84,3 +84,14 @@ test("the hotel's goods come in on a delivery note and the month is invoiced in 
   await invoice.close();
   await expect(statement.getByRole("button", { name: "صدور فاکتور گروهی" })).toBeDisabled();
 });
+
+test("the accountant sees what the hotel owes in the receivables aging", async ({ page }) => {
+  await loginAndWait(page, "accountant");
+  await page.goto("/reports/receivables");
+  await expect(page.getByRole("heading", { name: "سن مطالبات" })).toBeVisible();
+  const row = page.getByRole("row").filter({ hasText: "هتل آزادی" });
+  // Two orders: 89,100 at the counter and 356,400 from the delivery note, not due for 30 days.
+  await expect(row.getByRole("cell").nth(2)).toHaveText("۴۴۵٬۵۰۰");
+  await page.goto("/reports");
+  await expect(page.getByRole("button", { name: "خروجی حسابداری" })).toBeVisible();
+});

@@ -2070,6 +2070,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/receivables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Receivables aging
+         * @description What every customer, or company for orders charged to one, still
+         *     owes, by days past due: current, 1-30, 31-60, 61-90 and over 90.
+         *     Orders are due when taken in, or after the company's payment terms.
+         */
+        get: operations["report.receivables"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/receivables/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the receivables aging as Excel
+         * @description Amounts in the display unit.
+         */
+        get: operations["report.receivablesExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/accounting/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download an accounting journal as Excel
+         * @description Every order taken in, payment, refund and expense of the period as
+         *     balanced journal lines (date, document, description, account code
+         *     and name, debit, credit) in rials, for import into accounting
+         *     software. Same period rules as the sales report.
+         */
+        get: operations["report.accountingExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/permissions": {
         parameters: {
             query?: never;
@@ -9710,6 +9775,112 @@ export interface operations {
                             }[];
                         };
                     };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "report.receivables": {
+        parameters: {
+            query?: {
+                branch_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            as_of: string;
+                            rows: {
+                                key: string;
+                                /** @enum {string} */
+                                kind: "company" | "customer";
+                                id: number;
+                                name: string;
+                                mobile: string | null;
+                                orders: number;
+                                current: number;
+                                d30: number;
+                                d60: number;
+                                d90: number;
+                                over90: number;
+                                total: number;
+                                oldest_days: number;
+                            }[];
+                            totals: {
+                                orders: number;
+                                current: number;
+                                d30: number;
+                                d60: number;
+                                d90: number;
+                                over90: number;
+                                total: number;
+                            };
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "report.receivablesExport": {
+        parameters: {
+            query?: {
+                branch_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "report.accountingExport": {
+        parameters: {
+            query: {
+                /** @description Local dates (the organization's time zone), both included. */
+                from: string;
+                to: string;
+                branch_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
             401: components["responses"]["AuthenticationException"];

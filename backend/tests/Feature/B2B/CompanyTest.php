@@ -12,24 +12,6 @@ beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-11-24 10:00', 'Asia/Tehran'));
 });
 
-/** A hotel on account (credit 2,000,000) whose housekeeping orders for it. */
-function hotel(object $shop, array $attributes = []): object
-{
-    return app(OrganizationContext::class)->runFor($shop->organization->id, function () use ($shop, $attributes): object {
-        $company = Company::query()->create(['name' => 'هتل آزادی', 'credit_limit' => 2_000_000, ...$attributes]);
-        $housekeeping = $company->departments()->create(['name' => 'خانه‌داری', 'code' => 'HK']);
-        $restaurant = $company->departments()->create(['name' => 'رستوران']);
-        $shop->customer->forceFill(['company_id' => $company->id])->save();
-
-        return (object) ['company' => $company, 'housekeeping' => $housekeeping, 'restaurant' => $restaurant];
-    });
-}
-
-function shirtPayload(object $shop, int $quantity = 1, array $extra = []): array
-{
-    return orderPayload($shop, ['lines' => [['item_id' => $shop->shirt->id, 'service_type_id' => $shop->dc->id, 'quantity' => $quantity]], ...$extra]);
-}
-
 it('manages companies with their contract, departments and members', function () {
     $shop = shop();
     $this->actingAs($this->userWithRole('accountant', $shop->organization));

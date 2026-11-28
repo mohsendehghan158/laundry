@@ -82,7 +82,8 @@
     "slots": "Time windows",
     "invoices": "Invoices",
     "expenses": "Expenses",
-    "companies": "Corporate customers"
+    "companies": "Corporate customers",
+    "receivables": "Receivables aging"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -1146,7 +1147,23 @@
     "export": "Export to Excel",
     "empty": "No sales in this period.",
     "lineNote": "By service or item, each row adds up order lines before the order's discount and tax; the Sales card shows the orders' final totals.",
-    "expensesByCategory": "Expenses by category"
+    "expensesByCategory": "Expenses by category",
+    "journalExport": "Accounting export",
+    "aging": {
+      "title": "Receivables aging",
+      "subtitle": "Open balances as of {date}, by days past due",
+      "name": "Customer / company",
+      "current": "Not yet due",
+      "d30": "1-30 days",
+      "d60": "31-60 days",
+      "d90": "61-90 days",
+      "over90": "Over 90 days",
+      "total": "Total owed",
+      "oldest": "Oldest (days)",
+      "overdue": "Past due",
+      "empty": "Nothing is owed.",
+      "note": "An order is due the day it is taken in; for company orders, that day plus the contract’s payment terms. Company orders are totalled under the company."
+    }
   },
   "pieceFlags": {
     "rework": "Rework",

@@ -30,7 +30,7 @@ test("a branch manager issues an invoice for an order and an accountant voids it
   const dialog = page.getByRole("dialog", { name: "صدور فاکتور رسمی" });
   await expect(dialog.getByLabel("نام و نام خانوادگی")).toHaveValue("محمد حسینی");
   await dialog.getByText("شخص حقوقی").click();
-  await dialog.getByLabel("نام شرکت / سازمان").fill("هتل آزادی");
+  await dialog.getByLabel("نام شرکت / سازمان").fill("هتل پارسیان");
   await dialog.getByLabel("شناسه ملی").fill("10101234566");
   const popup = page.waitForEvent("popup");
   await dialog.getByRole("button", { name: "صدور فاکتور" }).click();
@@ -46,7 +46,7 @@ test("a branch manager issues an invoice for an order and an accountant voids it
   const invoice = (await (await page.request.get(`/api/v1/orders/${order.id}`, { headers: API_HEADERS })).json()).data.invoice;
   await page.goto(`/print/invoices/${invoice.id}?auto=0`);
   await expect(page.getByRole("heading", { name: "صورتحساب فروش کالا و خدمات" })).toBeVisible();
-  await expect(page.getByText("هتل آزادی")).toBeVisible();
+  await expect(page.getByText("هتل پارسیان")).toBeVisible();
   await expect(page.getByText("۴۱۱۲۳۴۵۶۷۸۹۰")).toBeVisible();
   // One shirt, 900,000 rials + 90,000 VAT.
   await expect(page.getByText("نهصد و نود هزار ریال")).toBeVisible();
@@ -55,7 +55,7 @@ test("a branch manager issues an invoice for an order and an accountant voids it
   await page.context().clearCookies();
   await loginAndWait(page, "accountant");
   await page.goto("/invoices");
-  const row = page.getByRole("row").filter({ hasText: "هتل آزادی" });
+  const row = page.getByRole("row").filter({ hasText: "هتل پارسیان" });
   await expect(row.getByText("صادرشده")).toBeVisible();
   await row.getByRole("button", { name: "ابطال" }).click();
   const voiding = page.getByRole("dialog");

@@ -10,23 +10,6 @@ beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-11-24 10:00', 'Asia/Tehran'));
 });
 
-function incomingNote(object $shop, object $hotel, array $overrides = []): array
-{
-    return [
-        'type' => 'in',
-        'company_id' => $hotel->company->id,
-        'branch_id' => $shop->branch->id,
-        'customer_id' => $shop->customer->id,
-        'company_department_id' => $hotel->housekeeping->id,
-        'lines' => [
-            // The hotel says 20 shirts and 3 suits; 19 shirts are counted here.
-            ['item_id' => $shop->shirt->id, 'service_type_id' => $shop->dc->id, 'expected_quantity' => 20, 'counted_quantity' => '۱۹'],
-            ['item_id' => $shop->suit->id, 'service_type_id' => $shop->dc->id, 'expected_quantity' => 3, 'counted_quantity' => 3],
-        ],
-        ...$overrides,
-    ];
-}
-
 it('turns a confirmed incoming delivery note into an order of what was counted', function () {
     $shop = shop();
     $hotel = hotel($shop, ['credit_limit' => null]);
