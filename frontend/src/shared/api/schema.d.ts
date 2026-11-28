@@ -821,6 +821,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List invoices
+         * @description Newest first, for the branches the user works in.
+         */
+        get: operations["invoice.index"];
+        put?: never;
+        /**
+         * Issue an invoice
+         * @description For one order, or several of the same customer (a group invoice).
+         *     Takes the next invoice number and the seller details from settings.
+         *     Fails with 409 `order_not_invoiceable` (cancelled, or no items yet),
+         *     `order_already_invoiced` or `invoice_customers_differ`.
+         */
+        post: operations["invoice.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invoices/{invoice}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Show an invoice */
+        get: operations["invoice.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invoices/{invoice}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Void an invoice
+         * @description With a reason; the number is not reused and its orders can be
+         *     invoiced again. Fails with 409 `invoice_already_void`.
+         */
+        post: operations["invoice.void"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/items": {
         parameters: {
             query?: never;
@@ -2535,6 +2600,15 @@ export interface components {
          * @enum {string}
          */
         BranchType: "store" | "plant" | "hybrid";
+        /**
+         * BuyerType
+         * @description | |
+         *     |---|
+         *     | `individual` <br/> A person: national code of 10 digits. |
+         *     | `legal` <br/> A company or institution: national id of 11 digits. |
+         * @enum {string}
+         */
+        BuyerType: "individual" | "legal";
         /** CashMovementRequest */
         CashMovementRequest: {
             type: components["schemas"]["CashMovementType"];
@@ -2691,6 +2765,18 @@ export interface components {
             notes: string | null;
             /** @description Shown as a warning whenever the customer is picked at the counter. */
             alert: string | null;
+            /** @description Buyer details from the customer's last invoice. */
+            invoice_details: {
+                /** @enum {string} */
+                type: "individual" | "legal";
+                name: string;
+                national_id: string | null;
+                economic_code: string | null;
+                registration_number: string | null;
+                postal_code: string | null;
+                address: string | null;
+                phone: string | null;
+            } | null;
             /** @description Present on a single customer and after saving. */
             addresses?: components["schemas"]["CustomerAddressResource"][];
             /** Format: date-time */
@@ -2740,6 +2826,105 @@ export interface components {
             file: string;
             /** @description false (default): only compare; true: also save, when the sheet has no errors. */
             apply?: boolean;
+        };
+        /** InvoiceResource */
+        InvoiceResource: {
+            id: number;
+            number: number;
+            status: components["schemas"]["InvoiceStatus"];
+            /** Format: date-time */
+            issued_at: string;
+            branch: {
+                id: number;
+                name: string;
+            };
+            customer: {
+                id: number;
+                name: string;
+                mobile: string;
+            };
+            seller: {
+                name: string;
+                national_id: string | null;
+                economic_code: string | null;
+                registration_number: string | null;
+                postal_code: string | null;
+                address: string | null;
+                phone: string | null;
+            };
+            buyer: {
+                /** @enum {string} */
+                type: "individual" | "legal";
+                name: string;
+                national_id: string | null;
+                economic_code: string | null;
+                registration_number: string | null;
+                postal_code: string | null;
+                address: string | null;
+                phone: string | null;
+            };
+            vat_percent: number;
+            subtotal: number;
+            discount_amount: number;
+            tax_amount: number;
+            total: number;
+            notes: string | null;
+            created_by?: {
+                id: number;
+                name: string;
+            } | null;
+            /** @description Set once voided. */
+            void: {
+                at: string;
+                reason: string;
+                by: {
+                    id: number;
+                    name: string;
+                } | null;
+            } | null;
+            orders?: {
+                id: number;
+                ticket_number: string;
+            }[];
+            lines?: {
+                position: number;
+                order_id: number | null;
+                description: string;
+                quantity: number;
+                unit: string | null;
+                unit_price: number;
+                amount: number;
+                discount: number;
+                tax: number;
+                total: number;
+            }[];
+        };
+        /**
+         * InvoiceStatus
+         * @description | |
+         *     |---|
+         *     | `issued` <br/>  |
+         *     | `void` <br/> Cancelled with a reason; the number stays taken. |
+         * @enum {string}
+         */
+        InvoiceStatus: "issued" | "void";
+        /**
+         * IssueInvoiceRequest
+         * @description Issues an invoice for orders of one customer, with the buyer's details
+         *     as they should be printed.
+         */
+        IssueInvoiceRequest: {
+            order_ids: number[];
+            buyer_type: components["schemas"]["BuyerType"];
+            buyer_name: string;
+            /** @description National code (10 digits) of a person or national id (11 digits) of a company; required for companies. */
+            buyer_national_id?: string | null;
+            buyer_economic_code?: string | null;
+            buyer_registration_number?: string | null;
+            buyer_postal_code?: string | null;
+            buyer_address?: string | null;
+            buyer_phone?: string | null;
+            notes?: string | null;
         };
         /** ItemCategoryResource */
         ItemCategoryResource: {
@@ -2939,6 +3124,11 @@ export interface components {
             /** @description Still to be paid. */
             balance: number;
             piece_count?: number;
+            /** @description The invoice that bills this order (voided ones are not shown). */
+            invoice?: {
+                id: number;
+                number: number;
+            } | null;
             /** @description Send back with an edit; a newer version on the server means someone else changed the order. */
             version: number;
             /** @description Statuses this order can be moved to with POST /orders/{id}/transitions. */
@@ -3905,7 +4095,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -3917,6 +4107,16 @@ export interface components {
             tax?: {
                 vat_percent?: number;
                 prices_include_vat?: boolean;
+            };
+            invoice?: {
+                seller_name?: string | null;
+                seller_national_id?: string | null;
+                seller_economic_code?: string | null;
+                seller_registration_number?: string | null;
+                seller_postal_code?: string | null;
+                seller_address?: string | null;
+                seller_phone?: string | null;
+                notes?: string | null;
             };
             receipt?: {
                 header_text?: string | null;
@@ -3995,6 +4195,10 @@ export interface components {
             phone: string | null;
             services: string | null;
             is_active: boolean;
+        };
+        /** VoidInvoiceRequest */
+        VoidInvoiceRequest: {
+            reason: string;
         };
         /** ZoneResource */
         ZoneResource: {
@@ -5983,6 +6187,159 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "invoice.index": {
+        parameters: {
+            query?: {
+                /** @description issued or void. */
+                "filter[status]"?: string;
+                "filter[branch_id]"?: number;
+                "filter[customer_id]"?: number;
+                /** @description Invoice number, or part of the buyer name. */
+                "filter[q]"?: string;
+                /** @description Issued on or after this date (Y-m-d). */
+                "filter[from]"?: string;
+                /** @description Issued on or before this date (Y-m-d). */
+                "filter[to]"?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `InvoiceResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvoiceResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "invoice.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueInvoiceRequest"];
+            };
+        };
+        responses: {
+            /** @description `InvoiceResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvoiceResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "invoice.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The invoice ID */
+                invoice: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `InvoiceResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvoiceResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "invoice.void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The invoice ID */
+                invoice: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoidInvoiceRequest"];
+            };
+        };
+        responses: {
+            /** @description `InvoiceResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvoiceResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "items.index": {
@@ -8002,6 +8359,16 @@ export interface operations {
                                 vat_percent: number;
                                 prices_include_vat: boolean;
                             };
+                            invoice: {
+                                seller_name: string | null;
+                                seller_national_id: string | null;
+                                seller_economic_code: string | null;
+                                seller_registration_number: string | null;
+                                seller_postal_code: string | null;
+                                seller_address: string | null;
+                                seller_phone: string | null;
+                                notes: string | null;
+                            };
                             receipt: {
                                 header_text: string | null;
                                 footer_text: string | null;
@@ -8057,6 +8424,16 @@ export interface operations {
                             tax: {
                                 vat_percent: number;
                                 prices_include_vat: boolean;
+                            };
+                            invoice: {
+                                seller_name: string | null;
+                                seller_national_id: string | null;
+                                seller_economic_code: string | null;
+                                seller_registration_number: string | null;
+                                seller_postal_code: string | null;
+                                seller_address: string | null;
+                                seller_phone: string | null;
+                                notes: string | null;
                             };
                             receipt: {
                                 header_text: string | null;

@@ -79,7 +79,8 @@
     "productionReport": "Production report",
     "logistics": "Pickup and delivery",
     "zones": "Service zones",
-    "slots": "Time windows"
+    "slots": "Time windows",
+    "invoices": "Invoices"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -193,6 +194,7 @@
       "customers": "Customers",
       "orders": "Orders",
       "billing": "Register & payments",
+      "invoices": "Official invoices",
       "promotions": "Promotions",
       "notifications": "Messages",
       "reports": "Reports",
@@ -255,6 +257,11 @@
         "operate": "Open and close the register",
         "view": "Review shifts"
       },
+      "invoices": {
+        "view": "View invoices",
+        "issue": "Issue official invoices",
+        "void": "Void invoices"
+      },
       "promotions": {
         "manage": "Manage promo codes"
       },
@@ -290,6 +297,7 @@
       "organization": "Organization",
       "general": "General",
       "tax": "Tax",
+      "invoice": "Official invoice",
       "receipt": "Receipt",
       "production": "Workshop",
       "logistics": "Pickup and delivery"
@@ -308,7 +316,18 @@
       "bookingDays": "Days customers can book ahead",
       "bookingDaysHelp": "Customers can pick a window from today through this many days.",
       "leadMinutes": "Minimum notice before a window (minutes)",
-      "leadMinutesHelp": "Windows starting sooner than this are not offered to customers."
+      "leadMinutesHelp": "Windows starting sooner than this are not offered to customers.",
+      "sellerHelp": "Printed as the seller on official invoices and frozen into each one; changing it does not alter invoices already issued.",
+      "sellerName": "Seller name",
+      "sellerNameHelp": "Leave empty to print the business name.",
+      "sellerNationalId": "National id / national code",
+      "sellerEconomicCode": "Economic code",
+      "sellerRegistrationNumber": "Registration number",
+      "sellerPostalCode": "Postal code",
+      "sellerPhone": "Phone",
+      "sellerAddress": "Address",
+      "invoiceNotes": "Invoice footer text",
+      "digitsInvalid": "Digits only, of the right length."
     }
   },
   "activity": {
@@ -344,6 +363,7 @@
       "order": "Orders",
       "cash": "Register",
       "promo": "Promo codes",
+      "invoice": "Invoices",
       "notifications": "Messages"
     },
     "events": {
@@ -359,7 +379,9 @@
       "cancelled": "Cancelled",
       "refunded": "Refund",
       "shift_closed": "Register closed",
-      "handed_over": "Handed over"
+      "handed_over": "Handed over",
+      "issued": "Invoice issued",
+      "voided": "Invoice voided"
     }
   },
   "account": {
@@ -699,6 +721,75 @@
     "history": "Recent shifts",
     "shiftDetails": "Shift details",
     "noDifference": "No difference"
+  },
+  "invoices": {
+    "title": "Official invoices",
+    "subtitle": "VAT sales invoices; amounts in rials.",
+    "searchPlaceholder": "Invoice number or buyer name",
+    "issue": "Issue invoice",
+    "issueTitle": "Issue an official invoice",
+    "issueHelp": "Buyer details exactly as they should be printed. An issued invoice cannot be edited; void it and issue a new one instead.",
+    "issued": "Invoice {number} issued.",
+    "number": "Invoice {number}",
+    "print": "Print invoice",
+    "void": "Void",
+    "voidTitle": "Void invoice {number}",
+    "voidPrompt": "Give the reason. The invoice number is never reused, and its orders can be invoiced again.",
+    "voidReason": "Reason for voiding",
+    "voided": "Invoice voided.",
+    "voidStamp": "VOID",
+    "statuses": {
+      "issued": "Issued",
+      "void": "Void"
+    },
+    "buyerTypes": {
+      "individual": "Individual",
+      "legal": "Company"
+    },
+    "columns": {
+      "number": "Number",
+      "issuedAt": "Issued",
+      "buyer": "Buyer",
+      "tax": "Tax (rial)",
+      "totalRial": "Total (rial)"
+    },
+    "fields": {
+      "buyerType": "Buyer type",
+      "buyerName": "Full name",
+      "companyName": "Company / organization",
+      "personCode": "National code",
+      "legalId": "National id",
+      "economicCode": "Economic code",
+      "registrationNumber": "Registration number",
+      "postalCode": "Postal code",
+      "phone": "Phone",
+      "address": "Address",
+      "notes": "Note on the invoice"
+    },
+    "notesHelp": "Leave empty to use the invoice footer from settings.",
+    "personCodeLength": "A national code has 10 digits.",
+    "legalIdLength": "A national id has 11 digits.",
+    "economicCodeLength": "An economic code has 10 to 14 digits.",
+    "postalCodeLength": "A postal code has 10 digits.",
+    "printTitle": "Sales invoice for goods and services",
+    "orders": "Order",
+    "seller": "Seller",
+    "buyer": "Buyer",
+    "line": {
+      "position": "#",
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price (rial)",
+      "amount": "Amount (rial)",
+      "discount": "Discount (rial)",
+      "afterDiscount": "After discount (rial)",
+      "tax": "VAT {percent}% (rial)",
+      "total": "Total (rial)"
+    },
+    "totals": "Totals",
+    "payable": "Amount payable",
+    "sellerSignature": "Seller stamp and signature",
+    "buyerSignature": "Buyer stamp and signature"
   },
   "promotions": {
     "title": "Promo codes",

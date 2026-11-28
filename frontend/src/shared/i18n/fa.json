@@ -79,7 +79,8 @@
     "productionReport": "گزارش تولید",
     "logistics": "جمع‌آوری و تحویل",
     "zones": "محدوده‌های سرویس",
-    "slots": "بازه‌های زمانی"
+    "slots": "بازه‌های زمانی",
+    "invoices": "فاکتورها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -193,6 +194,7 @@
       "customers": "مشتریان",
       "orders": "سفارش‌ها",
       "billing": "صندوق و پرداخت",
+      "invoices": "فاکتور رسمی",
       "promotions": "تخفیف و بازاریابی",
       "notifications": "پیامک و اعلان",
       "reports": "گزارش‌ها",
@@ -255,6 +257,11 @@
         "operate": "باز و بسته کردن صندوق",
         "view": "مشاهده گزارش شیفت‌ها"
       },
+      "invoices": {
+        "view": "مشاهده فاکتورها",
+        "issue": "صدور فاکتور رسمی",
+        "void": "ابطال فاکتور"
+      },
       "promotions": {
         "manage": "مدیریت کدهای تخفیف"
       },
@@ -290,6 +297,7 @@
       "organization": "سازمان",
       "general": "عمومی",
       "tax": "مالیات",
+      "invoice": "فاکتور رسمی",
       "receipt": "رسید",
       "production": "کارگاه",
       "logistics": "جمع‌آوری و تحویل"
@@ -308,7 +316,18 @@
       "bookingDays": "چند روز جلوتر قابل رزرو است",
       "bookingDaysHelp": "مشتری از امروز تا این تعداد روز می‌تواند بازه انتخاب کند.",
       "leadMinutes": "حداقل فاصله تا شروع بازه (دقیقه)",
-      "leadMinutesHelp": "بازه‌ای که زودتر از این شروع شود به مشتری نشان داده نمی‌شود."
+      "leadMinutesHelp": "بازه‌ای که زودتر از این شروع شود به مشتری نشان داده نمی‌شود.",
+      "sellerHelp": "این مشخصات به‌عنوان فروشنده روی فاکتورهای رسمی چاپ می‌شود و در هر فاکتور ثابت می‌ماند؛ تغییر آن فاکتورهای صادرشده را عوض نمی‌کند.",
+      "sellerName": "نام فروشنده",
+      "sellerNameHelp": "اگر خالی باشد نام کسب‌وکار چاپ می‌شود.",
+      "sellerNationalId": "شناسه ملی / کد ملی",
+      "sellerEconomicCode": "کد اقتصادی",
+      "sellerRegistrationNumber": "شماره ثبت",
+      "sellerPostalCode": "کد پستی",
+      "sellerPhone": "تلفن",
+      "sellerAddress": "نشانی",
+      "invoiceNotes": "متن پایین فاکتور",
+      "digitsInvalid": "فقط رقم، با طول درست."
     }
   },
   "activity": {
@@ -344,6 +363,7 @@
       "order": "سفارش‌ها",
       "cash": "صندوق",
       "promo": "کدهای تخفیف",
+      "invoice": "فاکتورها",
       "notifications": "پیامک‌ها"
     },
     "events": {
@@ -359,7 +379,9 @@
       "cancelled": "لغو",
       "refunded": "بازپرداخت",
       "shift_closed": "بستن صندوق",
-      "handed_over": "تحویل"
+      "handed_over": "تحویل",
+      "issued": "صدور فاکتور",
+      "voided": "ابطال فاکتور"
     }
   },
   "account": {
@@ -699,6 +721,75 @@
     "history": "شیفت‌های اخیر",
     "shiftDetails": "جزئیات شیفت",
     "noDifference": "بدون مغایرت"
+  },
+  "invoices": {
+    "title": "فاکتورهای رسمی",
+    "subtitle": "صورتحساب‌های فروش با مالیات بر ارزش افزوده؛ مبالغ به ریال.",
+    "searchPlaceholder": "شماره فاکتور یا نام خریدار",
+    "issue": "صدور فاکتور",
+    "issueTitle": "صدور فاکتور رسمی",
+    "issueHelp": "مشخصات خریدار همان‌طور که باید روی فاکتور چاپ شود. فاکتور پس از صدور قابل ویرایش نیست؛ برای اصلاح، باطل و دوباره صادر کنید.",
+    "issued": "فاکتور شماره {number} صادر شد.",
+    "number": "فاکتور {number}",
+    "print": "چاپ فاکتور",
+    "void": "ابطال",
+    "voidTitle": "ابطال فاکتور {number}",
+    "voidPrompt": "دلیل ابطال را بنویسید. شماره فاکتور دوباره استفاده نمی‌شود و سفارش‌های آن دوباره قابل فاکتور شدن هستند.",
+    "voidReason": "دلیل ابطال",
+    "voided": "فاکتور باطل شد.",
+    "voidStamp": "باطل شده",
+    "statuses": {
+      "issued": "صادرشده",
+      "void": "باطل"
+    },
+    "buyerTypes": {
+      "individual": "شخص حقیقی",
+      "legal": "شخص حقوقی"
+    },
+    "columns": {
+      "number": "شماره",
+      "issuedAt": "تاریخ صدور",
+      "buyer": "خریدار",
+      "tax": "مالیات (ریال)",
+      "totalRial": "جمع کل (ریال)"
+    },
+    "fields": {
+      "buyerType": "نوع خریدار",
+      "buyerName": "نام و نام خانوادگی",
+      "companyName": "نام شرکت / سازمان",
+      "personCode": "کد ملی",
+      "legalId": "شناسه ملی",
+      "economicCode": "کد اقتصادی",
+      "registrationNumber": "شماره ثبت",
+      "postalCode": "کد پستی",
+      "phone": "تلفن",
+      "address": "نشانی",
+      "notes": "توضیح روی فاکتور"
+    },
+    "notesHelp": "اگر خالی باشد متن پایین فاکتور از تنظیمات می‌آید.",
+    "personCodeLength": "کد ملی ۱۰ رقم است.",
+    "legalIdLength": "شناسه ملی ۱۱ رقم است.",
+    "economicCodeLength": "کد اقتصادی ۱۰ تا ۱۴ رقم است.",
+    "postalCodeLength": "کد پستی ۱۰ رقم است.",
+    "printTitle": "صورتحساب فروش کالا و خدمات",
+    "orders": "سفارش",
+    "seller": "مشخصات فروشنده",
+    "buyer": "مشخصات خریدار",
+    "line": {
+      "position": "ردیف",
+      "description": "شرح کالا یا خدمت",
+      "quantity": "تعداد / مقدار",
+      "unitPrice": "مبلغ واحد (ریال)",
+      "amount": "مبلغ (ریال)",
+      "discount": "تخفیف (ریال)",
+      "afterDiscount": "مبلغ پس از تخفیف (ریال)",
+      "tax": "مالیات و عوارض {percent}٪ (ریال)",
+      "total": "جمع کل (ریال)"
+    },
+    "totals": "جمع",
+    "payable": "مبلغ قابل پرداخت",
+    "sellerSignature": "مهر و امضای فروشنده",
+    "buyerSignature": "مهر و امضای خریدار"
   },
   "promotions": {
     "title": "کدهای تخفیف",

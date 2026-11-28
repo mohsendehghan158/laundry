@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckOutlined, CloseCircleOutlined, DollarOutlined, EditOutlined, ExportOutlined, PlayCircleOutlined, PrinterOutlined, RollbackOutlined, TagsOutlined, UndoOutlined } from "@ant-design/icons";
+import { AuditOutlined, CheckOutlined, CloseCircleOutlined, DollarOutlined, EditOutlined, ExportOutlined, PlayCircleOutlined, PrinterOutlined, RollbackOutlined, TagsOutlined, UndoOutlined } from "@ant-design/icons";
 import { Alert, App, Button, Card, Col, Descriptions, Flex, Input, Modal, Result, Row, Skeleton, Table, Tag, Timeline, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
@@ -19,6 +19,8 @@ import { PageHeader } from "@/shared/ui/PageHeader";
 import { AssemblyDialog } from "@/features/production/components/AssemblyDialog";
 import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { openPrint } from "@/features/printing/api";
+import { openInvoicePrint } from "@/features/invoices/api";
+import { IssueInvoiceModal } from "@/features/invoices/components/IssueInvoiceModal";
 import { useOrder, useTransitionOrder, useUpdateRack } from "../api";
 import { OPEN_STATUSES, ORDER_STATUS_COLOR, PAYMENT_STATUS_COLOR } from "../status";
 
@@ -37,6 +39,7 @@ export function OrderDetailPage() {
   const [assembling, setAssembling] = useState(false);
   const [answer, setAnswer] = useState("");
   const [paying, setPaying] = useState<"pay" | "refund" | null>(null);
+  const [invoicing, setInvoicing] = useState(false);
 
   if (order.isLoading) {
     return <Skeleton active />;
@@ -133,6 +136,21 @@ export function OrderDetailPage() {
             <Button icon={<TagsOutlined />} onClick={() => openPrint(data.id, "tags")} aria-label={t("printing.tags")}>
               {t("printing.tags")}
             </Button>
+            {data.invoice ? (
+              can("invoices.view") && (
+                <Button icon={<AuditOutlined />} onClick={() => data.invoice && openInvoicePrint(data.invoice.id)}>
+                  {t("invoices.number", { number: toPersianDigits(data.invoice.number) })}
+                </Button>
+              )
+            ) : (
+              can("invoices.issue") &&
+              data.status !== "cancelled" &&
+              (data.lines ?? []).length > 0 && (
+                <Button icon={<AuditOutlined />} onClick={() => setInvoicing(true)}>
+                  {t("invoices.issue")}
+                </Button>
+              )
+            )}
             {["ready", "partially_ready"].includes(data.status) && can("orders.handover") && (
               <Link href={`/handover?code=${encodeURIComponent(data.ticket_number)}`}>
                 <Button type="primary" icon={<ExportOutlined />}>
@@ -310,6 +328,7 @@ export function OrderDetailPage() {
       </Row>
       <PaymentModal order={data} mode={paying ?? "pay"} open={paying !== null} onClose={() => setPaying(null)} />
       <AssemblyDialog orderId={data.id} open={assembling} onClose={() => setAssembling(false)} />
+      <IssueInvoiceModal orderIds={[data.id]} customerId={data.customer.id} open={invoicing} onClose={() => setInvoicing(false)} />
       <Modal
         open={asking !== null}
         title={t("orders.actions.cancelled")}

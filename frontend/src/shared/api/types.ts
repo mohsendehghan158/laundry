@@ -43,6 +43,10 @@ export type Payment = Schemas["PaymentResource"];
 export type PaymentMethod = Schemas["PaymentMethod"];
 export type PromoCode = Schemas["PromoCodeResource"];
 export type SavePromoCodeInput = Schemas["SavePromoCodeRequest"];
+export type Invoice = Schemas["InvoiceResource"];
+export type InvoiceStatus = Schemas["InvoiceStatus"];
+export type BuyerType = Schemas["BuyerType"];
+export type IssueInvoiceInput = Schemas["IssueInvoiceRequest"];
 
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];

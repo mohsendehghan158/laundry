@@ -7,7 +7,7 @@ import { applyFormErrors, errorMessage } from "@/shared/api/formErrors";
 import type { Settings } from "@/shared/api/types";
 import { usePermission } from "@/shared/hooks/usePermission";
 import { parseAmount } from "@/shared/lib/money";
-import { inputNumberFormatter } from "@/shared/lib/digits";
+import { inputNumberFormatter, toLatinDigits } from "@/shared/lib/digits";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { useOrganization, useSettings, useUpdateOrganization, useUpdateSettings } from "../api";
 
@@ -63,7 +63,7 @@ function OrganizationForm() {
   );
 }
 
-function SettingsForm({ section }: { section: "general" | "tax" | "receipt" | "production" | "logistics" }) {
+function SettingsForm({ section }: { section: "general" | "tax" | "invoice" | "receipt" | "production" | "logistics" }) {
   const t = useTranslations();
   const { message } = App.useApp();
   const { can } = usePermission();
@@ -132,6 +132,41 @@ function SettingsForm({ section }: { section: "general" | "tax" | "receipt" | "p
           </Form.Item>
         </>
       )}
+      {section === "invoice" && (
+        <>
+          <Alert type="info" showIcon title={t("settings.fields.sellerHelp")} style={{ marginBottom: 16 }} />
+          <Form.Item name={["invoice", "seller_name"]} label={t("settings.fields.sellerName")} extra={t("settings.fields.sellerNameHelp")} rules={[{ max: 150 }]}>
+            <Input />
+          </Form.Item>
+          {(
+            [
+              ["seller_national_id", "sellerNationalId", /^(\d{10}|\d{11})$/, 11],
+              ["seller_economic_code", "sellerEconomicCode", /^\d{10,14}$/, 14],
+              ["seller_registration_number", "sellerRegistrationNumber", /^\d{1,20}$/, 20],
+              ["seller_postal_code", "sellerPostalCode", /^\d{10}$/, 10],
+            ] as const
+          ).map(([name, label, pattern, max]) => (
+            <Form.Item
+              key={name}
+              name={["invoice", name]}
+              label={t(`settings.fields.${label}`)}
+              normalize={(v: string) => toLatinDigits(v ?? "").replace(/\D/g, "") || null}
+              rules={[{ pattern, message: t("settings.fields.digitsInvalid") }]}
+            >
+              <Input dir="ltr" inputMode="numeric" maxLength={max} style={{ width: 240 }} />
+            </Form.Item>
+          ))}
+          <Form.Item name={["invoice", "seller_phone"]} label={t("settings.fields.sellerPhone")} normalize={(v: string) => toLatinDigits(v ?? "") || null} rules={[{ max: 20 }]}>
+            <Input dir="ltr" style={{ width: 240 }} />
+          </Form.Item>
+          <Form.Item name={["invoice", "seller_address"]} label={t("settings.fields.sellerAddress")} rules={[{ max: 500 }]}>
+            <Input.TextArea rows={2} maxLength={500} />
+          </Form.Item>
+          <Form.Item name={["invoice", "notes"]} label={t("settings.fields.invoiceNotes")} rules={[{ max: 500 }]}>
+            <Input.TextArea rows={2} showCount maxLength={500} />
+          </Form.Item>
+        </>
+      )}
       {section === "receipt" && (
         <>
           <Form.Item name={["receipt", "header_text"]} label={t("settings.fields.headerText")} rules={[{ max: 500 }]}>
@@ -197,6 +232,7 @@ export function SettingsPage() {
             { key: "organization", label: t("settings.tabs.organization"), children: <OrganizationForm /> },
             { key: "general", label: t("settings.tabs.general"), children: <SettingsForm section="general" /> },
             { key: "tax", label: t("settings.tabs.tax"), children: <SettingsForm section="tax" /> },
+            { key: "invoice", label: t("settings.tabs.invoice"), children: <SettingsForm section="invoice" /> },
             { key: "receipt", label: t("settings.tabs.receipt"), children: <SettingsForm section="receipt" /> },
             { key: "production", label: t("settings.tabs.production"), children: <SettingsForm section="production" /> },
             { key: "logistics", label: t("settings.tabs.logistics"), children: <SettingsForm section="logistics" /> },
