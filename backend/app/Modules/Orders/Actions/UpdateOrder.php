@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Actions;
 
+use App\Modules\B2B\Models\Company;
+use App\Modules\B2B\Support\CompanyAccounts;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Models\Order;
@@ -18,6 +20,7 @@ final class UpdateOrder
     public function __construct(
         private readonly OrderPricer $pricer,
         private readonly OrderWriter $writer,
+        private readonly CompanyAccounts $companies,
     ) {}
 
     /**
@@ -51,7 +54,16 @@ final class UpdateOrder
             throw ApiException::conflict('order_total_below_paid');
         }
 
-        return DB::transaction(function () use ($actor, $order, $data, $priced): Order {
+        $company = $order->company_id === null ? null : Company::query()->find($order->company_id);
+        $departmentId = array_key_exists('company_department_id', $data)
+            ? $this->writer->department($company, $data['company_department_id'])
+            : $order->company_department_id;
+
+        return DB::transaction(function () use ($actor, $order, $data, $priced, $company, $departmentId): Order {
+            if ($company !== null) {
+                $this->companies->assertCredit(Company::query()->lockForUpdate()->findOrFail($company->id), $priced['total'] - $order->paid_amount, $order->id);
+            }
+
             $before = ['total' => $order->total, 'lines' => $order->lines()->count()];
 
             $locked = Order::query()->lockForUpdate()->findOrFail($order->id);
@@ -64,6 +76,7 @@ final class UpdateOrder
             $order->fill([
                 ...$this->writer->attributes($priced, Arr::get($data, 'discount.reason')),
                 'notes' => array_key_exists('notes', $data) ? $data['notes'] : $order->notes,
+                'company_department_id' => $departmentId,
                 'payment_status' => PaymentStatus::for($priced['total'], $order->paid_amount),
                 'version' => $order->version + 1,
             ])->save();

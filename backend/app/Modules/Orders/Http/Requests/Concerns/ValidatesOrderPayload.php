@@ -48,6 +48,8 @@ trait ValidatesOrderPayload
             // Rials for "amount", percent (up to two decimals) for "percent".
             'discount.value' => ['required_with:discount', 'numeric', 'min:0', $this->input('discount.type') === DiscountType::Percent->value ? 'max:100' : 'max:1000000000000'],
             'discount.reason' => ['nullable', 'string', 'max:255'],
+            // For customers of a company: the department the order is charged to.
+            'company_department_id' => ['nullable', 'integer'],
         ];
     }
 

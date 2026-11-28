@@ -29,7 +29,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class OrderController
 {
     /** Relations an order is shown with. */
-    private const array DETAIL = ['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'lines.pieces.rackSlot', 'history.user', 'payments.user', 'invoices'];
+    private const array DETAIL = ['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'lines.pieces.rackSlot', 'history.user', 'payments.user', 'invoices', 'company', 'department'];
 
     /**
      * List orders
@@ -48,7 +48,7 @@ class OrderController
     {
         Gate::authorize('orders.view');
 
-        $orders = QueryBuilder::for(Order::query()->visibleTo($actor)->with(['branch', 'customer'])->withCount('pieces'))
+        $orders = QueryBuilder::for(Order::query()->visibleTo($actor)->with(['branch', 'customer', 'company', 'department'])->withCount('pieces'))
             ->allowedFilters(
                 AllowedFilter::callback('q', function (Builder $query, mixed $value): void {
                     $term = trim(Digits::toLatin(is_array($value) ? implode(',', $value) : (string) $value));
@@ -62,6 +62,7 @@ class OrderController
                 }),
                 AllowedFilter::callback('status', fn (Builder $query, mixed $value) => $query->whereIn('status', (array) $value)),
                 AllowedFilter::exact('branch_id'),
+                AllowedFilter::exact('company_id'),
                 AllowedFilter::exact('customer_id'),
                 AllowedFilter::callback('due', function (Builder $query, mixed $value): void {
                     $open = array_map(fn (OrderStatus $status): string => $status->value, array_filter(OrderStatus::cases(), fn (OrderStatus $status): bool => $status->isOpen()));

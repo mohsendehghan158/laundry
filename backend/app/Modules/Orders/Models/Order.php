@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Models;
 
+use App\Modules\B2B\Models\Company;
+use App\Modules\B2B\Models\CompanyDepartment;
 use App\Modules\Billing\Models\Invoice;
 use App\Modules\Billing\Models\Payment;
 use App\Modules\Billing\Models\PromoCode;
@@ -35,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @property int $organization_id
  * @property int $branch_id
  * @property int $customer_id
+ * @property int|null $company_id charged to this company
+ * @property int|null $company_department_id
  * @property string $public_id
  * @property string $ticket_number
  * @property OrderStatus $status
@@ -75,6 +79,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Branch $branch
  * @property-read Customer $customer
+ * @property-read Company|null $company
+ * @property-read CompanyDepartment|null $department
  * @property-read User|null $creator
  * @property-read PromoCode|null $promoCode
  * @property-read Collection<int, Invoice> $invoices
@@ -152,6 +158,22 @@ class Order extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class)->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo<Company, $this>
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class)->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo<CompanyDepartment, $this>
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(CompanyDepartment::class, 'company_department_id');
     }
 
     /**

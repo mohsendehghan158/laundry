@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Customers\Models;
 
+use App\Modules\B2B\Models\Company;
 use App\Modules\Customers\Database\Factories\CustomerFactory;
 use App\Modules\Organization\Concerns\BelongsToOrganization;
 use App\Support\Text\Mobile;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -24,6 +26,7 @@ use Spatie\Activitylog\Support\LogOptions;
 /**
  * @property int $id
  * @property int $organization_id
+ * @property int|null $company_id the company the customer orders for
  * @property string $name
  * @property string $mobile
  * @property string|null $phone
@@ -34,6 +37,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property Carbon|null $last_login_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Company|null $company
  */
 #[Fillable(['name', 'mobile', 'phone', 'notes', 'alert'])]
 #[UseFactory(CustomerFactory::class)]
@@ -63,6 +67,14 @@ class Customer extends Model implements AuthenticatableContract
     public function getAuthPassword(): string
     {
         return '';
+    }
+
+    /**
+     * @return BelongsTo<Company, $this>
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     /**

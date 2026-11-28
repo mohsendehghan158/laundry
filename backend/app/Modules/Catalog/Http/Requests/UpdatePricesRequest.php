@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Http\Requests;
 
+use Illuminate\Validation\Rule;
+
 class UpdatePricesRequest extends CatalogRequest
 {
     /**
@@ -12,6 +14,8 @@ class UpdatePricesRequest extends CatalogRequest
     public function rules(): array
     {
         return [
+            // A contract price list; the default list when left out.
+            'price_list_id' => ['nullable', 'integer', Rule::exists('price_lists', 'id')->where('organization_id', $this->actor()->organization_id)],
             'prices' => ['required', 'array', 'min:1', 'max:2000'],
             'prices.*.item_id' => ['required', 'integer', $this->existsInOrganization('items')],
             'prices.*.service_type_id' => ['required', 'integer', $this->existsInOrganization('service_types')],

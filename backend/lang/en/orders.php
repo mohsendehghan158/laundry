@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'item_unavailable' => 'This item is not active in the catalog.',
+    'department_invalid' => "This department does not belong to the customer's company or is inactive.",
     'no_price' => 'There is no price for “:item” with “:service”.',
     'whole_quantity' => 'This item is counted in whole pieces.',
     'tier_unavailable' => 'This turnaround tier is not active.',

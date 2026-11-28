@@ -40,6 +40,12 @@ class OrderResource extends JsonResource
                 'mobile' => $this->customer->mobile,
                 'alert' => $this->customer->alert,
             ],
+            /** @var array{id: int, name: string, department: array{id: int, name: string}|null}|null The company the order is charged to. */
+            'company' => $this->company_id === null ? null : $this->whenLoaded('company', fn (): ?array => $this->company === null ? null : [
+                'id' => $this->company->id,
+                'name' => $this->company->name,
+                'department' => $this->department === null ? null : ['id' => $this->department->id, 'name' => $this->department->name],
+            ]),
             /** @var array{id: int|null, name: string|null, surcharge_percent: int} */
             'turnaround' => ['id' => $this->turnaround_tier_id, 'name' => $this->turnaround_name, 'surcharge_percent' => $this->surcharge_percent],
             'source' => $this->source,

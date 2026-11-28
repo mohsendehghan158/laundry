@@ -2759,6 +2759,701 @@
                 }
             }
         },
+        "/companies": {
+            "get": {
+                "operationId": "company.index",
+                "description": "With what each owes on orders not yet paid in full.",
+                "summary": "List companies",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[q]",
+                        "in": "query",
+                        "description": "Part of the name, or the national id.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[active]",
+                        "in": "query",
+                        "description": "Only active (true) or inactive (false) companies.",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CompanyResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "company.store",
+                "summary": "Create a company",
+                "tags": [
+                    "Company"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveCompanyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/companies/{company}": {
+            "get": {
+                "operationId": "company.show",
+                "description": "With its departments and the customers who order for it.",
+                "summary": "Show a company",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "company.update",
+                "description": "A new price list or credit limit applies to orders taken from now on.",
+                "summary": "Update a company",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveCompanyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "company.destroy",
+                "description": "Only one without orders (409 `company_has_orders`); deactivate it\notherwise.",
+                "summary": "Delete a company",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/companies/{company}/departments": {
+            "post": {
+                "operationId": "company.storeDepartment",
+                "summary": "Add a department",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveDepartmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/companies/{company}/departments/{department}": {
+            "put": {
+                "operationId": "company.updateDepartment",
+                "summary": "Update a department",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "description": "The department ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveDepartmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "company.destroyDepartment",
+                "description": "Orders charged to it keep their company but lose the department.",
+                "summary": "Delete a department",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "description": "The department ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/companies/{company}/members": {
+            "post": {
+                "operationId": "company.addMember",
+                "description": "Their orders from now on are charged to the company, at its contract\nprices. A customer orders for one company at a time.",
+                "summary": "Add a customer to the company",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "customer_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "customer_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/companies/{company}/members/{customer}": {
+            "delete": {
+                "operationId": "company.removeMember",
+                "summary": "Remove a customer from the company",
+                "tags": [
+                    "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CompanyResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/customers": {
             "get": {
                 "operationId": "customers.index",
@@ -2814,7 +3509,17 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/CustomerResource"
+                                                "allOf": [
+                                                    {
+                                                        "$ref": "#/components/schemas/CustomerResource"
+                                                    },
+                                                    {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "company"
+                                                        ]
+                                                    }
+                                                ]
                                             }
                                         },
                                         "links": {
@@ -3042,6 +3747,7 @@
                                                 {
                                                     "type": "object",
                                                     "required": [
+                                                        "company",
                                                         "addresses"
                                                     ]
                                                 }
@@ -7825,10 +8531,20 @@
         "/prices": {
             "get": {
                 "operationId": "price.index",
-                "description": "Every priced item \u00d7 service pair of the default price list, in\nwhole rials per unit. A missing pair means the service is not\noffered for that item.",
+                "description": "Every priced item \u00d7 service pair of the default price list, in\nwhole rials per unit. A missing pair means the service is not\noffered for that item. With `price_list_id`, the prices of that\ncontract list instead: the pairs it overrides.",
                 "summary": "Show the price matrix",
                 "tags": [
                     "Price"
+                ],
+                "parameters": [
+                    {
+                        "name": "price_list_id",
+                        "in": "query",
+                        "description": "A contract price list.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -8117,6 +8833,220 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/price-lists": {
+            "get": {
+                "operationId": "price-lists.index",
+                "description": "The default list first, then contract lists, with how many prices\neach has.",
+                "summary": "List price lists",
+                "tags": [
+                    "PriceList"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_default": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "prices_count": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "is_default",
+                                                    "prices_count"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "price-lists.store",
+                "description": "Empty, or with `percent` set, a copy of every default price changed by\nthat percent (\u221210 for 10% off), rounded to whole rials.",
+                "summary": "Create a contract price list",
+                "tags": [
+                    "PriceList"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SavePriceListRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/price-lists/{priceList}": {
+            "put": {
+                "operationId": "price-lists.update",
+                "summary": "Rename a price list",
+                "tags": [
+                    "PriceList"
+                ],
+                "parameters": [
+                    {
+                        "name": "priceList",
+                        "in": "path",
+                        "required": true,
+                        "description": "The price list ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SavePriceListRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "is_default": {
+                                                    "type": "boolean"
+                                                },
+                                                "prices_count": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "is_default",
+                                                "prices_count"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "price-lists.destroy",
+                "description": "Companies using it go back to default prices. The default list\ncannot be deleted (409 `price_list_default`).",
+                "summary": "Delete a contract price list",
+                "tags": [
+                    "PriceList"
+                ],
+                "parameters": [
+                    {
+                        "name": "priceList",
+                        "in": "path",
+                        "required": true,
+                        "description": "The price list ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -14131,6 +15061,206 @@
                 ],
                 "title": "ColorResource"
             },
+            "CompanyResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "national_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "economic_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "registration_number": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "postal_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contact_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contact_mobile": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contract_number": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contract_starts_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contract_ends_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contract_running": {
+                        "type": "boolean",
+                        "description": "The contract's dates include today."
+                    },
+                    "price_list": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "credit_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Empty: the company pays like any customer."
+                    },
+                    "payment_terms_days": {
+                        "type": "integer"
+                    },
+                    "on_account": {
+                        "type": "boolean",
+                        "description": "Orders are taken on account, up to the credit limit."
+                    },
+                    "outstanding": {
+                        "type": "integer",
+                        "description": "What it owes on orders not yet paid in full."
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "departments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "code": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "is_active": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "code",
+                                "is_active"
+                            ]
+                        }
+                    },
+                    "members": {
+                        "type": "array",
+                        "description": "Customers who order for the company.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "mobile": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "mobile"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "national_id",
+                    "economic_code",
+                    "registration_number",
+                    "postal_code",
+                    "address",
+                    "phone",
+                    "contact_name",
+                    "contact_mobile",
+                    "contract_number",
+                    "contract_starts_on",
+                    "contract_ends_on",
+                    "contract_running",
+                    "credit_limit",
+                    "payment_terms_days",
+                    "on_account",
+                    "notes",
+                    "is_active"
+                ],
+                "title": "CompanyResource"
+            },
             "CompleteAssemblyRequest": {
                 "type": "object",
                 "properties": {
@@ -14301,6 +15431,54 @@
                             "postal_code",
                             "address",
                             "phone"
+                        ]
+                    },
+                    "company": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The company the customer orders for; on a single customer with credit left and active departments.",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "on_account": {
+                                "type": "boolean"
+                            },
+                            "credit_available": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "departments": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "on_account",
+                            "credit_available"
                         ]
                     },
                     "addresses": {
@@ -15460,6 +16638,44 @@
                             "name",
                             "mobile",
                             "alert"
+                        ]
+                    },
+                    "company": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The company the order is charged to.",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "department": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "department"
                         ]
                     },
                     "turnaround": {
@@ -17102,6 +18318,13 @@
                                 "maxLength": 255
                             }
                         }
+                    },
+                    "company_department_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "For customers of a company: the department the order is charged to."
                     }
                 },
                 "required": [
@@ -17346,6 +18569,125 @@
                 ],
                 "title": "SaveColorRequest"
             },
+            "SaveCompanyRequest": {
+                "type": "object",
+                "description": "Creates (POST) or updates (PUT) a company and its contract.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "national_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "11-digit national id of the legal entity."
+                    },
+                    "economic_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\d{10,14}$"
+                    },
+                    "registration_number": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\d{1,20}$"
+                    },
+                    "postal_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\d{10}$"
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 20
+                    },
+                    "contact_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 100
+                    },
+                    "contact_mobile": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^09\\d{9}$"
+                    },
+                    "contract_number": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 50
+                    },
+                    "contract_starts_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "contract_ends_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "price_list_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "A price list other than the default one."
+                    },
+                    "credit_limit": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Rials; empty means the company pays like any customer (no account).",
+                        "minimum": 0,
+                        "maximum": 1000000000000000
+                    },
+                    "payment_terms_days": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 365
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "SaveCompanyRequest"
+            },
             "SaveCustomerRequest": {
                 "type": "object",
                 "description": "Creates (POST) or updates (PUT) a customer together with their\naddresses. On update, the addresses sent replace the stored ones:\nentries with an id are kept and changed, the rest are added, and\naddresses left out are removed.",
@@ -17456,6 +18798,29 @@
                     "kind"
                 ],
                 "title": "SaveDefectTypeRequest"
+            },
+            "SaveDepartmentRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 30
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "SaveDepartmentRequest"
             },
             "SaveExpenseCategoryRequest": {
                 "type": "object",
@@ -17584,6 +18949,28 @@
                     }
                 },
                 "title": "SaveItemRequest"
+            },
+            "SavePriceListRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "percent": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "description": "New lists only: copy the default prices changed by this percent (\u221210 = 10% off).",
+                        "minimum": -100,
+                        "maximum": 1000
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "SavePriceListRequest"
             },
             "SavePromoCodeRequest": {
                 "type": "object",
@@ -18509,6 +19896,13 @@
                                 "maxLength": 255
                             }
                         }
+                    },
+                    "company_department_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "For customers of a company: the department the order is charged to."
                     }
                 },
                 "required": [
@@ -19129,6 +20523,13 @@
                                 "maxLength": 255
                             }
                         }
+                    },
+                    "company_department_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "For customers of a company: the department the order is charged to."
                     }
                 },
                 "required": [
@@ -19174,6 +20575,13 @@
             "UpdatePricesRequest": {
                 "type": "object",
                 "properties": {
+                    "price_list_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "A contract price list; the default list when left out."
+                    },
                     "prices": {
                         "type": "array",
                         "items": {
@@ -19274,6 +20682,8 @@
                                 "expenses.view",
                                 "expenses.manage",
                                 "expenses.categories",
+                                "companies.view",
+                                "companies.manage",
                                 "promotions.manage",
                                 "notifications.manage",
                                 "notifications.view",

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Actions;
 
+use App\Modules\B2B\Models\Company;
+use App\Modules\B2B\Support\CompanyAccounts;
 use App\Modules\Billing\Models\PromoCode;
 use App\Modules\Billing\Support\PromoCodes;
 use App\Modules\Identity\Models\User;
@@ -28,6 +30,7 @@ final class CreateOrder
         private readonly OrderWriter $writer,
         private readonly Sequences $sequences,
         private readonly PromoCodes $promoCodes,
+        private readonly CompanyAccounts $companies,
     ) {}
 
     /**
@@ -59,9 +62,16 @@ final class CreateOrder
         $pricing = $data;
         $priced = $this->pricer->price($pricing);
         $this->writer->authorizeDiscount($actor, $priced);
+        $company = $this->companies->forCustomer((int) $data['customer_id']);
+        $departmentId = $this->writer->department($company, $data['company_department_id'] ?? null);
 
         try {
-            $order = DB::transaction(function () use ($actor, $data, $branch, $priced, $idempotencyKey): Order {
+            $order = DB::transaction(function () use ($actor, $data, $branch, $priced, $idempotencyKey, $company, $departmentId): Order {
+                if ($company !== null) {
+                    // One order at a time per company, so the credit limit holds.
+                    $this->companies->assertCredit(Company::query()->lockForUpdate()->findOrFail($company->id), $priced['total']);
+                }
+
                 // Serialize orders using the same promo code, so usage limits hold.
                 if ($priced['promo'] !== null) {
                     PromoCode::query()->lockForUpdate()->findOrFail($priced['promo']->id);
@@ -74,6 +84,8 @@ final class CreateOrder
                 $order = Order::query()->create([
                     'branch_id' => $branch->id,
                     'customer_id' => $data['customer_id'],
+                    'company_id' => $company?->id,
+                    'company_department_id' => $departmentId,
                     'ticket_number' => $branch->code.'-'.str_pad((string) $number, 5, '0', STR_PAD_LEFT),
                     'status' => OrderStatus::Received,
                     'payment_status' => PaymentStatus::for($priced['total'], 0),

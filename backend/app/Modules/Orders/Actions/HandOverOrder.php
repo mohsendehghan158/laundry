@@ -20,7 +20,8 @@ final class HandOverOrder
      * Gives ready pieces back to the customer: all of them, or some (the
      * rest stays on the rack). The order is completed once every piece
      * has been handed over. An unpaid balance blocks handover unless the
-     * user may release orders on credit (orders.handover_unpaid).
+     * user may release orders on credit (orders.handover_unpaid) or the
+     * order is charged to a company on account.
      *
      * @param  list<int>  $pieceIds
      */
@@ -33,7 +34,8 @@ final class HandOverOrder
                 throw ApiException::conflict('handover_not_ready');
             }
 
-            if ($order->balance() > 0 && ! $actor->can('orders.handover_unpaid')) {
+            // Orders of a company on account are paid later, against its statement.
+            if ($order->balance() > 0 && ! $actor->can('orders.handover_unpaid') && ! $order->company?->onAccount()) {
                 throw ApiException::conflict('handover_unpaid');
             }
 

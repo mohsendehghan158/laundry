@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'item_unavailable' => 'این قلم در کاتالوگ فعال نیست.',
+    'department_invalid' => 'این واحد متعلق به سازمان این مشتری نیست یا غیرفعال است.',
     'no_price' => 'برای «:item» با خدمت «:service» قیمتی تعریف نشده است.',
     'whole_quantity' => 'تعداد این قلم باید عدد صحیح باشد.',
     'tier_unavailable' => 'این سطح تحویل فعال نیست.',

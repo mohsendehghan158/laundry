@@ -35,7 +35,7 @@ class CustomerController
     {
         Gate::authorize('customers.view');
 
-        $customers = QueryBuilder::for(Customer::class)
+        $customers = QueryBuilder::for(Customer::query()->with('company'))
             ->allowedFilters(
                 AllowedFilter::callback('q', function (Builder $query, mixed $value): void {
                     /** @var Builder<Customer> $query */
@@ -69,7 +69,7 @@ class CustomerController
     {
         Gate::authorize('customers.view');
 
-        return new CustomerResource($customer->load('addresses'));
+        return new CustomerResource($customer->load(['addresses', 'company.departments']));
     }
 
     /**

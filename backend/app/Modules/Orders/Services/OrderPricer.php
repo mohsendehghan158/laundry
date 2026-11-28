@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Services;
 
+use App\Modules\B2B\Support\CompanyAccounts;
 use App\Modules\Billing\Models\PromoCode;
 use App\Modules\Billing\Support\PromoCodes;
 use App\Modules\Catalog\Enums\PriceUnit;
@@ -42,6 +43,7 @@ final class OrderPricer
         private readonly DueDateCalculator $dueDates,
         private readonly Settings $settings,
         private readonly PromoCodes $promoCodes,
+        private readonly CompanyAccounts $companies,
     ) {}
 
     /**
@@ -56,10 +58,13 @@ final class OrderPricer
         $services = ServiceType::query()->whereIn('id', array_column($lines, 'service_type_id'))->get()->keyBy('id');
         $upchargeIds = array_merge(...array_map(fn (array $line): array => $line['upcharge_ids'] ?? [], $lines));
         $upcharges = Upcharge::query()->active()->whereIn('id', $upchargeIds)->get()->keyBy('id');
+        // A company's contract list replaces the default prices it has; the rest stay.
+        $lists = array_values(array_filter([PriceList::default()->id, $this->companies->priceListFor($input['customer_id'] ?? null)]));
         $prices = Price::query()
-            ->where('price_list_id', PriceList::default()->id)
+            ->whereIn('price_list_id', $lists)
             ->whereIn('item_id', $items->keys())
             ->get()
+            ->sortBy(fn (Price $price): int => (int) array_search($price->price_list_id, $lists, true))
             ->mapWithKeys(fn (Price $price): array => ["{$price->item_id}:{$price->service_type_id}" => $price->price]);
         $colors = Color::query()->whereIn('id', $this->pieceField($lines, 'color_id'))->pluck('name', 'id');
         $defects = DefectType::query()->whereIn('id', array_merge(...$this->pieceField($lines, 'defect_type_ids')))->get()->keyBy('id');

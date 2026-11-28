@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Support;
 
+use App\Modules\B2B\Models\Company;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Enums\PieceStatus;
 use App\Modules\Orders\Models\Order;
@@ -20,6 +21,25 @@ use Illuminate\Validation\ValidationException;
 final class OrderWriter
 {
     public function __construct(private readonly Settings $settings) {}
+
+    /**
+     * The department an order is charged to: one of the company's active
+     * departments, and only for a customer of a company.
+     */
+    public function department(?Company $company, mixed $departmentId): ?int
+    {
+        if ($departmentId === null) {
+            return null;
+        }
+
+        $valid = $company !== null && $company->departments()->where('is_active', true)->whereKey((int) $departmentId)->exists();
+
+        if (! $valid) {
+            throw ValidationException::withMessages(['company_department_id' => __('orders.department_invalid')]);
+        }
+
+        return (int) $departmentId;
+    }
 
     /**
      * Staff need orders.discount to give any discount, and without

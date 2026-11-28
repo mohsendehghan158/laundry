@@ -12,7 +12,9 @@ use App\Modules\Catalog\Models\PriceList;
 use App\Modules\Catalog\Support\PriceSheet;
 use App\Modules\Organization\Support\Settings;
 use App\Support\Export\XlsxReader;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -25,15 +27,17 @@ class PriceController
      *
      * Every priced item × service pair of the default price list, in
      * whole rials per unit. A missing pair means the service is not
-     * offered for that item.
+     * offered for that item. With `price_list_id`, the prices of that
+     * contract list instead: the pairs it overrides.
      *
      * @response array{data: list<array{item_id: int, service_type_id: int, price: int}>}
      */
-    public function index(): JsonResponse
+    #[QueryParameter('price_list_id', 'A contract price list.', type: 'integer')]
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('catalog.view');
 
-        return response()->json(['data' => $this->matrix()]);
+        return response()->json(['data' => $this->matrix($this->list($request->integer('price_list_id') ?: null))]);
     }
 
     /**
@@ -49,9 +53,10 @@ class PriceController
         /** @var list<array{item_id: int, service_type_id: int, price: int|null}> $cells */
         $cells = $request->validated('prices');
 
-        $updatePrices->handle($request->actor(), $cells);
+        $list = $this->list($request->integer('price_list_id') ?: null);
+        $updatePrices->handle($request->actor(), $cells, $list);
 
-        return response()->json(['data' => $this->matrix()]);
+        return response()->json(['data' => $this->matrix($list)]);
     }
 
     /**
@@ -104,6 +109,11 @@ class PriceController
         return response()->json(['data' => [...$result, 'applied' => $applied]]);
     }
 
+    private function list(?int $id): PriceList
+    {
+        return $id === null ? PriceList::default() : PriceList::query()->findOrFail($id);
+    }
+
     private function sheet(Settings $settings): PriceSheet
     {
         return new PriceSheet($settings->get('general.currency_unit') === 'toman');
@@ -112,10 +122,10 @@ class PriceController
     /**
      * @return list<array{item_id: int, service_type_id: int, price: int}>
      */
-    private function matrix(): array
+    private function matrix(PriceList $list): array
     {
         return array_values(Price::query()
-            ->where('price_list_id', PriceList::default()->id)
+            ->where('price_list_id', $list->id)
             ->orderBy('item_id')
             ->orderBy('service_type_id')
             ->get()

@@ -8,6 +8,7 @@ use App\Modules\Catalog\Http\Controllers\DefectTypeController;
 use App\Modules\Catalog\Http\Controllers\ItemCategoryController;
 use App\Modules\Catalog\Http\Controllers\ItemController;
 use App\Modules\Catalog\Http\Controllers\PriceController;
+use App\Modules\Catalog\Http\Controllers\PriceListController;
 use App\Modules\Catalog\Http\Controllers\ServiceTypeController;
 use App\Modules\Catalog\Http\Controllers\TurnaroundTierController;
 use App\Modules\Catalog\Http\Controllers\UpchargeController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('catalog', CatalogController::class);
 
+    Route::apiResource('price-lists', PriceListController::class)->except('show');
     Route::get('prices', [PriceController::class, 'index']);
     Route::put('prices', [PriceController::class, 'update']);
     Route::get('prices/export', [PriceController::class, 'export']);
