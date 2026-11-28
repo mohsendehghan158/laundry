@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Orders\Models;
 
+use App\Modules\Billing\Models\Invoice;
 use App\Modules\Billing\Models\Payment;
 use App\Modules\Billing\Models\PromoCode;
 use App\Modules\Customers\Models\Customer;
@@ -20,10 +21,12 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -74,6 +77,7 @@ use Illuminate\Support\Carbon;
  * @property-read Customer $customer
  * @property-read User|null $creator
  * @property-read PromoCode|null $promoCode
+ * @property-read Collection<int, Invoice> $invoices
  */
 #[UseFactory(OrderFactory::class)]
 #[UsePolicy(OrderPolicy::class)]
@@ -196,6 +200,23 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class)->orderBy('id');
+    }
+
+    /**
+     * The invoice that bills this order, as a list of at most one: voided
+     * invoices are left out.
+     *
+     * @return BelongsToMany<Invoice, $this>
+     */
+    public function invoices(): BelongsToMany
+    {
+        return $this->belongsToMany(Invoice::class, 'invoice_orders')->wherePivot('active', true);
+    }
+
+    /** Invoiced orders keep their lines and status until the invoice is voided. */
+    public function isInvoiced(): bool
+    {
+        return $this->invoices()->exists();
     }
 
     public function balance(): int

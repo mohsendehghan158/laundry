@@ -4462,6 +4462,423 @@
                 }
             }
         },
+        "/invoices": {
+            "get": {
+                "operationId": "invoice.index",
+                "description": "Newest first, for the branches the user works in.",
+                "summary": "List invoices",
+                "tags": [
+                    "Invoice"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "description": "issued or void.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[branch_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[customer_id]",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "filter[q]",
+                        "in": "query",
+                        "description": "Invoice number, or part of the buyer name.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[from]",
+                        "in": "query",
+                        "description": "Issued on or after this date (Y-m-d).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[to]",
+                        "in": "query",
+                        "description": "Issued on or before this date (Y-m-d).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Page size, 1-100.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `InvoiceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/InvoiceResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "invoice.store",
+                "description": "For one order, or several of the same customer (a group invoice).\nTakes the next invoice number and the seller details from settings.\nFails with 409 `order_not_invoiceable` (cancelled, or no items yet),\n`order_already_invoiced` or `invoice_customers_differ`.",
+                "summary": "Issue an invoice",
+                "tags": [
+                    "Invoice"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IssueInvoiceRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`InvoiceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/InvoiceResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by",
+                                                        "orders",
+                                                        "lines"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/invoices/{invoice}": {
+            "get": {
+                "operationId": "invoice.show",
+                "summary": "Show an invoice",
+                "tags": [
+                    "Invoice"
+                ],
+                "parameters": [
+                    {
+                        "name": "invoice",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invoice ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`InvoiceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/InvoiceResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by",
+                                                        "orders",
+                                                        "lines"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/invoices/{invoice}/void": {
+            "post": {
+                "operationId": "invoice.void",
+                "description": "With a reason; the number is not reused and its orders can be\ninvoiced again. Fails with 409 `invoice_already_void`.",
+                "summary": "Void an invoice",
+                "tags": [
+                    "Invoice"
+                ],
+                "parameters": [
+                    {
+                        "name": "invoice",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invoice ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VoidInvoiceRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`InvoiceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/InvoiceResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "created_by",
+                                                        "orders",
+                                                        "lines"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/items": {
             "get": {
                 "operationId": "items.index",
@@ -5590,6 +6007,7 @@
                                                     "type": "object",
                                                     "required": [
                                                         "promo_code",
+                                                        "invoice",
                                                         "created_by",
                                                         "lines",
                                                         "payments",
@@ -5662,6 +6080,7 @@
                                                     "type": "object",
                                                     "required": [
                                                         "promo_code",
+                                                        "invoice",
                                                         "created_by",
                                                         "lines",
                                                         "payments",
@@ -8958,6 +9377,69 @@
                                                         "prices_include_vat"
                                                     ]
                                                 },
+                                                "invoice": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "seller_name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_national_id": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_economic_code": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_registration_number": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_postal_code": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_address": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_phone": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "notes": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "seller_name",
+                                                        "seller_national_id",
+                                                        "seller_economic_code",
+                                                        "seller_registration_number",
+                                                        "seller_postal_code",
+                                                        "seller_address",
+                                                        "seller_phone",
+                                                        "notes"
+                                                    ]
+                                                },
                                                 "receipt": {
                                                     "type": "object",
                                                     "properties": {
@@ -9042,6 +9524,7 @@
                                             "required": [
                                                 "general",
                                                 "tax",
+                                                "invoice",
                                                 "receipt",
                                                 "hours",
                                                 "production",
@@ -9126,6 +9609,69 @@
                                                         "prices_include_vat"
                                                     ]
                                                 },
+                                                "invoice": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "seller_name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_national_id": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_economic_code": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_registration_number": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_postal_code": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_address": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "seller_phone": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "notes": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "seller_name",
+                                                        "seller_national_id",
+                                                        "seller_economic_code",
+                                                        "seller_registration_number",
+                                                        "seller_postal_code",
+                                                        "seller_address",
+                                                        "seller_phone",
+                                                        "notes"
+                                                    ]
+                                                },
                                                 "receipt": {
                                                     "type": "object",
                                                     "properties": {
@@ -9210,6 +9756,7 @@
                                             "required": [
                                                 "general",
                                                 "tax",
+                                                "invoice",
                                                 "receipt",
                                                 "hours",
                                                 "production",
@@ -12445,6 +12992,15 @@
                 ],
                 "title": "BranchType"
             },
+            "BuyerType": {
+                "type": "string",
+                "description": "| |\n|---|\n| `individual` <br/> A person: national code of 10 digits. |\n| `legal` <br/> A company or institution: national id of 11 digits. |",
+                "enum": [
+                    "individual",
+                    "legal"
+                ],
+                "title": "BuyerType"
+            },
             "CashMovementRequest": {
                 "type": "object",
                 "properties": {
@@ -13008,6 +13564,71 @@
                         ],
                         "description": "Shown as a warning whenever the customer is picked at the counter."
                     },
+                    "invoice_details": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "Buyer details from the customer's last invoice.",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "individual",
+                                    "legal"
+                                ]
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "national_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "economic_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "registration_number": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "postal_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "address": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "name",
+                            "national_id",
+                            "economic_code",
+                            "registration_number",
+                            "postal_code",
+                            "address",
+                            "phone"
+                        ]
+                    },
                     "addresses": {
                         "type": "array",
                         "description": "Present on a single customer and after saving.",
@@ -13030,6 +13651,7 @@
                     "phone",
                     "notes",
                     "alert",
+                    "invoice_details",
                     "created_at"
                 ],
                 "title": "CustomerResource"
@@ -13130,6 +13752,427 @@
                     "file"
                 ],
                 "title": "ImportPricesRequest"
+            },
+            "InvoiceResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "number": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/InvoiceStatus"
+                    },
+                    "issued_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "branch": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "customer": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "mobile": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "mobile"
+                        ]
+                    },
+                    "seller": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "national_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "economic_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "registration_number": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "postal_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "address": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "national_id",
+                            "economic_code",
+                            "registration_number",
+                            "postal_code",
+                            "address",
+                            "phone"
+                        ]
+                    },
+                    "buyer": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "individual",
+                                    "legal"
+                                ]
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "national_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "economic_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "registration_number": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "postal_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "address": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "name",
+                            "national_id",
+                            "economic_code",
+                            "registration_number",
+                            "postal_code",
+                            "address",
+                            "phone"
+                        ]
+                    },
+                    "vat_percent": {
+                        "type": "number"
+                    },
+                    "subtotal": {
+                        "type": "integer"
+                    },
+                    "discount_amount": {
+                        "type": "integer"
+                    },
+                    "tax_amount": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_by": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
+                    },
+                    "void": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "Set once voided.",
+                        "properties": {
+                            "at": {
+                                "type": "string"
+                            },
+                            "reason": {
+                                "type": "string"
+                            },
+                            "by": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "at",
+                            "reason",
+                            "by"
+                        ]
+                    },
+                    "orders": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "ticket_number": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "ticket_number"
+                            ]
+                        }
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "position": {
+                                    "type": "integer"
+                                },
+                                "order_id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "quantity": {
+                                    "type": "number"
+                                },
+                                "unit": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "unit_price": {
+                                    "type": "integer"
+                                },
+                                "amount": {
+                                    "type": "integer"
+                                },
+                                "discount": {
+                                    "type": "integer"
+                                },
+                                "tax": {
+                                    "type": "integer"
+                                },
+                                "total": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "position",
+                                "order_id",
+                                "description",
+                                "quantity",
+                                "unit",
+                                "unit_price",
+                                "amount",
+                                "discount",
+                                "tax",
+                                "total"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "issued_at",
+                    "branch",
+                    "customer",
+                    "seller",
+                    "buyer",
+                    "vat_percent",
+                    "subtotal",
+                    "discount_amount",
+                    "tax_amount",
+                    "total",
+                    "notes",
+                    "void"
+                ],
+                "title": "InvoiceResource"
+            },
+            "InvoiceStatus": {
+                "type": "string",
+                "description": "| |\n|---|\n| `issued` <br/>  |\n| `void` <br/> Cancelled with a reason; the number stays taken. |",
+                "enum": [
+                    "issued",
+                    "void"
+                ],
+                "title": "InvoiceStatus"
+            },
+            "IssueInvoiceRequest": {
+                "type": "object",
+                "description": "Issues an invoice for orders of one customer, with the buyer's details\nas they should be printed.",
+                "properties": {
+                    "order_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "minItems": 1,
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    },
+                    "buyer_type": {
+                        "$ref": "#/components/schemas/BuyerType"
+                    },
+                    "buyer_name": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "buyer_national_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "National code (10 digits) of a person or national id (11 digits) of a company; required for companies."
+                    },
+                    "buyer_economic_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\d{10,14}$"
+                    },
+                    "buyer_registration_number": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\d{1,20}$"
+                    },
+                    "buyer_postal_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\d{10}$"
+                    },
+                    "buyer_address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    },
+                    "buyer_phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 20
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "order_ids",
+                    "buyer_type",
+                    "buyer_name"
+                ],
+                "title": "IssueInvoiceRequest"
             },
             "ItemCategoryResource": {
                 "type": "object",
@@ -13827,6 +14870,25 @@
                     },
                     "piece_count": {
                         "type": "integer"
+                    },
+                    "invoice": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The invoice that bills this order (voided ones are not shown).",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "number": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "number"
+                        ]
                     },
                     "version": {
                         "type": "integer",
@@ -17358,6 +18420,9 @@
                                 "payments.refund",
                                 "shifts.operate",
                                 "shifts.view",
+                                "invoices.view",
+                                "invoices.issue",
+                                "invoices.void",
                                 "promotions.manage",
                                 "notifications.manage",
                                 "notifications.view",
@@ -17410,6 +18475,67 @@
                             },
                             "prices_include_vat": {
                                 "type": "boolean"
+                            }
+                        }
+                    },
+                    "invoice": {
+                        "type": "object",
+                        "properties": {
+                            "seller_name": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 150
+                            },
+                            "seller_national_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "pattern": "^(\\d{10}|\\d{11})$"
+                            },
+                            "seller_economic_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "pattern": "^\\d{10,14}$"
+                            },
+                            "seller_registration_number": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "pattern": "^\\d{1,20}$"
+                            },
+                            "seller_postal_code": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "pattern": "^\\d{10}$"
+                            },
+                            "seller_address": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 500
+                            },
+                            "seller_phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 20
+                            },
+                            "notes": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 500
                             }
                         }
                     },
@@ -17703,6 +18829,19 @@
                     "is_active"
                 ],
                 "title": "VendorResource"
+            },
+            "VoidInvoiceRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "reason"
+                ],
+                "title": "VoidInvoiceRequest"
             },
             "ZoneResource": {
                 "type": "object",

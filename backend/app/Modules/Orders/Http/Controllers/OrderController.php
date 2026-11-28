@@ -29,7 +29,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class OrderController
 {
     /** Relations an order is shown with. */
-    private const array DETAIL = ['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'lines.pieces.rackSlot', 'history.user', 'payments.user'];
+    private const array DETAIL = ['branch', 'customer', 'creator', 'promoCode', 'lines.upcharges', 'lines.pieces.defects', 'lines.pieces.rackSlot', 'history.user', 'payments.user', 'invoices'];
 
     /**
      * List orders

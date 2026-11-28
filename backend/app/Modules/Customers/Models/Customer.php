@@ -29,6 +29,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property string|null $phone
  * @property string|null $notes
  * @property string|null $alert
+ * @property array<string, string|null>|null $invoice_details buyer details last used on an invoice
  * @property int|null $created_by
  * @property Carbon|null $last_login_at
  * @property Carbon|null $created_at
@@ -56,7 +57,7 @@ class Customer extends Model implements AuthenticatableContract
      */
     protected function casts(): array
     {
-        return ['last_login_at' => 'datetime'];
+        return ['last_login_at' => 'datetime', 'invoice_details' => 'array'];
     }
 
     public function getAuthPassword(): string

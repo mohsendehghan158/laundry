@@ -34,6 +34,10 @@ final class UpdateOrder
             throw ApiException::conflict('order_not_editable');
         }
 
+        if ($order->isInvoiced()) {
+            throw ApiException::conflict('order_invoiced');
+        }
+
         if ((int) $data['version'] !== $order->version) {
             throw ApiException::conflict('order_version_conflict');
         }

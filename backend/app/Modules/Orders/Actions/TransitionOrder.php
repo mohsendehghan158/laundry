@@ -34,6 +34,10 @@ final class TransitionOrder
             throw ApiException::conflict('order_has_payments');
         }
 
+        if ($to === OrderStatus::Cancelled && $order->isInvoiced()) {
+            throw ApiException::conflict('order_invoiced');
+        }
+
         return DB::transaction(function () use ($actor, $order, $to, $reason): Order {
             $from = $order->status;
             $now = now();

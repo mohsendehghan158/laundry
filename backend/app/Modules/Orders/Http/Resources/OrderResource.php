@@ -81,6 +81,8 @@ class OrderResource extends JsonResource
             /** Still to be paid. */
             'balance' => $this->balance(),
             'piece_count' => $this->whenCounted('pieces'),
+            /** @var array{id: int, number: int}|null The invoice that bills this order (voided ones are not shown). */
+            'invoice' => $this->whenLoaded('invoices', fn (): ?array => ($invoice = $this->invoices->first()) === null ? null : ['id' => $invoice->id, 'number' => $invoice->number]),
             /** Send back with an edit; a newer version on the server means someone else changed the order. */
             'version' => $this->version,
             /** @var list<OrderStatus> Statuses this order can be moved to with POST /orders/{id}/transitions. */

@@ -39,6 +39,49 @@ final class SettingsRegistry
                 'type' => 'boolean',
                 'rules' => ['boolean'],
             ],
+            // The seller printed on official invoices; the name defaults to the organization's.
+            'invoice.seller_name' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'max:150'],
+            ],
+            // National id of the company (11 digits), or national code of the owner (10).
+            'invoice.seller_national_id' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'regex:/^(\\d{10}|\\d{11})$/'],
+            ],
+            'invoice.seller_economic_code' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'regex:/^\\d{10,14}$/'],
+            ],
+            'invoice.seller_registration_number' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'regex:/^\\d{1,20}$/'],
+            ],
+            'invoice.seller_postal_code' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'regex:/^\\d{10}$/'],
+            ],
+            'invoice.seller_address' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'max:500'],
+            ],
+            'invoice.seller_phone' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'max:20'],
+            ],
+            // Printed at the foot of every invoice.
+            'invoice.notes' => [
+                'default' => null,
+                'type' => 'string',
+                'rules' => ['nullable', 'string', 'max:500'],
+            ],
             'receipt.header_text' => [
                 'default' => null,
                 'type' => 'string',

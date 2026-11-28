@@ -32,6 +32,11 @@ return [
         'order_version_conflict' => 'Someone else changed this order in the meantime. Reload and try again.',
         'order_total_below_paid' => 'The new total is below what has been paid; refund first.',
         'order_transition_not_allowed' => 'The order cannot go from “:from” to “:to”.',
+        'order_not_invoiceable' => 'Order :ticket cannot be invoiced: it is cancelled or has no items yet.',
+        'order_already_invoiced' => 'Order :ticket is already invoiced; void that invoice first.',
+        'invoice_customers_differ' => 'All orders on an invoice must belong to one customer.',
+        'invoice_already_void' => 'This invoice is already void.',
+        'order_invoiced' => 'This order has an official invoice; void it before changing or cancelling the order.',
         'order_has_payments' => 'This order has payments; refund them first.',
 
         'shift_already_open' => 'This branch\'s register is already open.',

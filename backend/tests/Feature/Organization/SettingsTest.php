@@ -14,6 +14,10 @@ it('returns defaults until a setting is changed', function () {
         ->assertExactJson(['data' => [
             'general' => ['currency_unit' => 'toman', 'timezone' => 'Asia/Tehran'],
             'tax' => ['vat_percent' => 10, 'prices_include_vat' => false],
+            'invoice' => [
+                'seller_name' => null, 'seller_national_id' => null, 'seller_economic_code' => null, 'seller_registration_number' => null,
+                'seller_postal_code' => null, 'seller_address' => null, 'seller_phone' => null, 'notes' => null,
+            ],
             'receipt' => ['header_text' => null, 'footer_text' => null],
             'hours' => ['opening' => '09:00', 'closing' => '21:00', 'closed_days' => '5'],
             'production' => ['assembly_scan_required' => false],
