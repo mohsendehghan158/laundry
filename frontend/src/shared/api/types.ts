@@ -107,6 +107,7 @@ export type DashboardReport = Json<operations["report.dashboard"]>["data"];
 export type SalesReport = Json<operations["report.sales"]>["data"];
 export type SalesRow = SalesReport["rows"][number];
 export type ExpenseList = Json<operations["expenses.index"]>;
+export type CompanyStatement = Json<operations["statement.show"]>["data"];
 export type SalesGroup = operations["report.sales"]["parameters"]["query"]["group"];
 
 /** Laravel's paginated resource collection. */

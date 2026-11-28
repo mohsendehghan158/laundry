@@ -30,7 +30,7 @@ final class IssueInvoice
 
     /**
      * Issues the next numbered invoice for one or more orders of the same
-     * customer. The order discount and tax are spread over the lines so
+     * customer, or of customers ordering for the same company. The order discount and tax are spread over the lines so
      * each row carries its own share and the rows add up to the orders'
      * totals; a delivery fee becomes a row of its own.
      *
@@ -66,6 +66,7 @@ final class IssueInvoice
             $invoice = Invoice::query()->create([
                 'branch_id' => $first->branch_id,
                 'customer_id' => $first->customer_id,
+                'company_id' => $orders->pluck('company_id')->unique()->count() === 1 ? $first->company_id : null,
                 'number' => $this->sequences->next($actor->organization_id, 'invoice'),
                 'status' => InvoiceStatus::Issued,
                 'issued_at' => now(),
@@ -86,7 +87,9 @@ final class IssueInvoice
             $invoice->orders()->attach($orders->modelKeys());
 
             // Offered again for this customer's next invoice.
-            $first->customer->forceFill(['invoice_details' => $buyer])->save();
+            if ($orders->pluck('customer_id')->unique()->count() === 1) {
+                $first->customer->forceFill(['invoice_details' => $buyer])->save();
+            }
 
             activity('invoice')->causedBy($actor)->performedOn($invoice)->event('issued')
                 ->withProperties(['number' => $invoice->number, 'orders' => $orders->pluck('ticket_number')->all(), 'total' => $invoice->total])
@@ -107,7 +110,10 @@ final class IssueInvoice
             }
         }
 
-        if ($orders->pluck('customer_id')->unique()->count() > 1) {
+        // One customer, or several customers ordering for the same company.
+        $sameCustomer = $orders->pluck('customer_id')->unique()->count() === 1;
+        $companies = $orders->pluck('company_id')->unique();
+        if (! $sameCustomer && ($companies->count() > 1 || $companies->first() === null)) {
             throw ApiException::conflict('invoice_customers_differ');
         }
 

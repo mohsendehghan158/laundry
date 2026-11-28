@@ -22,6 +22,7 @@ import { StatTile } from "@/shared/ui/StatTile";
 import { useAddMember, useCompany, useDeleteCompany, useDeleteDepartment, useRemoveMember, useSaveDepartment } from "../api";
 import { CompanyFormModal } from "./CompanyFormModal";
 import { DeliveryNotesCard } from "./DeliveryNotesCard";
+import { StatementCard } from "./StatementCard";
 
 type Department = NonNullable<Company["departments"]>[number];
 type Member = NonNullable<Company["members"]>[number];
@@ -249,6 +250,9 @@ export function CompanyDetailPage() {
               <Table<Member> rowKey="id" size="small" columns={memberColumns} dataSource={data.members ?? []} pagination={false} />
             </Card>
           </Flex>
+        </Col>
+        <Col xs={24}>
+          <StatementCard company={data} />
         </Col>
         <Col xs={24}>
           <DeliveryNotesCard company={data} />

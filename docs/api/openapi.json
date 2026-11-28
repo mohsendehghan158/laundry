@@ -12546,6 +12546,403 @@
                 }
             }
         },
+        "/companies/{company}/statement": {
+            "get": {
+                "operationId": "statement.show",
+                "description": "Orders charged to the company taken in between two dates, with the\ndelivery notes behind them, per department, paid and owed, and what\nwas owed from before.",
+                "summary": "A company's statement",
+                "tags": [
+                    "Statement"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "description": "Local dates (the organization's time zone), both included; at most a year.",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "notes",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 500
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "company": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "national_id": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "economic_code": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "address": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "payment_terms_days": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "national_id",
+                                                        "economic_code",
+                                                        "address",
+                                                        "payment_terms_days"
+                                                    ]
+                                                },
+                                                "from": {
+                                                    "type": "string"
+                                                },
+                                                "to": {
+                                                    "type": "string"
+                                                },
+                                                "previous_balance": {
+                                                    "type": "integer"
+                                                },
+                                                "orders": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "ticket_number": {
+                                                                "type": "string"
+                                                            },
+                                                            "received_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "department": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "delivery_notes": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "subtotal": {
+                                                                "type": "integer"
+                                                            },
+                                                            "discount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tax": {
+                                                                "type": "integer"
+                                                            },
+                                                            "total": {
+                                                                "type": "integer"
+                                                            },
+                                                            "paid": {
+                                                                "type": "integer"
+                                                            },
+                                                            "balance": {
+                                                                "type": "integer"
+                                                            },
+                                                            "invoice": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "number": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "number"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "ticket_number",
+                                                            "received_at",
+                                                            "department",
+                                                            "delivery_notes",
+                                                            "subtotal",
+                                                            "discount",
+                                                            "tax",
+                                                            "total",
+                                                            "paid",
+                                                            "balance",
+                                                            "invoice"
+                                                        ]
+                                                    }
+                                                },
+                                                "departments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "orders": {
+                                                                "type": "integer"
+                                                            },
+                                                            "total": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "name",
+                                                            "orders",
+                                                            "total"
+                                                        ]
+                                                    }
+                                                },
+                                                "delivery_notes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "number": {
+                                                                "type": "integer"
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "in",
+                                                                    "out"
+                                                                ]
+                                                            },
+                                                            "confirmed_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "order_id": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "items": {
+                                                                "type": "number"
+                                                            },
+                                                            "differences": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "number",
+                                                            "type",
+                                                            "confirmed_at",
+                                                            "order_id",
+                                                            "items",
+                                                            "differences"
+                                                        ]
+                                                    }
+                                                },
+                                                "totals": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "orders": {
+                                                            "type": "integer"
+                                                        },
+                                                        "subtotal": {
+                                                            "type": "integer"
+                                                        },
+                                                        "discount": {
+                                                            "type": "integer"
+                                                        },
+                                                        "tax": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "paid": {
+                                                            "type": "integer"
+                                                        },
+                                                        "balance": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "orders",
+                                                        "subtotal",
+                                                        "discount",
+                                                        "tax",
+                                                        "total",
+                                                        "paid",
+                                                        "balance"
+                                                    ]
+                                                },
+                                                "uninvoiced_order_ids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "company",
+                                                "from",
+                                                "to",
+                                                "previous_balance",
+                                                "orders",
+                                                "departments",
+                                                "delivery_notes",
+                                                "totals",
+                                                "uninvoiced_order_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/companies/{company}/statement/invoice": {
+            "post": {
+                "operationId": "statement.invoice",
+                "description": "One invoice for every order of the period not invoiced yet, with the\ncompany as buyer. Fails with 409 `statement_nothing_to_invoice`.",
+                "summary": "Invoice a company's period",
+                "tags": [
+                    "Statement"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StatementRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
         "/stations": {
             "get": {
                 "operationId": "stations.index",
@@ -20551,6 +20948,32 @@
                     "is_active"
                 ],
                 "title": "SlotTemplateResource"
+            },
+            "StatementRequest": {
+                "type": "object",
+                "properties": {
+                    "from": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Local dates (the organization's time zone), both included; at most a year."
+                    },
+                    "to": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "from",
+                    "to"
+                ],
+                "title": "StatementRequest"
             },
             "StationKind": {
                 "type": "string",

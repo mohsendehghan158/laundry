@@ -29,6 +29,7 @@ use Illuminate\Support\Carbon;
  * @property int $organization_id
  * @property int $branch_id
  * @property int $customer_id
+ * @property int|null $company_id set when every order is charged to one company
  * @property int $number
  * @property InvoiceStatus $status
  * @property Carbon $issued_at

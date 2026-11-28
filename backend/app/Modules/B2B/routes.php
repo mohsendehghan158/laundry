@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\B2B\Http\Controllers\CompanyController;
 use App\Modules\B2B\Http\Controllers\DeliveryNoteController;
+use App\Modules\B2B\Http\Controllers\StatementController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
@@ -19,6 +20,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::post('companies/{company}/members', [CompanyController::class, 'addMember']);
     Route::delete('companies/{company}/members/{customer}', [CompanyController::class, 'removeMember']);
+
+    Route::get('companies/{company}/statement', [StatementController::class, 'show']);
+    Route::post('companies/{company}/statement/invoice', [StatementController::class, 'invoice']);
 
     Route::get('delivery-notes', [DeliveryNoteController::class, 'index']);
     Route::post('delivery-notes', [DeliveryNoteController::class, 'store']);

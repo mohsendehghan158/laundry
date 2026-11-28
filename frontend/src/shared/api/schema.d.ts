@@ -2375,6 +2375,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{company}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A company's statement
+         * @description Orders charged to the company taken in between two dates, with the
+         *     delivery notes behind them, per department, paid and owed, and what
+         *     was owed from before.
+         */
+        get: operations["statement.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{company}/statement/invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Invoice a company's period
+         * @description One invoice for every order of the period not invoiced yet, with the
+         *     company as buyer. Fails with 409 `statement_nothing_to_invoice`.
+         */
+        post: operations["statement.invoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stations": {
         parameters: {
             query?: never;
@@ -4444,6 +4487,17 @@ export interface components {
             ends_at: string;
             capacity: number;
             is_active: boolean;
+        };
+        /** StatementRequest */
+        StatementRequest: {
+            /**
+             * Format: date
+             * @description Local dates (the organization's time zone), both included; at most a year.
+             */
+            from: string;
+            /** Format: date */
+            to: string;
+            notes?: string | null;
         };
         /**
          * StationKind
@@ -10387,6 +10441,123 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "statement.show": {
+        parameters: {
+            query: {
+                /** @description Local dates (the organization's time zone), both included; at most a year. */
+                from: string;
+                to: string;
+                notes?: string | null;
+            };
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            company: {
+                                id: number;
+                                name: string;
+                                national_id: string | null;
+                                economic_code: string | null;
+                                address: string | null;
+                                payment_terms_days: number;
+                            };
+                            from: string;
+                            to: string;
+                            previous_balance: number;
+                            orders: {
+                                id: number;
+                                ticket_number: string;
+                                received_at: string | null;
+                                department: string | null;
+                                delivery_notes: number[];
+                                subtotal: number;
+                                discount: number;
+                                tax: number;
+                                total: number;
+                                paid: number;
+                                balance: number;
+                                invoice: {
+                                    id: number;
+                                    number: number;
+                                } | null;
+                            }[];
+                            departments: {
+                                name: string | null;
+                                orders: number;
+                                total: number;
+                            }[];
+                            delivery_notes: {
+                                id: number;
+                                number: number;
+                                /** @enum {string} */
+                                type: "in" | "out";
+                                confirmed_at: string | null;
+                                order_id: number | null;
+                                items: number;
+                                differences: number;
+                            }[];
+                            totals: {
+                                orders: number;
+                                subtotal: number;
+                                discount: number;
+                                tax: number;
+                                total: number;
+                                paid: number;
+                                balance: number;
+                            };
+                            uninvoiced_order_ids: number[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "statement.invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatementRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "stations.index": {

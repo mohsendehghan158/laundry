@@ -34,7 +34,7 @@ return [
         'order_transition_not_allowed' => 'سفارش از وضعیت «:from» به «:to» نمی‌رود.',
         'order_not_invoiceable' => 'برای سفارش :ticket فاکتور صادر نمی‌شود؛ سفارش لغو شده یا هنوز قلمی ندارد.',
         'order_already_invoiced' => 'سفارش :ticket فاکتور دارد؛ برای فاکتور دوباره اول فاکتور قبلی را باطل کنید.',
-        'invoice_customers_differ' => 'سفارش‌های یک فاکتور باید از یک مشتری باشند.',
+        'invoice_customers_differ' => 'سفارش‌های یک فاکتور باید از یک مشتری یا یک سازمان باشند.',
         'invoice_already_void' => 'این فاکتور پیش‌تر باطل شده است.',
         'order_invoiced' => 'این سفارش فاکتور رسمی دارد؛ برای تغییر یا لغو، اول فاکتور را باطل کنید.',
         'expense_from_register' => 'این هزینه از صندوق پرداخت شده؛ شعبه، مبلغ و روش پرداخت آن تغییر نمی‌کند.',
@@ -46,6 +46,7 @@ return [
         'delivery_note_confirmed' => 'این حواله تأیید شده و تغییر نمی‌کند.',
         'delivery_note_empty' => 'در این حواله قلمی شمرده نشده است.',
         'delivery_note_order_closed' => 'این سفارش تحویل یا لغو شده است.',
+        'statement_nothing_to_invoice' => 'همه سفارش‌های این دوره فاکتور دارند.',
         'order_has_payments' => 'این سفارش پرداخت ثبت‌شده دارد؛ اول مبلغ را بازپرداخت کنید.',
 
         'shift_already_open' => 'صندوق این شعبه از قبل باز است.',

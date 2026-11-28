@@ -3,7 +3,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { customerKeys } from "@/features/customers/api";
 import { api } from "@/shared/api/client";
-import type { Company, DeliveryNote, Order, Paginated, SaveCompanyInput, SaveDeliveryNoteInput, Wrapped } from "@/shared/api/types";
+import type { Company, CompanyStatement, DeliveryNote, Order, Paginated, SaveCompanyInput, SaveDeliveryNoteInput, Wrapped } from "@/shared/api/types";
 
 export const companyKeys = {
   list: (filters: object) => ["companies", "list", filters] as const,
@@ -137,4 +137,30 @@ export function useDeleteDeliveryNote() {
 /** Opens a delivery note for printing; it prints itself once loaded. */
 export function openDeliveryNotePrint(id: number) {
   window.open(`/print/delivery-notes/${id}`, `print-delivery-${id}`, "width=900,height=800");
+}
+
+export function useCompanyStatement(companyId: number | null, from: string, to: string) {
+  return useQuery({
+    queryKey: ["companies", "statement", companyId ?? 0, from, to],
+    queryFn: async () => (await api.get<Wrapped<CompanyStatement>>(`/companies/${companyId}/statement`, { from, to })).data,
+    enabled: companyId !== null,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useInvoiceStatement() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ companyId, from, to }: { companyId: number; from: string; to: string }) =>
+      (await api.post<Wrapped<{ id: number; number: number; total: number }>>(`/companies/${companyId}/statement/invoice`, { from, to })).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["companies", "statement"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+}
+
+export function openStatementPrint(companyId: number, from: string, to: string) {
+  window.open(`/print/companies/${companyId}/statement?from=${from}&to=${to}`, `print-statement-${companyId}`, "width=1100,height=800");
 }

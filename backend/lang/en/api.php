@@ -34,7 +34,7 @@ return [
         'order_transition_not_allowed' => 'The order cannot go from “:from” to “:to”.',
         'order_not_invoiceable' => 'Order :ticket cannot be invoiced: it is cancelled or has no items yet.',
         'order_already_invoiced' => 'Order :ticket is already invoiced; void that invoice first.',
-        'invoice_customers_differ' => 'All orders on an invoice must belong to one customer.',
+        'invoice_customers_differ' => 'All orders on an invoice must belong to one customer or one company.',
         'invoice_already_void' => 'This invoice is already void.',
         'order_invoiced' => 'This order has an official invoice; void it before changing or cancelling the order.',
         'expense_from_register' => 'This expense was paid from the register; its branch, amount and method cannot change.',
@@ -46,6 +46,7 @@ return [
         'delivery_note_confirmed' => 'This delivery note is confirmed and cannot change.',
         'delivery_note_empty' => 'Nothing was counted on this delivery note.',
         'delivery_note_order_closed' => 'This order is already completed or cancelled.',
+        'statement_nothing_to_invoice' => 'Every order of this period is already invoiced.',
         'order_has_payments' => 'This order has payments; refund them first.',
 
         'shift_already_open' => 'This branch\'s register is already open.',

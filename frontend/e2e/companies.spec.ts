@@ -49,3 +49,38 @@ test("the owner sets up a hotel contract and its orders get contract prices and 
   await page.getByRole("button", { name: "ثبت سفارش" }).click();
   await expect(page.getByTestId("ticket-number")).toBeVisible();
 });
+
+test("the hotel's goods come in on a delivery note and the month is invoiced in one click", async ({ page }) => {
+  await loginAndWait(page, "admin");
+  await page.goto("/companies");
+  await page.getByRole("link", { name: "هتل آزادی" }).click();
+
+  await page.getByRole("button", { name: "حواله ورود" }).click();
+  const note = page.getByRole("dialog", { name: "حواله ورود" });
+  await note.getByLabel("قلم").click();
+  await page.locator(".ant-select-dropdown:visible").getByText("پیراهن", { exact: true }).click();
+  await note.getByLabel("خدمت").click();
+  await page.locator(".ant-select-dropdown:visible").getByText("خشکشویی").click();
+  await note.getByLabel("اعلام سازمان").fill("۵");
+  await note.getByLabel("شمارش ما").fill("۴");
+  await note.getByRole("button", { name: "ذخیره" }).click();
+  await expect(page.getByText("۱ مغایرت")).toBeVisible();
+
+  await page.getByRole("button", { name: "تأیید و امضا" }).click();
+  const confirm = page.getByRole("dialog", { name: /تأیید حواله/ });
+  await confirm.getByLabel("نام تحویل‌گیرنده/تحویل‌دهنده سازمان").fill("خانم احمدی");
+  await confirm.getByRole("button", { name: "تأیید و امضا" }).click();
+  await expect(page.getByText("حواله تأیید شد.")).toBeVisible();
+
+  // The statement has the counter order and the one from the note.
+  const statement = page.locator(".ant-card").filter({ hasText: "صورت‌حساب دوره‌ای" });
+  await expect(statement.getByRole("row")).toHaveCount(3);
+  await statement.getByRole("button", { name: "صدور فاکتور گروهی" }).click();
+  const popup = page.waitForEvent("popup");
+  await page.locator(".ant-popconfirm").getByRole("button", { name: "صدور فاکتور" }).click();
+  const invoice = await popup;
+  await expect(invoice.getByRole("heading", { name: "صورتحساب فروش کالا و خدمات" })).toBeVisible();
+  await expect(invoice.getByText("هتل آزادی")).toBeVisible();
+  await invoice.close();
+  await expect(statement.getByRole("button", { name: "صدور فاکتور گروهی" })).toBeDisabled();
+});

@@ -634,6 +634,29 @@
     "shopSignature": "Shop signature",
     "companySignature": "Company representative"
   },
+  "statements": {
+    "title": "Periodic statement",
+    "period": "Period",
+    "print": "Print statement",
+    "groupInvoice": "Group invoice",
+    "invoiceConfirm": "{count, plural, =0 {Every order is invoiced.} one {Issue one invoice for the # uninvoiced order of this period?} other {Issue one invoice for the # uninvoiced orders of this period?}}",
+    "previous": "Owed from before",
+    "total": "{count, plural, =0 {Orders in period} one {# order in period} other {# orders in period}}",
+    "paid": "Paid",
+    "due": "Amount due",
+    "noDepartment": "No department",
+    "empty": "No orders in this period.",
+    "notes": "Delivery notes",
+    "invoice": "Invoice",
+    "printTitle": "Corporate customer statement",
+    "periodTotal": "Period total",
+    "orders": "Orders",
+    "rial": {
+      "total": "Amount (rial)",
+      "paid": "Paid (rial)",
+      "balance": "Balance (rial)"
+    }
+  },
   "pos": {
     "title": "Counter",
     "branch": "Branch",
