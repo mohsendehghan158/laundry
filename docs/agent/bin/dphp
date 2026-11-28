@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Runs a command with PHP 8.4 in the backend folder: dphp vendor/bin/pest
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+exec docker run --rm -i --network host -u root -v "$ROOT:$ROOT" -e SHOW_WELCOME_MESSAGE=false $DPHP_ENV -w "$ROOT/backend" serversideup/php:8.4-cli "$@"

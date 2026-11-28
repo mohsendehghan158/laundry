@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Starts the API for Playwright on a freshly seeded laundry_e2e database (port 8000).
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+docker rm -f laundry-e2e-api >/dev/null 2>&1
+docker run -d --name laundry-e2e-api --network host -u root -v "$ROOT:$ROOT" -e SHOW_WELCOME_MESSAGE=false \
+  -e DB_DATABASE=laundry_e2e -e SESSION_DRIVER=file -e CACHE_STORE=file -e QUEUE_CONNECTION=sync -e APP_URL=http://localhost:3000 -e OTP_FIXED_CODE=12345 \
+  -w "$ROOT/backend" serversideup/php:8.4-cli bash -c "php artisan migrate:fresh --seed --force && php artisan serve --host=127.0.0.1 --port=8000" >/dev/null
+for i in $(seq 1 60); do curl -sf http://127.0.0.1:8000/up >/dev/null && echo up && exit 0; sleep 2; done
+docker logs laundry-e2e-api | tail -20; exit 1

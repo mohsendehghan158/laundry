@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# The gate before every commit: pint, phpstan, pest, typecheck, lint, vitest.
+set -o pipefail
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+D="$ROOT/docs/agent/bin/dphp"
+cd "$ROOT/backend"
+$D vendor/bin/pint --test | tail -2 || exit 1
+$D vendor/bin/phpstan analyse --no-progress --memory-limit=2G --error-format=raw 2>/dev/null | grep . && exit 1
+out=$($D vendor/bin/pest 2>&1); rc=$?
+echo "$out" | grep -E "Tests:|FAILED|⨯"; [ $rc -eq 0 ] || exit 1
+cd "$ROOT/frontend"
+npm run -s typecheck || exit 1
+npm run -s lint || exit 1
+out=$(npm test 2>&1); rc=$?
+echo "$out" | grep -E "Test Files|Tests |FAIL"; [ $rc -eq 0 ] || exit 1
+echo "ALL GREEN"
