@@ -90,6 +90,11 @@ export function CustomerDetailPage() {
                   <span className="ltr">{data.phone}</span>
                 </Descriptions.Item>
               )}
+              {data.company && (
+                <Descriptions.Item label={t("orders.detail.company")}>
+                  <Link href={`/companies/${data.company.id}`}>{data.company.name}</Link>
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label={t("customers.fields.createdAt")}>{formatDate(data.created_at)}</Descriptions.Item>
               {data.notes && <Descriptions.Item label={t("customers.fields.notes")}>{data.notes}</Descriptions.Item>}
             </Descriptions>

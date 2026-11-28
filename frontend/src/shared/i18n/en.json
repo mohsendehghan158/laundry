@@ -81,7 +81,8 @@
     "zones": "Service zones",
     "slots": "Time windows",
     "invoices": "Invoices",
-    "expenses": "Expenses"
+    "expenses": "Expenses",
+    "companies": "Corporate customers"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -193,6 +194,7 @@
       "activity": "Activity log",
       "catalog": "Catalog & prices",
       "customers": "Customers",
+      "companies": "Corporate customers",
       "orders": "Orders",
       "billing": "Register & payments",
       "invoices": "Official invoices",
@@ -240,6 +242,10 @@
         "view": "View customers",
         "manage": "Add and edit customers",
         "delete": "Delete customers"
+      },
+      "companies": {
+        "view": "View corporate customers",
+        "manage": "Manage companies, contracts, credit and departments"
       },
       "orders": {
         "view": "View orders",
@@ -367,6 +373,7 @@
       "organization": "Organization",
       "catalog": "Catalog & prices",
       "customer": "Customers",
+      "company": "Corporate customers",
       "order": "Orders",
       "cash": "Register",
       "promo": "Promo codes",
@@ -499,6 +506,18 @@
         "old": "Current price ({unit})",
         "new": "New price ({unit})"
       }
+    },
+    "priceLists": {
+      "list": "Price list",
+      "default": "Default price list",
+      "overrides": "{count, plural, =0 {no own prices} one {# own price} other {# own prices}}",
+      "new": "New contract price list",
+      "delete": "Delete this list",
+      "deleteConfirm": "Delete this price list? Companies using it go back to default prices.",
+      "help": "For customers of companies whose contract uses this list, its prices replace the default ones. An empty cell means the default price (shown faded) applies.",
+      "name": "List name",
+      "percent": "Change from the default prices (percent)",
+      "percentHelp": "For example −10 for 10% off. Leave empty to start with an empty list, so every default price applies."
     }
   },
   "customers": {
@@ -525,6 +544,50 @@
       "addressTitle": "Label",
       "addressTitlePlaceholder": "Home, work …",
       "default": "Default"
+    }
+  },
+  "companies": {
+    "title": "Corporate customers",
+    "subtitle": "Hotels, restaurants and other contracted companies: own price list, credit limit and departments.",
+    "new": "New company",
+    "edit": "Edit company",
+    "searchPlaceholder": "Name or national id",
+    "notFound": "Company not found.",
+    "backToList": "Back to companies",
+    "contract": "Contract",
+    "until": "until {date}",
+    "noAccount": "No credit account",
+    "outstanding": "Owed now",
+    "available": "Credit left",
+    "days": "{count, plural, =0 {cash} one {# day} other {# days}}",
+    "contractEnded": "ended",
+    "departments": "Departments",
+    "newDepartment": "New department name",
+    "addDepartment": "Add department",
+    "noDepartments": "No departments yet.",
+    "deleteDepartmentConfirm": "Delete department “{name}”? Recorded orders keep their company.",
+    "members": "Customers who order for it",
+    "addMember": "Add customer",
+    "remove": "Remove",
+    "removeMemberConfirm": "Remove “{name}” from this company? Earlier orders do not change.",
+    "membersHelp": "Orders of these customers are charged to the company at its contract prices.",
+    "deleteConfirm": "Delete this company? Only a company without orders can be deleted.",
+    "mobileInvalid": "A mobile number starts with 09 and has 11 digits.",
+    "priceListHelp": "While the contract dates include today, this list's prices replace the default ones.",
+    "creditHelp": "The company's orders are taken on account and handed over unpaid up to this amount owed.",
+    "fields": {
+      "name": "Company name",
+      "contactName": "Contact person",
+      "contactMobile": "Contact mobile",
+      "contractNumber": "Contract number",
+      "contractPeriod": "Contract period",
+      "priceList": "Contract price list",
+      "onAccount": "Credit account",
+      "creditLimit": "Credit limit",
+      "paymentTerms": "Payment terms (days)",
+      "notes": "Notes",
+      "department": "Department",
+      "costCenter": "Cost centre code"
     }
   },
   "pos": {
@@ -566,7 +629,9 @@
     "emptyCatalog": "The catalog is empty. Add items and prices under “Catalog & prices”.",
     "noPrice": "No price",
     "serviceCount": "{count, number} services",
-    "promoCode": "Promo code"
+    "promoCode": "Promo code",
+    "creditAvailable": "Credit left: {amount}",
+    "department": "Department"
   },
   "orders": {
     "title": "Orders",
@@ -645,7 +710,8 @@
       "pickup": "Pickup from the door",
       "pickupWindow": "Pickup time",
       "pickupAddress": "Address",
-      "itemsByDriver": "The customer left the items for the driver to list."
+      "itemsByDriver": "The customer left the items for the driver to list.",
+      "company": "Company"
     },
     "actions": {
       "in_process": "Start work",

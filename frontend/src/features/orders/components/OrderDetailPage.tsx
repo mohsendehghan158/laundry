@@ -302,6 +302,12 @@ export function OrderDetailPage() {
                     </Typography.Text>
                   </Descriptions.Item>
                 )}
+                {data.company && (
+                  <Descriptions.Item label={t("orders.detail.company")}>
+                    <Link href={`/companies/${data.company.id}`}>{data.company.name}</Link>
+                    {data.company.department && ` · ${data.company.department.name}`}
+                  </Descriptions.Item>
+                )}
                 <Descriptions.Item label={t("orders.columns.branch")}>{data.branch.name}</Descriptions.Item>
                 {data.created_by && <Descriptions.Item label={t("orders.detail.createdBy")}>{data.created_by.name}</Descriptions.Item>}
                 {data.notes && <Descriptions.Item label={t("orders.detail.notes")}>{data.notes}</Descriptions.Item>}

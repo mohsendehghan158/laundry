@@ -32,6 +32,8 @@ export type Cart = {
   /** A promo code replaces any manual discount. */
   promoCode: string;
   notes: string;
+  /** The company department the order is charged to, for customers of a company. */
+  departmentId?: number | null;
 };
 
 export type CartAction =
@@ -46,6 +48,7 @@ export type CartAction =
   | { type: "setDiscount"; discount: CartDiscount | null }
   | { type: "setPromoCode"; code: string }
   | { type: "setNotes"; notes: string }
+  | { type: "setDepartment"; departmentId: number | null }
   | { type: "reset" };
 
 export const emptyCart: Cart = { customerId: null, lines: [], tierId: null, discount: null, promoCode: "", notes: "" };
@@ -72,7 +75,10 @@ export function cartReducer(cart: Cart, action: CartAction): Cart {
 
   switch (action.type) {
     case "setCustomer":
-      return { ...cart, customerId: action.customerId };
+      return { ...cart, customerId: action.customerId, departmentId: null };
+
+    case "setDepartment":
+      return { ...cart, departmentId: action.departmentId };
 
     case "add": {
       // Tapping the same counted item again adds one more, unless that line
@@ -161,6 +167,7 @@ export function toPayload(cart: Cart): OrderPayload {
     })),
     turnaround_tier_id: cart.tierId,
     customer_id: cart.customerId,
+    ...(cart.departmentId ? { company_department_id: cart.departmentId } : {}),
     ...(cart.promoCode
       ? { promo_code: cart.promoCode }
       : { discount: cart.discount ? { type: cart.discount.type, value: cart.discount.value, reason: cart.discount.reason || null } : null }),

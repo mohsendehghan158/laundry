@@ -455,6 +455,132 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List companies
+         * @description With what each owes on orders not yet paid in full.
+         */
+        get: operations["company.index"];
+        put?: never;
+        /** Create a company */
+        post: operations["company.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{company}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show a company
+         * @description With its departments and the customers who order for it.
+         */
+        get: operations["company.show"];
+        /**
+         * Update a company
+         * @description A new price list or credit limit applies to orders taken from now on.
+         */
+        put: operations["company.update"];
+        post?: never;
+        /**
+         * Delete a company
+         * @description Only one without orders (409 `company_has_orders`); deactivate it
+         *     otherwise.
+         */
+        delete: operations["company.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{company}/departments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a department */
+        post: operations["company.storeDepartment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{company}/departments/{department}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a department */
+        put: operations["company.updateDepartment"];
+        post?: never;
+        /**
+         * Delete a department
+         * @description Orders charged to it keep their company but lose the department.
+         */
+        delete: operations["company.destroyDepartment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{company}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a customer to the company
+         * @description Their orders from now on are charged to the company, at its contract
+         *     prices. A customer orders for one company at a time.
+         */
+        post: operations["company.addMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{company}/members/{customer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a customer from the company */
+        delete: operations["company.removeMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/customers": {
         parameters: {
             query?: never;
@@ -1533,7 +1659,8 @@ export interface paths {
          * Show the price matrix
          * @description Every priced item × service pair of the default price list, in
          *     whole rials per unit. A missing pair means the service is not
-         *     offered for that item.
+         *     offered for that item. With `price_list_id`, the prices of that
+         *     contract list instead: the pairs it overrides.
          */
         get: operations["price.index"];
         /**
@@ -1589,6 +1716,54 @@ export interface paths {
          */
         post: operations["price.import"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/price-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List price lists
+         * @description The default list first, then contract lists, with how many prices
+         *     each has.
+         */
+        get: operations["price-lists.index"];
+        put?: never;
+        /**
+         * Create a contract price list
+         * @description Empty, or with `percent` set, a copy of every default price changed by
+         *     that percent (−10 for 10% off), rounded to whole rials.
+         */
+        post: operations["price-lists.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/price-lists/{priceList}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Rename a price list */
+        put: operations["price-lists.update"];
+        post?: never;
+        /**
+         * Delete a contract price list
+         * @description Companies using it go back to default prices. The default list
+         *     cannot be deleted (409 `price_list_default`).
+         */
+        delete: operations["price-lists.destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2835,6 +3010,49 @@ export interface components {
             sort_order: number;
             is_active: boolean;
         };
+        /** CompanyResource */
+        CompanyResource: {
+            id: number;
+            name: string;
+            national_id: string | null;
+            economic_code: string | null;
+            registration_number: string | null;
+            postal_code: string | null;
+            address: string | null;
+            phone: string | null;
+            contact_name: string | null;
+            contact_mobile: string | null;
+            contract_number: string | null;
+            contract_starts_on: string | null;
+            contract_ends_on: string | null;
+            /** @description The contract's dates include today. */
+            contract_running: boolean;
+            price_list?: {
+                id: number;
+                name: string;
+            } | null;
+            /** @description Empty: the company pays like any customer. */
+            credit_limit: number | null;
+            payment_terms_days: number;
+            /** @description Orders are taken on account, up to the credit limit. */
+            on_account: boolean;
+            /** @description What it owes on orders not yet paid in full. */
+            outstanding?: number;
+            notes: string | null;
+            is_active: boolean;
+            departments?: {
+                id: number;
+                name: string;
+                code: string | null;
+                is_active: boolean;
+            }[];
+            /** @description Customers who order for the company. */
+            members?: {
+                id: number;
+                name: string;
+                mobile: string;
+            }[];
+        };
         /** CompleteAssemblyRequest */
         CompleteAssemblyRequest: {
             /** @description Pieces ticked off by hand at the counter (not allowed when scanning is required). */
@@ -2874,6 +3092,17 @@ export interface components {
                 postal_code: string | null;
                 address: string | null;
                 phone: string | null;
+            } | null;
+            /** @description The company the customer orders for; on a single customer with credit left and active departments. */
+            company?: {
+                id: number;
+                name: string;
+                on_account: boolean;
+                credit_available: number | null;
+                departments?: {
+                    id: number;
+                    name: string;
+                }[];
             } | null;
             /** @description Present on a single customer and after saving. */
             addresses?: components["schemas"]["CustomerAddressResource"][];
@@ -3200,6 +3429,15 @@ export interface components {
                 mobile: string;
                 alert: string | null;
             };
+            /** @description The company the order is charged to. */
+            company?: {
+                id: number;
+                name: string;
+                department: {
+                    id: number;
+                    name: string;
+                } | null;
+            } | null;
             turnaround: {
                 id: number | null;
                 name: string | null;
@@ -3633,6 +3871,8 @@ export interface components {
                 value?: number;
                 reason?: string | null;
             } | null;
+            /** @description For customers of a company: the department the order is charged to. */
+            company_department_id?: number | null;
         };
         /**
          * PriceUnit
@@ -3706,6 +3946,34 @@ export interface components {
             is_active?: boolean;
         };
         /**
+         * SaveCompanyRequest
+         * @description Creates (POST) or updates (PUT) a company and its contract.
+         */
+        SaveCompanyRequest: {
+            name?: string;
+            /** @description 11-digit national id of the legal entity. */
+            national_id?: string | null;
+            economic_code?: string | null;
+            registration_number?: string | null;
+            postal_code?: string | null;
+            address?: string | null;
+            phone?: string | null;
+            contact_name?: string | null;
+            contact_mobile?: string | null;
+            contract_number?: string | null;
+            /** Format: date */
+            contract_starts_on?: string | null;
+            /** Format: date */
+            contract_ends_on?: string | null;
+            /** @description A price list other than the default one. */
+            price_list_id?: number | null;
+            /** @description Rials; empty means the company pays like any customer (no account). */
+            credit_limit?: number | null;
+            payment_terms_days?: number;
+            notes?: string | null;
+            is_active?: boolean;
+        };
+        /**
          * SaveCustomerRequest
          * @description Creates (POST) or updates (PUT) a customer together with their
          *     addresses. On update, the addresses sent replace the stored ones:
@@ -3734,6 +4002,12 @@ export interface components {
             name: string;
             kind: components["schemas"]["DefectKind"];
             sort_order?: number;
+            is_active?: boolean;
+        };
+        /** SaveDepartmentRequest */
+        SaveDepartmentRequest: {
+            name: string;
+            code?: string | null;
             is_active?: boolean;
         };
         /** SaveExpenseCategoryRequest */
@@ -3780,6 +4054,12 @@ export interface components {
             icon?: string | null;
             sort_order?: number;
             is_active?: boolean;
+        };
+        /** SavePriceListRequest */
+        SavePriceListRequest: {
+            name: string;
+            /** @description New lists only: copy the default prices changed by this percent (−10 = 10% off). */
+            percent?: number | null;
         };
         /**
          * SavePromoCodeRequest
@@ -4050,6 +4330,8 @@ export interface components {
                 value?: number;
                 reason?: string | null;
             } | null;
+            /** @description For customers of a company: the department the order is charged to. */
+            company_department_id?: number | null;
         };
         /** StoreShipmentRequest */
         StoreShipmentRequest: {
@@ -4222,6 +4504,8 @@ export interface components {
                 value?: number;
                 reason?: string | null;
             } | null;
+            /** @description For customers of a company: the department the order is charged to. */
+            company_department_id?: number | null;
         };
         /** UpdateOrganizationRequest */
         UpdateOrganizationRequest: {
@@ -4235,6 +4519,8 @@ export interface components {
         };
         /** UpdatePricesRequest */
         UpdatePricesRequest: {
+            /** @description A contract price list; the default list when left out. */
+            price_list_id?: number | null;
             prices: {
                 item_id: number;
                 service_type_id: number;
@@ -4250,7 +4536,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "expenses.view" | "expenses.manage" | "expenses.categories" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "expenses.view" | "expenses.manage" | "expenses.categories" | "companies.view" | "companies.manage" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -5518,6 +5804,338 @@ export interface operations {
             404: components["responses"]["ModelNotFoundException"];
         };
     };
+    "company.index": {
+        parameters: {
+            query?: {
+                /** @description Part of the name, or the national id. */
+                "filter[q]"?: string;
+                /** @description Only active (true) or inactive (false) companies. */
+                "filter[active]"?: boolean;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "company.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveCompanyRequest"];
+            };
+        };
+        responses: {
+            /** @description `CompanyResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "company.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "company.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveCompanyRequest"];
+            };
+        };
+        responses: {
+            /** @description `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "company.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "company.storeDepartment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveDepartmentRequest"];
+            };
+        };
+        responses: {
+            /** @description `CompanyResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "company.updateDepartment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+                /** @description The department ID */
+                department: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveDepartmentRequest"];
+            };
+        };
+        responses: {
+            /** @description `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "company.destroyDepartment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+                /** @description The department ID */
+                department: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "company.addMember": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    customer_id: number;
+                };
+            };
+        };
+        responses: {
+            /** @description `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "company.removeMember": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The company ID */
+                company: number;
+                /** @description The customer ID */
+                customer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `CompanyResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompanyResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
     "customers.index": {
         parameters: {
             query?: {
@@ -5542,7 +6160,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["CustomerResource"][];
+                        data: (components["schemas"]["CustomerResource"] & Record<string, never>)[];
                         links: {
                             first: string | null;
                             last: string | null;
@@ -7885,7 +8503,10 @@ export interface operations {
     };
     "price.index": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description A contract price list. */
+                price_list_id?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -8008,6 +8629,121 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "price-lists.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            name: string;
+                            is_default: boolean;
+                            prices_count: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "price-lists.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavePriceListRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "price-lists.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The price list ID */
+                priceList: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavePriceListRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            name: string;
+                            is_default: boolean;
+                            prices_count: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "price-lists.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The price list ID */
+                priceList: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
         };
     };
     "promo-codes.index": {

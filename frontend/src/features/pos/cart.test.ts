@@ -83,4 +83,13 @@ describe("cart", () => {
     const cart = cartWith({ type: "setDiscount", discount: { type: "amount", value: 0, reason: "" } });
     expect(cart.discount).toBeNull();
   });
+
+  it("charges the order to a company department until the customer changes", () => {
+    let cart: Cart = cartReducer(emptyCart, { type: "setCustomer", customerId: 7 });
+    cart = cartReducer(cart, { type: "add", item: shirt, serviceTypeId: 10 });
+    cart = cartReducer(cart, { type: "setDepartment", departmentId: 3 });
+    expect(toPayload(cart)).toMatchObject({ customer_id: 7, company_department_id: 3 });
+    cart = cartReducer(cart, { type: "setCustomer", customerId: 8 });
+    expect(toPayload(cart)).not.toHaveProperty("company_department_id");
+  });
 });

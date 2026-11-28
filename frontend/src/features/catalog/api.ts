@@ -63,22 +63,50 @@ export function useDeleteCatalogEntry(resource: CatalogResource) {
   });
 }
 
-export function usePrices() {
+/** Prices of the default list, or of a contract list (only the pairs it overrides). */
+export function usePrices(priceListId: number | null = null) {
   return useQuery({
-    queryKey: catalogKeys.prices,
-    queryFn: async () => (await api.get<Wrapped<PriceCell[]>>("/prices")).data,
+    queryKey: [...catalogKeys.prices, priceListId ?? "default"],
+    queryFn: async () => (await api.get<Wrapped<PriceCell[]>>("/prices", { price_list_id: priceListId ?? undefined })).data,
+  });
+}
+
+export type PriceListSummary = { id: number; name: string; is_default: boolean; prices_count: number };
+
+export function usePriceLists(enabled = true) {
+  return useQuery({
+    queryKey: ["catalog", "price-lists"],
+    queryFn: async () => (await api.get<Wrapped<PriceListSummary[]>>("/price-lists")).data,
+    enabled,
+  });
+}
+
+export function useCreatePriceList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { name: string; percent: number | null }) => (await api.post<Wrapped<PriceListSummary>>("/price-lists", input)).data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["catalog", "price-lists"] }),
+  });
+}
+
+export function useDeletePriceList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.delete(`/price-lists/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["catalog", "price-lists"] }),
   });
 }
 
 export type PriceChange = { item_id: number; service_type_id: number; price: number | null };
 
-export function useUpdatePrices() {
+export function useUpdatePrices(priceListId: number | null = null) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (prices: PriceChange[]) => (await api.put<Wrapped<PriceCell[]>>("/prices", { prices })).data,
+    mutationFn: async (prices: PriceChange[]) => (await api.put<Wrapped<PriceCell[]>>("/prices", { prices, price_list_id: priceListId })).data,
     onSuccess: (prices) => {
-      queryClient.setQueryData(catalogKeys.prices, prices);
+      queryClient.setQueryData([...catalogKeys.prices, priceListId ?? "default"], prices);
       queryClient.invalidateQueries({ queryKey: catalogKeys.counter });
+      queryClient.invalidateQueries({ queryKey: ["catalog", "price-lists"] });
     },
   });
 }

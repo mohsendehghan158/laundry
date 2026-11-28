@@ -1,26 +1,33 @@
 "use client";
 
-import { SwapOutlined, UserAddOutlined, WarningFilled } from "@ant-design/icons";
-import { Alert, Button, Card, Empty, Flex, Select, Spin, Typography } from "antd";
+import { BankOutlined, SwapOutlined, UserAddOutlined, WarningFilled } from "@ant-design/icons";
+import { Alert, Button, Card, Empty, Flex, Select, Spin, Tag, Typography } from "antd";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { looksLikePhone, useCustomer, useCustomers } from "@/features/customers/api";
 import { CustomerFormModal } from "@/features/customers/components/CustomerFormModal";
 import { usePermission } from "@/shared/hooks/usePermission";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
+import { useCurrencyUnit } from "@/shared/hooks/useCurrencyUnit";
 import { toLatinDigits } from "@/shared/lib/digits";
+import { formatMoney } from "@/shared/lib/money";
 
 type Props = {
   customerId: number | null;
   onChange: (customerId: number | null) => void;
+  /** For customers of a company: the department the order is charged to. */
+  departmentId?: number | null;
+  onDepartmentChange?: (departmentId: number | null) => void;
 };
 
 /**
  * Finds the customer by typing part of a name or mobile number, or
  * registers a new one with what was typed. Once chosen, shows their alert.
  */
-export function CustomerPicker({ customerId, onChange }: Props) {
+export function CustomerPicker({ customerId, onChange, departmentId = null, onDepartmentChange }: Props) {
   const t = useTranslations("pos");
+  const tm = useTranslations("money");
+  const unit = useCurrencyUnit();
   const { can } = usePermission();
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
@@ -58,6 +65,31 @@ export function CustomerPicker({ customerId, onChange }: Props) {
               </Button>
             </Flex>
             {customer.alert && <Alert type="warning" showIcon icon={<WarningFilled />} title={customer.alert} />}
+            {customer.company && (
+              <Flex vertical gap={6}>
+                <Flex gap={6} align="center" wrap>
+                  <Tag icon={<BankOutlined />} color="blue">
+                    {customer.company.name}
+                  </Tag>
+                  {customer.company.on_account && customer.company.credit_available !== null && (
+                    <Typography.Text type={customer.company.credit_available > 0 ? "secondary" : "danger"} style={{ fontSize: 12 }}>
+                      {t("creditAvailable", { amount: `${formatMoney(customer.company.credit_available, unit)} ${tm(unit)}` })}
+                    </Typography.Text>
+                  )}
+                </Flex>
+                {onDepartmentChange && (customer.company.departments ?? []).length > 0 && (
+                  <Select
+                    allowClear
+                    size="small"
+                    placeholder={t("department")}
+                    aria-label={t("department")}
+                    value={departmentId}
+                    onChange={(value?: number) => onDepartmentChange(value ?? null)}
+                    options={(customer.company.departments ?? []).map((d) => ({ value: d.id, label: d.name }))}
+                  />
+                )}
+              </Flex>
+            )}
           </Flex>
         )}
       </Card>

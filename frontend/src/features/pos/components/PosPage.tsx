@@ -102,7 +102,12 @@ export function PosPage() {
                 aria-label={t("pos.branch")}
               />
             )}
-            <CustomerPicker customerId={cart.customerId} onChange={(customerId) => dispatch({ type: "setCustomer", customerId })} />
+            <CustomerPicker
+              customerId={cart.customerId}
+              onChange={(customerId) => dispatch({ type: "setCustomer", customerId })}
+              departmentId={cart.departmentId ?? null}
+              onDepartmentChange={(departmentId) => dispatch({ type: "setDepartment", departmentId })}
+            />
 
             <Card size="small" title={<Space><ShoppingCartOutlined />{t("pos.cart")}</Space>} styles={{ body: { padding: 12 } }}>
               {cart.lines.length === 0 ? (

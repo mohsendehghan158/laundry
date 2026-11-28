@@ -50,6 +50,8 @@ export type IssueInvoiceInput = Schemas["IssueInvoiceRequest"];
 export type Expense = Schemas["ExpenseResource"];
 export type ExpenseCategory = Schemas["ExpenseCategoryResource"];
 export type SaveExpenseInput = Schemas["SaveExpenseRequest"];
+export type Company = Schemas["CompanyResource"];
+export type SaveCompanyInput = Schemas["SaveCompanyRequest"];
 
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
