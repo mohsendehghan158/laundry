@@ -16,7 +16,7 @@ export type ActivityFilters = {
 };
 
 export const LOG_NAMES = ["auth", "user", "branch", "role", "settings", "organization", "catalog", "customer", "order", "cash", "promo", "invoice", "expense", "company", "notifications"] as const;
-export const EVENTS = ["created", "updated", "deleted", "login", "logout", "roles_updated", "prices_updated", "discounted", "edited", "cancelled", "refunded", "shift_closed", "handed_over", "issued", "voided"] as const;
+export const EVENTS = ["created", "updated", "deleted", "login", "logout", "roles_updated", "prices_updated", "discounted", "edited", "cancelled", "refunded", "shift_closed", "handed_over", "issued", "voided", "delivery_confirmed"] as const;
 
 export function useActivityLog(filters: ActivityFilters) {
   return useQuery({

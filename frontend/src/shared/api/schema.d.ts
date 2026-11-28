@@ -947,6 +947,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/delivery-notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List delivery notes
+         * @description Newest first, for the branches the user works in.
+         */
+        get: operations["deliveryNote.index"];
+        put?: never;
+        /**
+         * Record a delivery note
+         * @description As a draft. In: items a company sent, with what it stated and what
+         *     was counted. Out: an order of the company going back.
+         */
+        post: operations["deliveryNote.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/delivery-notes/{deliveryNote}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Show a delivery note */
+        get: operations["deliveryNote.show"];
+        /**
+         * Change a draft delivery note
+         * @description Fails with 409 `delivery_note_confirmed` once confirmed.
+         */
+        put: operations["deliveryNote.update"];
+        post?: never;
+        /** Delete a draft delivery note */
+        delete: operations["deliveryNote.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/delivery-notes/{deliveryNote}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a delivery note
+         * @description With who signed for the company. In: makes the order of the counted
+         *     items. Out: records the company's count and hands the order over
+         *     (409 `handover_not_ready` until it is ready).
+         */
+        post: operations["deliveryNote.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/expenses": {
         parameters: {
             query?: never;
@@ -3063,6 +3132,16 @@ export interface components {
             /** @description Rack what has been gathered while other pieces are still in work. */
             partial?: boolean;
         };
+        /** ConfirmDeliveryNoteRequest */
+        ConfirmDeliveryNoteRequest: {
+            /** @description Who counted and signed for the company. */
+            counterpart_name: string;
+            /** @description Outgoing notes: what the company counted, per line id; lines left out keep what was sent. */
+            received?: {
+                line_id: number;
+                quantity: number;
+            }[];
+        };
         /** CustomerAddressResource */
         CustomerAddressResource: {
             id: number;
@@ -3126,6 +3205,77 @@ export interface components {
             sort_order: number;
             is_active: boolean;
         };
+        /** DeliveryNoteResource */
+        DeliveryNoteResource: {
+            id: number;
+            number: number;
+            type: components["schemas"]["DeliveryNoteType"];
+            status: components["schemas"]["DeliveryNoteStatus"];
+            company: {
+                id: number;
+                name: string;
+            };
+            department: {
+                id: number;
+                name: string;
+                code: string | null;
+            } | null;
+            branch: {
+                id: number;
+                name: string;
+            };
+            customer: {
+                id: number;
+                name: string;
+                mobile: string;
+            };
+            /** @description In: the order made from it. Out: the order sent back. */
+            order: {
+                id: number;
+                ticket_number: string;
+            } | null;
+            counterpart_name: string | null;
+            notes: string | null;
+            /** Format: date-time */
+            created_at: string | null;
+            /** Format: date-time */
+            confirmed_at: string | null;
+            created_by: {
+                id: number;
+                name: string;
+            } | null;
+            /** @description Lines whose counts differ. */
+            differences?: number;
+            lines?: {
+                id: number;
+                item_id: number | null;
+                service_type_id: number | null;
+                order_line_id: number | null;
+                item_name: string;
+                service_name: string | null;
+                expected_quantity: number;
+                counted_quantity: number;
+                difference: number;
+            }[];
+        };
+        /**
+         * DeliveryNoteStatus
+         * @description | |
+         *     |---|
+         *     | `draft` <br/>  |
+         *     | `confirmed` <br/> Counted and signed by both sides; no longer changes. |
+         * @enum {string}
+         */
+        DeliveryNoteStatus: "draft" | "confirmed";
+        /**
+         * DeliveryNoteType
+         * @description | |
+         *     |---|
+         *     | `in` <br/> Items the company sent in; confirmed, it becomes an order. |
+         *     | `out` <br/> Items sent back for an order; confirmed, the order is handed over. |
+         * @enum {string}
+         */
+        DeliveryNoteType: "in" | "out";
         /**
          * DiscountType
          * @description | |
@@ -4004,6 +4154,30 @@ export interface components {
             sort_order?: number;
             is_active?: boolean;
         };
+        /**
+         * SaveDeliveryNoteRequest
+         * @description Records (POST) or changes (PUT) a draft delivery note.
+         */
+        SaveDeliveryNoteRequest: {
+            type?: components["schemas"]["DeliveryNoteType"];
+            company_id?: number;
+            /** @description In: the branch receiving the items and the company's customer the order is for. */
+            branch_id?: number;
+            customer_id?: number;
+            company_department_id?: number;
+            /** @description Out: the order going back. */
+            order_id?: number;
+            lines?: {
+                item_id?: number;
+                service_type_id?: number;
+                order_line_id: number;
+                /** @description In: what the company stated. Out: not sent (the order's quantities). */
+                expected_quantity?: number;
+                /** @description In: what was counted here. Out: what is being sent. */
+                counted_quantity: number;
+            }[] | null;
+            notes?: string | null;
+        };
         /** SaveDepartmentRequest */
         SaveDepartmentRequest: {
             name: string;
@@ -4536,7 +4710,7 @@ export interface components {
         /** UpdateRoleRequest */
         UpdateRoleRequest: {
             /** @description The complete list of permissions the role should have. */
-            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "expenses.view" | "expenses.manage" | "expenses.categories" | "companies.view" | "companies.manage" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
+            permissions: ("organization.update" | "branches.view" | "branches.create" | "branches.update" | "branches.delete" | "branches.access_all" | "users.view" | "users.create" | "users.update" | "users.delete" | "roles.view" | "roles.update" | "settings.view" | "settings.update" | "activity.view" | "catalog.view" | "catalog.manage" | "customers.view" | "customers.manage" | "customers.delete" | "orders.view" | "orders.create" | "orders.update" | "orders.cancel" | "orders.discount" | "orders.discount_unlimited" | "orders.handover" | "orders.handover_unpaid" | "payments.create" | "payments.refund" | "shifts.operate" | "shifts.view" | "invoices.view" | "invoices.issue" | "invoices.void" | "expenses.view" | "expenses.manage" | "expenses.categories" | "companies.view" | "companies.manage" | "companies.delivery" | "promotions.manage" | "notifications.manage" | "notifications.view" | "production.view" | "production.scan" | "production.manage" | "production.transfer" | "production.outsource" | "claims.view" | "claims.manage" | "reports.view" | "reports.production" | "logistics.view" | "logistics.manage")[];
         };
         /** UpdateSettingsRequest */
         UpdateSettingsRequest: {
@@ -6960,6 +7134,219 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "deliveryNote.index": {
+        parameters: {
+            query?: {
+                "filter[company_id]"?: number;
+                "filter[order_id]"?: number;
+                /** @description in or out. */
+                "filter[type]"?: string;
+                /** @description draft or confirmed. */
+                "filter[status]"?: string;
+                page?: number;
+                /** @description Page size, 1-100. */
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `DeliveryNoteResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: (components["schemas"]["DeliveryNoteResource"] & Record<string, never>)[];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "deliveryNote.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveDeliveryNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description `DeliveryNoteResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeliveryNoteResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "deliveryNote.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deliveryNote: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `DeliveryNoteResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeliveryNoteResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "deliveryNote.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deliveryNote: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SaveDeliveryNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description `DeliveryNoteResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeliveryNoteResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "deliveryNote.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deliveryNote: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description An error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Error overview.
+                         * @example
+                         */
+                        message: string;
+                    };
+                };
+            };
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "deliveryNote.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deliveryNote: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmDeliveryNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description `DeliveryNoteResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeliveryNoteResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "expenses.index": {

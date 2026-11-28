@@ -43,6 +43,9 @@ return [
         'credit_limit_exceeded' => "This order goes over the company's credit limit; :available rials of credit are left.",
         'price_list_default' => 'The default price list cannot be deleted.',
         'company_has_orders' => 'This company has orders and cannot be deleted; deactivate it instead.',
+        'delivery_note_confirmed' => 'This delivery note is confirmed and cannot change.',
+        'delivery_note_empty' => 'Nothing was counted on this delivery note.',
+        'delivery_note_order_closed' => 'This order is already completed or cancelled.',
         'order_has_payments' => 'This order has payments; refund them first.',
 
         'shift_already_open' => 'This branch\'s register is already open.',

@@ -45,8 +45,8 @@ final class PermissionRegistry
             'invoices' => ['invoices.view', 'invoices.issue', 'invoices.void'],
             // manage = record, change and delete; categories = the list of expense categories.
             'expenses' => ['expenses.view', 'expenses.manage', 'expenses.categories'],
-            // Corporate customers: contracts, departments, credit.
-            'companies' => ['companies.view', 'companies.manage'],
+            // Corporate customers: contracts, departments, credit; delivery = in/out delivery notes.
+            'companies' => ['companies.view', 'companies.manage', 'companies.delivery'],
             'promotions' => ['promotions.manage'],
             // manage = edit message texts and resend; view = the send log.
             'notifications' => ['notifications.manage', 'notifications.view'],
@@ -88,17 +88,17 @@ final class PermissionRegistry
                 'payments.create', 'payments.refund', 'shifts.operate', 'shifts.view',
                 'invoices.view', 'invoices.issue',
                 'expenses.view', 'expenses.manage',
-                'companies.view',
+                'companies.view', 'companies.delivery',
                 'notifications.view',
                 'production.view', 'production.scan', 'production.manage', 'production.transfer', 'production.outsource',
                 'claims.view', 'claims.manage',
                 'reports.view', 'reports.production',
                 'logistics.view', 'logistics.manage',
             ],
-            'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'orders.handover', 'payments.create', 'shifts.operate', 'production.view', 'production.transfer', 'claims.view'],
+            'cashier' => ['catalog.view', 'customers.view', 'customers.manage', 'orders.view', 'orders.create', 'orders.update', 'orders.discount', 'orders.handover', 'payments.create', 'shifts.operate', 'companies.delivery', 'production.view', 'production.transfer', 'claims.view'],
             'plant_operator' => ['catalog.view', 'orders.view', 'orders.update', 'production.view', 'production.scan', 'production.transfer', 'production.outsource', 'claims.view', 'reports.production'],
             'driver' => ['customers.view', 'logistics.view'],
-            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view', 'invoices.view', 'invoices.issue', 'invoices.void', 'expenses.view', 'expenses.manage', 'expenses.categories', 'companies.view', 'companies.manage', 'production.view', 'claims.view', 'reports.view', 'reports.production'],
+            'accountant' => ['branches.view', 'branches.access_all', 'settings.view', 'catalog.view', 'customers.view', 'orders.view', 'shifts.view', 'invoices.view', 'invoices.issue', 'invoices.void', 'expenses.view', 'expenses.manage', 'expenses.categories', 'companies.view', 'companies.manage', 'companies.delivery', 'production.view', 'claims.view', 'reports.view', 'reports.production'],
             'support' => ['branches.view', 'branches.access_all', 'catalog.view', 'customers.view', 'customers.manage', 'customers.delete', 'companies.view', 'orders.view', 'orders.create', 'notifications.view', 'production.view', 'claims.view', 'logistics.view'],
         ];
     }

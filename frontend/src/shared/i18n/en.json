@@ -245,7 +245,8 @@
       },
       "companies": {
         "view": "View corporate customers",
-        "manage": "Manage companies, contracts, credit and departments"
+        "manage": "Manage companies, contracts, credit and departments",
+        "delivery": "Record and confirm corporate delivery notes"
       },
       "orders": {
         "view": "View orders",
@@ -396,7 +397,8 @@
       "shift_closed": "Register closed",
       "handed_over": "Handed over",
       "issued": "Invoice issued",
-      "voided": "Invoice voided"
+      "voided": "Invoice voided",
+      "delivery_confirmed": "Delivery note confirmed"
     }
   },
   "account": {
@@ -589,6 +591,48 @@
       "department": "Department",
       "costCenter": "Cost centre code"
     }
+  },
+  "deliveryNotes": {
+    "title": "Delivery notes",
+    "newIn": "Incoming note",
+    "newOut": "Outgoing note",
+    "none": "No delivery notes yet.",
+    "number": "Note number",
+    "type": "Type",
+    "date": "Date",
+    "order": "Order",
+    "customer": "For customer",
+    "noMembers": "First add a customer to this company.",
+    "item": "Item",
+    "service": "Service",
+    "stated": "Stated by company",
+    "counted": "Our count",
+    "sent": "Sent",
+    "received": "Company count",
+    "difference": "Difference",
+    "addLine": "Add line",
+    "notes": "Note",
+    "outHelp": "Pick the company order going back; its lines are taken from the order.",
+    "confirm": "Confirm and sign",
+    "confirmTitle": "Confirm note {number}",
+    "confirmed": "Delivery note confirmed.",
+    "confirmInHelp": "Confirming places an order of the counted items at contract prices.",
+    "confirmOutHelp": "Enter the company's count where it differs; confirming hands over the order's ready pieces.",
+    "counterpart": "Name of the company's representative",
+    "deleteConfirm": "Delete this draft note?",
+    "types": {
+      "in": "In",
+      "out": "Out"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "confirmed": "Confirmed"
+    },
+    "differences": "{count, plural, one {# difference} other {# differences}}",
+    "printIn": "Incoming delivery note",
+    "printOut": "Outgoing delivery note",
+    "shopSignature": "Shop signature",
+    "companySignature": "Company representative"
   },
   "pos": {
     "title": "Counter",

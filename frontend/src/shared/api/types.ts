@@ -52,6 +52,8 @@ export type ExpenseCategory = Schemas["ExpenseCategoryResource"];
 export type SaveExpenseInput = Schemas["SaveExpenseRequest"];
 export type Company = Schemas["CompanyResource"];
 export type SaveCompanyInput = Schemas["SaveCompanyRequest"];
+export type DeliveryNote = Schemas["DeliveryNoteResource"];
+export type SaveDeliveryNoteInput = Schemas["SaveDeliveryNoteRequest"];
 
 export type LoginInput = Schemas["LoginRequest"];
 export type StoreBranchInput = Schemas["StoreBranchRequest"];
